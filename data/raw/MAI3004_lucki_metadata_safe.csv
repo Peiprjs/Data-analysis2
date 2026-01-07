@@ -1,0 +1,931 @@
+sample_id,family_id,sex,body_product,age_group_at_sample,year_of_birth
+MMHP_Lucki_0001,ENA_fam_0139,female,stool,1-2 weeks,2023
+MMHP_Lucki_0002,ENA_fam_0139,female,stool,NA,1995
+MMHP_Lucki_0003,ENA_fam_0136,female,stool,1-2 weeks,2021
+MMHP_Lucki_0004,ENA_fam_0136,female,stool,NA,1978
+MMHP_Lucki_0005,ENA_fam_0136,female,stool,4 weeks,2021
+MMHP_Lucki_0006,ENA_fam_0138,male,stool,1-2 weeks,2022
+MMHP_Lucki_0007,ENA_fam_0138,female,stool,NA,1972
+MMHP_Lucki_0008,ENA_fam_0133,male,stool,4 weeks,2022
+MMHP_Lucki_0009,ENA_fam_0133,male,stool,8 weeks,2022
+MMHP_Lucki_0010,ENA_fam_0133,male,stool,4 months,2022
+MMHP_Lucki_0011,ENA_fam_0133,female,stool,NA,1980
+MMHP_Lucki_0012,ENA_fam_0139,female,stool,8 weeks,2023
+MMHP_Lucki_0013,ENA_fam_0138,male,stool,4 weeks,2022
+MMHP_Lucki_0015,ENA_fam_0137,male,stool,8 weeks,2023
+MMHP_Lucki_0016,ENA_fam_0137,female,stool,NA,1989
+MMHP_Lucki_0017,ENA_fam_0135,male,stool,1-2 weeks,2023
+MMHP_Lucki_0018,ENA_fam_0135,male,stool,8 weeks,2023
+MMHP_Lucki_0019,ENA_fam_0135,female,stool,NA,1971
+MMHP_Lucki_0020,ENA_fam_0138,male,stool,4 months,2022
+MMHP_Lucki_0021,ENA_fam_0136,female,stool,8 weeks,2021
+MMHP_Lucki_0022,ENA_fam_0136,female,stool,4 months,2021
+MMHP_Lucki_0023,ENA_fam_0134,female,stool,1-2 weeks,2022
+MMHP_Lucki_0024,ENA_fam_0134,female,stool,NA,1986
+MMHP_Lucki_0025,ENA_fam_0134,female,stool,4 weeks,2022
+MMHP_Lucki_0026,ENA_fam_0134,female,stool,8 weeks,2022
+MMHP_Lucki_0027,ENA_fam_0132,female,stool,NA,1973
+MMHP_Lucki_0028,ENA_fam_0139,female,stool,5 months,2023
+MMHP_Lucki_0029,ENA_fam_0139,female,stool,6 months,2023
+MMHP_Lucki_0031,ENA_fam_0131,male,stool,1-2 weeks,2023
+MMHP_Lucki_0032,ENA_fam_0131,female,stool,NA,1980
+MMHP_Lucki_0033,ENA_fam_0126,male,stool,1-2 weeks,2021
+MMHP_Lucki_0035,ENA_fam_0126,female,stool,NA,1992
+MMHP_Lucki_0036,ENA_fam_0133,male,stool,9 months,2022
+MMHP_Lucki_0037,ENA_fam_0137,male,stool,5 months,2023
+MMHP_Lucki_0039,ENA_fam_0134,female,stool,4 months,2022
+MMHP_Lucki_0040,ENA_fam_0128,female,stool,1-2 weeks,2023
+MMHP_Lucki_0041,ENA_fam_0128,female,stool,4 weeks,2023
+MMHP_Lucki_0043,ENA_fam_0127,male,stool,1-2 weeks,2023
+MMHP_Lucki_0044,ENA_fam_0127,female,stool,NA,1989
+MMHP_Lucki_0045,ENA_fam_0126,male,stool,8 weeks,2021
+MMHP_Lucki_0046,ENA_fam_0138,male,stool,6 months,2022
+MMHP_Lucki_0047,ENA_fam_0124,male,stool,1-2 weeks,2023
+MMHP_Lucki_0048,ENA_fam_0124,female,stool,NA,1992
+MMHP_Lucki_0049,ENA_fam_0135,male,stool,4 months,2023
+MMHP_Lucki_0050,ENA_fam_0135,male,stool,5 months,2023
+MMHP_Lucki_0052,ENA_fam_0118,male,stool,1-2 weeks,2021
+MMHP_Lucki_0053,ENA_fam_0118,male,stool,4 weeks,2021
+MMHP_Lucki_0054,ENA_fam_0118,female,stool,NA,1976
+MMHP_Lucki_0055,ENA_fam_0131,male,stool,4 weeks,2023
+MMHP_Lucki_0056,ENA_fam_0131,male,stool,8 weeks,2023
+MMHP_Lucki_0058,ENA_fam_0130,female,stool,NA,1970
+MMHP_Lucki_0059,ENA_fam_0130,male,stool,4 weeks,2021
+MMHP_Lucki_0060,ENA_fam_0130,male,stool,8 weeks,2021
+MMHP_Lucki_0061,ENA_fam_0118,male,stool,8 weeks,2021
+MMHP_Lucki_0063,ENA_fam_0134,female,stool,5 months,2022
+MMHP_Lucki_0064,ENA_fam_0134,female,stool,6 months,2022
+MMHP_Lucki_0066,ENA_fam_0132,female,stool,5 months,2023
+MMHP_Lucki_0068,ENA_fam_0117,female,stool,1-2 weeks,2021
+MMHP_Lucki_0069,ENA_fam_0117,female,stool,4 weeks,2021
+MMHP_Lucki_0070,ENA_fam_0117,female,stool,8 weeks,2021
+MMHP_Lucki_0073,ENA_fam_0113,female,stool,1-2 weeks,2023
+MMHP_Lucki_0074,ENA_fam_0113,female,stool,4 weeks,2023
+MMHP_Lucki_0075,ENA_fam_0113,female,stool,8 weeks,2023
+MMHP_Lucki_0076,ENA_fam_0108,male,stool,4 months,2023
+MMHP_Lucki_0077,ENA_fam_0129,female,stool,4 weeks,2021
+MMHP_Lucki_0078,ENA_fam_0129,female,stool,8 weeks,2021
+MMHP_Lucki_0079,ENA_fam_0126,male,stool,4 months,2021
+MMHP_Lucki_0081,ENA_fam_0124,male,stool,4 weeks,2023
+MMHP_Lucki_0082,ENA_fam_0124,male,stool,8 weeks,2023
+MMHP_Lucki_0083,ENA_fam_0112,male,stool,1-2 weeks,2022
+MMHP_Lucki_0084,ENA_fam_0112,male,stool,4 weeks,2022
+MMHP_Lucki_0085,ENA_fam_0112,male,stool,8 weeks,2022
+MMHP_Lucki_0086,ENA_fam_0112,female,stool,NA,1993
+MMHP_Lucki_0087,ENA_fam_0138,male,stool,9 months,2022
+MMHP_Lucki_0088,ENA_fam_0133,male,stool,11 months,2022
+MMHP_Lucki_0089,ENA_fam_0133,male,stool,14 months,2022
+MMHP_Lucki_0090,ENA_fam_0125,female,stool,NA,1970
+MMHP_Lucki_0091,ENA_fam_0120,male,stool,1-2 weeks,2021
+MMHP_Lucki_0092,ENA_fam_0120,female,stool,NA,1973
+MMHP_Lucki_0093,ENA_fam_0120,male,stool,8 weeks,2021
+MMHP_Lucki_0094,ENA_fam_0119,female,stool,NA,1972
+MMHP_Lucki_0095,ENA_fam_0119,female,stool,8 weeks,2021
+MMHP_Lucki_0097,ENA_fam_0105,female,stool,NA,1981
+MMHP_Lucki_0098,ENA_fam_0105,male,stool,4 weeks,2023
+MMHP_Lucki_0099,ENA_fam_0139,female,stool,9 months,2023
+MMHP_Lucki_0101,ENA_fam_0131,male,stool,4 months,2023
+MMHP_Lucki_0103,ENA_fam_0109,female,stool,1-2 weeks,2021
+MMHP_Lucki_0106,ENA_fam_0139,female,stool,14 months,2023
+MMHP_Lucki_0107,ENA_fam_0124,male,stool,4 months,2023
+MMHP_Lucki_0109,ENA_fam_0124,male,stool,6 months,2023
+MMHP_Lucki_0110,ENA_fam_0114,female,stool,NA,1989
+MMHP_Lucki_0111,ENA_fam_0114,male,stool,8 weeks,2022
+MMHP_Lucki_0112,ENA_fam_0110,female,stool,NA,1985
+MMHP_Lucki_0113,ENA_fam_0110,female,stool,8 weeks,2023
+MMHP_Lucki_0114,ENA_fam_0107,female,stool,NA,1984
+MMHP_Lucki_0115,ENA_fam_0103,female,stool,1-2 weeks,2022
+MMHP_Lucki_0116,ENA_fam_0103,female,stool,8 weeks,2022
+MMHP_Lucki_0117,ENA_fam_0103,female,stool,NA,1976
+MMHP_Lucki_0118,ENA_fam_0100,female,stool,NA,1985
+MMHP_Lucki_0119,ENA_fam_0137,male,stool,6 months,2023
+MMHP_Lucki_0120,ENA_fam_0135,male,stool,9 months,2023
+MMHP_Lucki_0121,ENA_fam_0135,male,stool,11 months,2023
+MMHP_Lucki_0122,ENA_fam_0132,female,stool,9 months,2023
+MMHP_Lucki_0123,ENA_fam_0105,male,stool,8 weeks,2023
+MMHP_Lucki_0124,ENA_fam_0104,male,stool,1-2 weeks,2023
+MMHP_Lucki_0125,ENA_fam_0104,male,stool,4 weeks,2023
+MMHP_Lucki_0126,ENA_fam_0104,female,stool,NA,1989
+MMHP_Lucki_0127,ENA_fam_0102,female,stool,NA,1975
+MMHP_Lucki_0128,ENA_fam_0129,female,stool,4 months,2021
+MMHP_Lucki_0129,ENA_fam_0129,female,stool,5 months,2021
+MMHP_Lucki_0130,ENA_fam_0128,female,stool,4 months,2023
+MMHP_Lucki_0131,ENA_fam_0128,female,stool,5 months,2023
+MMHP_Lucki_0132,ENA_fam_0128,female,stool,6 months,2023
+MMHP_Lucki_0133,ENA_fam_0100,female,stool,8 weeks,2021
+MMHP_Lucki_0134,ENA_fam_0136,female,stool,9 months,2021
+MMHP_Lucki_0135,ENA_fam_0136,female,stool,11 months,2021
+MMHP_Lucki_0136,ENA_fam_0134,female,stool,9 months,2022
+MMHP_Lucki_0137,ENA_fam_0134,female,stool,11 months,2022
+MMHP_Lucki_0139,ENA_fam_0126,male,stool,6 months,2021
+MMHP_Lucki_0140,ENA_fam_0126,male,stool,9 months,2021
+MMHP_Lucki_0141,ENA_fam_0123,male,stool,4 months,2023
+MMHP_Lucki_0142,ENA_fam_0122,female,stool,1-2 weeks,2022
+MMHP_Lucki_0145,ENA_fam_0122,female,stool,NA,1991
+MMHP_Lucki_0146,ENA_fam_0121,male,stool,1-2 weeks,2021
+MMHP_Lucki_0147,ENA_fam_0121,male,stool,4 weeks,2021
+MMHP_Lucki_0148,ENA_fam_0121,male,stool,8 weeks,2021
+MMHP_Lucki_0149,ENA_fam_0121,female,stool,NA,1978
+MMHP_Lucki_0150,ENA_fam_0109,female,stool,4 months,2021
+MMHP_Lucki_0151,ENA_fam_0104,male,stool,8 weeks,2023
+MMHP_Lucki_0153,ENA_fam_0135,male,stool,14 months,2023
+MMHP_Lucki_0154,ENA_fam_0130,male,stool,4 months,2021
+MMHP_Lucki_0156,ENA_fam_0130,male,stool,6 months,2021
+MMHP_Lucki_0157,ENA_fam_0130,male,stool,9 months,2021
+MMHP_Lucki_0158,ENA_fam_0119,female,stool,4 months,2021
+MMHP_Lucki_0159,ENA_fam_0114,male,stool,4 months,2022
+MMHP_Lucki_0160,ENA_fam_0113,female,stool,4 months,2023
+MMHP_Lucki_0163,ENA_fam_0107,female,stool,4 months,2022
+MMHP_Lucki_0165,ENA_fam_0138,male,stool,14 months,2022
+MMHP_Lucki_0166,ENA_fam_0125,female,stool,5 months,2022
+MMHP_Lucki_0167,ENA_fam_0124,male,stool,9 months,2023
+MMHP_Lucki_0168,ENA_fam_0120,male,stool,4 months,2021
+MMHP_Lucki_0170,ENA_fam_0120,male,stool,6 months,2021
+MMHP_Lucki_0171,ENA_fam_0116,female,stool,8 weeks,2021
+MMHP_Lucki_0172,ENA_fam_0116,female,stool,NA,1983
+MMHP_Lucki_0173,ENA_fam_0115,female,stool,1-2 weeks,2022
+MMHP_Lucki_0174,ENA_fam_0115,female,stool,NA,1976
+MMHP_Lucki_0175,ENA_fam_0109,female,stool,5 months,2021
+MMHP_Lucki_0177,ENA_fam_0105,male,stool,4 months,2023
+MMHP_Lucki_0178,ENA_fam_0099,female,stool,1-2 weeks,2021
+MMHP_Lucki_0179,ENA_fam_0099,female,stool,4 weeks,2021
+MMHP_Lucki_0180,ENA_fam_0099,female,stool,8 weeks,2021
+MMHP_Lucki_0181,ENA_fam_0099,female,stool,NA,1973
+MMHP_Lucki_0182,ENA_fam_0118,male,stool,4 months,2021
+MMHP_Lucki_0185,ENA_fam_0117,female,stool,4 months,2021
+MMHP_Lucki_0186,ENA_fam_0117,female,stool,5 months,2021
+MMHP_Lucki_0187,ENA_fam_0117,female,stool,6 months,2021
+MMHP_Lucki_0188,ENA_fam_0117,female,stool,9 months,2021
+MMHP_Lucki_0189,ENA_fam_0108,male,stool,5 months,2023
+MMHP_Lucki_0190,ENA_fam_0100,female,stool,4 months,2021
+MMHP_Lucki_0191,ENA_fam_0100,female,stool,5 months,2021
+MMHP_Lucki_0192,ENA_fam_0103,female,stool,6 months,2022
+MMHP_Lucki_0193,ENA_fam_0102,male,stool,5 months,2023
+MMHP_Lucki_0194,ENA_fam_0102,male,stool,4 months,2023
+MMHP_Lucki_0195,ENA_fam_0127,male,stool,11 months,2023
+MMHP_Lucki_0196,ENA_fam_0127,male,stool,5 months,2023
+MMHP_Lucki_0197,ENA_fam_0105,male,stool,6 months,2023
+MMHP_Lucki_0198,ENA_fam_0092,male,stool,1-2 weeks,2021
+MMHP_Lucki_0199,ENA_fam_0092,male,stool,4 weeks,2021
+MMHP_Lucki_0200,ENA_fam_0092,male,stool,8 weeks,2021
+MMHP_Lucki_0201,ENA_fam_0092,female,stool,NA,1991
+MMHP_Lucki_0202,ENA_fam_0112,male,stool,4 months,2022
+MMHP_Lucki_0203,ENA_fam_0112,male,stool,5 months,2022
+MMHP_Lucki_0205,ENA_fam_0134,female,stool,14 months,2022
+MMHP_Lucki_0206,ENA_fam_0114,male,stool,5 months,2022
+MMHP_Lucki_0207,ENA_fam_0114,male,stool,6 months,2022
+MMHP_Lucki_0208,ENA_fam_0105,male,stool,5 months,2023
+MMHP_Lucki_0209,ENA_fam_0099,female,stool,4 months,2021
+MMHP_Lucki_0210,ENA_fam_0093,male,stool,1-2 weeks,2021
+MMHP_Lucki_0211,ENA_fam_0093,male,stool,4 weeks,2021
+MMHP_Lucki_0212,ENA_fam_0093,male,stool,8 weeks,2021
+MMHP_Lucki_0213,ENA_fam_0093,female,stool,NA,1990
+MMHP_Lucki_0214,ENA_fam_0122,female,stool,4 months,2022
+MMHP_Lucki_0215,ENA_fam_0122,female,stool,5 months,2022
+MMHP_Lucki_0216,ENA_fam_0122,female,stool,6 months,2022
+MMHP_Lucki_0217,ENA_fam_0118,male,stool,11 months,2021
+MMHP_Lucki_0218,ENA_fam_0113,female,stool,9 months,2023
+MMHP_Lucki_0219,ENA_fam_0113,female,stool,11 months,2023
+MMHP_Lucki_0220,ENA_fam_0110,female,stool,5 months,2023
+MMHP_Lucki_0222,ENA_fam_0100,female,stool,6 months,2021
+MMHP_Lucki_0223,ENA_fam_0090,male,stool,4 weeks,2021
+MMHP_Lucki_0224,ENA_fam_0098,female,stool,1-2 weeks,2023
+MMHP_Lucki_0225,ENA_fam_0098,female,stool,4 weeks,2023
+MMHP_Lucki_0226,ENA_fam_0090,female,stool,NA,1987
+MMHP_Lucki_0228,ENA_fam_0098,female,stool,NA,1976
+MMHP_Lucki_0229,ENA_fam_0131,male,stool,6 months,2023
+MMHP_Lucki_0230,ENA_fam_0104,male,stool,5 months,2023
+MMHP_Lucki_0231,ENA_fam_0131,male,stool,11 months,2023
+MMHP_Lucki_0232,ENA_fam_0131,male,stool,9 months,2023
+MMHP_Lucki_0233,ENA_fam_0104,male,stool,6 months,2023
+MMHP_Lucki_0234,ENA_fam_0123,male,stool,5 months,2023
+MMHP_Lucki_0235,ENA_fam_0123,male,stool,6 months,2023
+MMHP_Lucki_0236,ENA_fam_0099,female,stool,5 months,2021
+MMHP_Lucki_0238,ENA_fam_0109,female,stool,9 months,2021
+MMHP_Lucki_0239,ENA_fam_0097,female,stool,NA,1986
+MMHP_Lucki_0240,ENA_fam_0089,female,stool,NA,1988
+MMHP_Lucki_0241,ENA_fam_0115,female,stool,4 months,2022
+MMHP_Lucki_0242,ENA_fam_0076,female,stool,NA,1980
+MMHP_Lucki_0243,ENA_fam_0106,female,stool,8 weeks,2023
+MMHP_Lucki_0244,ENA_fam_0097,female,stool,5 months,2022
+MMHP_Lucki_0247,ENA_fam_0097,female,stool,4 months,2022
+MMHP_Lucki_0248,ENA_fam_0097,female,stool,6 months,2022
+MMHP_Lucki_0249,ENA_fam_0104,male,stool,4 months,2023
+MMHP_Lucki_0250,ENA_fam_0095,female,stool,NA,1990
+MMHP_Lucki_0252,ENA_fam_0078,female,stool,NA,1985
+MMHP_Lucki_0253,ENA_fam_0129,female,stool,9 months,2021
+MMHP_Lucki_0254,ENA_fam_0129,female,stool,11 months,2021
+MMHP_Lucki_0255,ENA_fam_0128,female,stool,11 months,2023
+MMHP_Lucki_0256,ENA_fam_0128,female,stool,14 months,2023
+MMHP_Lucki_0258,ENA_fam_0107,female,stool,9 months,2022
+MMHP_Lucki_0259,ENA_fam_0096,male,stool,1-2 weeks,2023
+MMHP_Lucki_0260,ENA_fam_0096,male,stool,4 weeks,2023
+MMHP_Lucki_0261,ENA_fam_0096,male,stool,8 weeks,2023
+MMHP_Lucki_0262,ENA_fam_0096,female,stool,NA,1987
+MMHP_Lucki_0263,ENA_fam_0084,male,stool,1-2 weeks,2023
+MMHP_Lucki_0264,ENA_fam_0084,male,stool,4 weeks,2023
+MMHP_Lucki_0265,ENA_fam_0084,female,stool,NA,1989
+MMHP_Lucki_0266,ENA_fam_0078,male,stool,8 weeks,2023
+MMHP_Lucki_0267,ENA_fam_0123,male,stool,9 months,2023
+MMHP_Lucki_0268,ENA_fam_0123,male,stool,11 months,2023
+MMHP_Lucki_0270,ENA_fam_0116,female,stool,6 months,2021
+MMHP_Lucki_0271,ENA_fam_0112,male,stool,9 months,2022
+MMHP_Lucki_0272,ENA_fam_0112,male,stool,11 months,2022
+MMHP_Lucki_0273,ENA_fam_0106,female,stool,4 months,2023
+MMHP_Lucki_0274,ENA_fam_0106,female,stool,5 months,2023
+MMHP_Lucki_0276,ENA_fam_0095,male,stool,8 weeks,2021
+MMHP_Lucki_0277,ENA_fam_0091,male,stool,1-2 weeks,2023
+MMHP_Lucki_0278,ENA_fam_0091,male,stool,4 weeks,2023
+MMHP_Lucki_0279,ENA_fam_0091,male,stool,8 weeks,2023
+MMHP_Lucki_0280,ENA_fam_0091,female,stool,NA,1974
+MMHP_Lucki_0281,ENA_fam_0079,male,stool,1-2 weeks,2021
+MMHP_Lucki_0282,ENA_fam_0079,female,stool,NA,1981
+MMHP_Lucki_0283,ENA_fam_0075,female,stool,4 weeks,2021
+MMHP_Lucki_0284,ENA_fam_0075,female,stool,8 weeks,2021
+MMHP_Lucki_0285,ENA_fam_0075,female,stool,NA,1995
+MMHP_Lucki_0286,ENA_fam_0071,male,stool,1-2 weeks,2023
+MMHP_Lucki_0287,ENA_fam_0119,female,stool,6 months,2021
+MMHP_Lucki_0288,ENA_fam_0128,female,stool,9 months,2023
+MMHP_Lucki_0289,ENA_fam_0124,male,stool,14 months,2023
+MMHP_Lucki_0290,ENA_fam_0120,male,stool,9 months,2021
+MMHP_Lucki_0291,ENA_fam_0120,male,stool,11 months,2021
+MMHP_Lucki_0293,ENA_fam_0083,male,stool,1-2 weeks,2023
+MMHP_Lucki_0295,ENA_fam_0072,female,stool,NA,1991
+MMHP_Lucki_0296,ENA_fam_0072,female,stool,1-2 weeks,2022
+MMHP_Lucki_0297,ENA_fam_0072,female,stool,4 weeks,2022
+MMHP_Lucki_0298,ENA_fam_0076,female,stool,8 weeks,2022
+MMHP_Lucki_0299,ENA_fam_0103,female,stool,9 months,2022
+MMHP_Lucki_0300,ENA_fam_0103,female,stool,11 months,2022
+MMHP_Lucki_0301,ENA_fam_0094,male,stool,4 weeks,2022
+MMHP_Lucki_0302,ENA_fam_0079,male,stool,4 weeks,2021
+MMHP_Lucki_0303,ENA_fam_0071,male,stool,4 weeks,2023
+MMHP_Lucki_0304,ENA_fam_0071,male,stool,8 weeks,2023
+MMHP_Lucki_0306,ENA_fam_0114,male,stool,9 months,2022
+MMHP_Lucki_0307,ENA_fam_0099,female,stool,6 months,2021
+MMHP_Lucki_0308,ENA_fam_0093,male,stool,4 months,2021
+MMHP_Lucki_0309,ENA_fam_0093,male,stool,5 months,2021
+MMHP_Lucki_0310,ENA_fam_0093,male,stool,6 months,2021
+MMHP_Lucki_0311,ENA_fam_0087,female,stool,1-2 weeks,2022
+MMHP_Lucki_0312,ENA_fam_0087,female,stool,4 weeks,2022
+MMHP_Lucki_0314,ENA_fam_0077,female,stool,1-2 weeks,2022
+MMHP_Lucki_0315,ENA_fam_0077,female,stool,4 weeks,2022
+MMHP_Lucki_0316,ENA_fam_0077,female,stool,NA,1970
+MMHP_Lucki_0317,ENA_fam_0116,female,stool,4 months,2021
+MMHP_Lucki_0318,ENA_fam_0111,female,stool,5 months,2023
+MMHP_Lucki_0319,ENA_fam_0111,female,stool,6 months,2023
+MMHP_Lucki_0320,ENA_fam_0105,male,stool,11 months,2023
+MMHP_Lucki_0321,ENA_fam_0101,male,stool,9 months,2021
+MMHP_Lucki_0322,ENA_fam_0092,male,stool,4 months,2021
+MMHP_Lucki_0323,ENA_fam_0092,male,stool,5 months,2021
+MMHP_Lucki_0325,ENA_fam_0087,female,stool,8 weeks,2022
+MMHP_Lucki_0326,ENA_fam_0080,female,stool,NA,1985
+MMHP_Lucki_0327,ENA_fam_0069,female,stool,1-2 weeks,2023
+MMHP_Lucki_0328,ENA_fam_0069,female,stool,4 weeks,2023
+MMHP_Lucki_0329,ENA_fam_0069,female,stool,NA,1976
+MMHP_Lucki_0330,ENA_fam_0116,female,stool,5 months,2021
+MMHP_Lucki_0331,ENA_fam_0114,male,stool,11 months,2022
+MMHP_Lucki_0332,ENA_fam_0111,female,stool,4 months,2023
+MMHP_Lucki_0333,ENA_fam_0105,male,stool,9 months,2023
+MMHP_Lucki_0334,ENA_fam_0102,male,stool,9 months,2023
+MMHP_Lucki_0335,ENA_fam_0102,male,stool,11 months,2023
+MMHP_Lucki_0336,ENA_fam_0080,male,stool,1-2 weeks,2023
+MMHP_Lucki_0337,ENA_fam_0080,male,stool,4 weeks,2023
+MMHP_Lucki_0338,ENA_fam_0080,male,stool,8 weeks,2023
+MMHP_Lucki_0340,ENA_fam_0067,female,stool,NA,1989
+MMHP_Lucki_0343,ENA_fam_0115,female,stool,6 months,2022
+MMHP_Lucki_0344,ENA_fam_0075,female,stool,4 months,2021
+MMHP_Lucki_0345,ENA_fam_0065,male,stool,1-2 weeks,2023
+MMHP_Lucki_0346,ENA_fam_0065,male,stool,4 weeks,2023
+MMHP_Lucki_0347,ENA_fam_0065,male,stool,8 weeks,2023
+MMHP_Lucki_0348,ENA_fam_0065,female,stool,NA,1994
+MMHP_Lucki_0349,ENA_fam_0064,male,stool,1-2 weeks,2022
+MMHP_Lucki_0350,ENA_fam_0058,male,stool,1-2 weeks,2023
+MMHP_Lucki_0351,ENA_fam_0058,male,stool,4 weeks,2023
+MMHP_Lucki_0352,ENA_fam_0058,male,stool,8 weeks,2023
+MMHP_Lucki_0353,ENA_fam_0058,female,stool,NA,1984
+MMHP_Lucki_0355,ENA_fam_0056,female,stool,8 weeks,2022
+MMHP_Lucki_0356,ENA_fam_0056,female,stool,NA,1984
+MMHP_Lucki_0360,ENA_fam_0089,male,stool,5 months,2022
+MMHP_Lucki_0361,ENA_fam_0089,male,stool,6 months,2022
+MMHP_Lucki_0362,ENA_fam_0070,male,stool,4 weeks,2023
+MMHP_Lucki_0363,ENA_fam_0070,male,stool,8 weeks,2023
+MMHP_Lucki_0364,ENA_fam_0068,female,stool,1-2 weeks,2023
+MMHP_Lucki_0365,ENA_fam_0068,female,stool,4 weeks,2023
+MMHP_Lucki_0366,ENA_fam_0068,female,stool,NA,1990
+MMHP_Lucki_0367,ENA_fam_0067,male,stool,8 weeks,2022
+MMHP_Lucki_0368,ENA_fam_0066,male,stool,1-2 weeks,2021
+MMHP_Lucki_0369,ENA_fam_0066,male,stool,4 weeks,2021
+MMHP_Lucki_0370,ENA_fam_0066,female,stool,NA,1991
+MMHP_Lucki_0371,ENA_fam_0129,female,stool,14 months,2021
+MMHP_Lucki_0372,ENA_fam_0110,female,stool,9 months,2023
+MMHP_Lucki_0373,ENA_fam_0110,female,stool,11 months,2023
+MMHP_Lucki_0374,ENA_fam_0100,female,stool,11 months,2021
+MMHP_Lucki_0375,ENA_fam_0099,female,stool,9 months,2021
+MMHP_Lucki_0376,ENA_fam_0098,female,stool,5 months,2023
+MMHP_Lucki_0377,ENA_fam_0098,female,stool,6 months,2023
+MMHP_Lucki_0378,ENA_fam_0098,female,stool,9 months,2023
+MMHP_Lucki_0381,ENA_fam_0096,male,stool,6 months,2023
+MMHP_Lucki_0382,ENA_fam_0095,male,stool,4 months,2021
+MMHP_Lucki_0384,ENA_fam_0095,male,stool,6 months,2021
+MMHP_Lucki_0385,ENA_fam_0091,male,stool,4 months,2023
+MMHP_Lucki_0386,ENA_fam_0091,male,stool,5 months,2023
+MMHP_Lucki_0387,ENA_fam_0091,male,stool,6 months,2023
+MMHP_Lucki_0388,ENA_fam_0117,female,stool,14 months,2021
+MMHP_Lucki_0389,ENA_fam_0112,male,stool,14 months,2022
+MMHP_Lucki_0390,ENA_fam_0088,female,stool,NA,1983
+MMHP_Lucki_0391,ENA_fam_0078,male,stool,5 months,2023
+MMHP_Lucki_0392,ENA_fam_0078,male,stool,6 months,2023
+MMHP_Lucki_0393,ENA_fam_0077,female,stool,4 months,2022
+MMHP_Lucki_0394,ENA_fam_0063,male,stool,1-2 weeks,2021
+MMHP_Lucki_0395,ENA_fam_0063,male,stool,4 weeks,2021
+MMHP_Lucki_0396,ENA_fam_0063,female,stool,NA,1984
+MMHP_Lucki_0397,ENA_fam_0062,male,stool,1-2 weeks,2023
+MMHP_Lucki_0398,ENA_fam_0062,male,stool,4 weeks,2023
+MMHP_Lucki_0399,ENA_fam_0075,female,stool,6 months,2021
+MMHP_Lucki_0400,ENA_fam_0074,male,stool,1-2 weeks,2021
+MMHP_Lucki_0401,ENA_fam_0074,female,stool,NA,1975
+MMHP_Lucki_0402,ENA_fam_0073,male,stool,1-2 weeks,2022
+MMHP_Lucki_0403,ENA_fam_0073,male,stool,4 weeks,2022
+MMHP_Lucki_0404,ENA_fam_0073,female,stool,NA,1990
+MMHP_Lucki_0405,ENA_fam_0072,female,stool,8 weeks,2022
+MMHP_Lucki_0406,ENA_fam_0127,male,stool,9 months,2023
+MMHP_Lucki_0407,ENA_fam_0121,male,stool,4 months,2021
+MMHP_Lucki_0408,ENA_fam_0121,male,stool,5 months,2021
+MMHP_Lucki_0409,ENA_fam_0121,male,stool,6 months,2021
+MMHP_Lucki_0411,ENA_fam_0121,male,stool,11 months,2021
+MMHP_Lucki_0412,ENA_fam_0121,male,stool,14 months,2021
+MMHP_Lucki_0413,ENA_fam_0109,female,stool,11 months,2021
+MMHP_Lucki_0414,ENA_fam_0081,female,stool,1-2 weeks,2021
+MMHP_Lucki_0416,ENA_fam_0081,female,stool,8 weeks,2021
+MMHP_Lucki_0417,ENA_fam_0081,female,stool,NA,1984
+MMHP_Lucki_0418,ENA_fam_0079,male,stool,8 weeks,2021
+MMHP_Lucki_0419,ENA_fam_0079,male,stool,4 months,2021
+MMHP_Lucki_0420,ENA_fam_0071,male,stool,4 months,2023
+MMHP_Lucki_0421,ENA_fam_0071,male,stool,5 months,2023
+MMHP_Lucki_0422,ENA_fam_0122,female,stool,9 months,2022
+MMHP_Lucki_0423,ENA_fam_0122,female,stool,11 months,2022
+MMHP_Lucki_0424,ENA_fam_0127,male,stool,14 months,2023
+MMHP_Lucki_0425,ENA_fam_0123,male,stool,14 months,2023
+MMHP_Lucki_0426,ENA_fam_0120,male,stool,14 months,2021
+MMHP_Lucki_0428,ENA_fam_0109,female,stool,14 months,2021
+MMHP_Lucki_0429,ENA_fam_0107,female,stool,14 months,2022
+MMHP_Lucki_0430,ENA_fam_0106,female,stool,9 months,2023
+MMHP_Lucki_0432,ENA_fam_0104,male,stool,9 months,2023
+MMHP_Lucki_0433,ENA_fam_0104,male,stool,11 months,2023
+MMHP_Lucki_0434,ENA_fam_0102,male,stool,14 months,2023
+MMHP_Lucki_0435,ENA_fam_0101,male,stool,11 months,2021
+MMHP_Lucki_0436,ENA_fam_0089,male,stool,4 months,2022
+MMHP_Lucki_0437,ENA_fam_0069,female,stool,8 weeks,2023
+MMHP_Lucki_0438,ENA_fam_0069,female,stool,4 months,2023
+MMHP_Lucki_0439,ENA_fam_0052,male,stool,1-2 weeks,2021
+MMHP_Lucki_0440,ENA_fam_0052,female,stool,NA,1991
+MMHP_Lucki_0441,ENA_fam_0051,female,stool,8 weeks,2023
+MMHP_Lucki_0442,ENA_fam_0051,female,stool,NA,1976
+MMHP_Lucki_0443,ENA_fam_0050,female,stool,1-2 weeks,2021
+MMHP_Lucki_0444,ENA_fam_0050,female,stool,NA,1988
+MMHP_Lucki_0445,ENA_fam_0047,male,stool,1-2 weeks,2021
+MMHP_Lucki_0446,ENA_fam_0047,female,stool,NA,1972
+MMHP_Lucki_0448,ENA_fam_0056,female,stool,4 months,2022
+MMHP_Lucki_0449,ENA_fam_0056,female,stool,5 months,2022
+MMHP_Lucki_0450,ENA_fam_0085,female,stool,8 weeks,2022
+MMHP_Lucki_0451,ENA_fam_0085,female,stool,4 months,2022
+MMHP_Lucki_0454,ENA_fam_0085,female,stool,NA,1994
+MMHP_Lucki_0455,ENA_fam_0054,male,stool,1-2 weeks,2021
+MMHP_Lucki_0456,ENA_fam_0054,male,stool,4 weeks,2021
+MMHP_Lucki_0457,ENA_fam_0054,male,stool,8 weeks,2021
+MMHP_Lucki_0458,ENA_fam_0054,female,stool,NA,1978
+MMHP_Lucki_0459,ENA_fam_0053,male,stool,4 weeks,2022
+MMHP_Lucki_0460,ENA_fam_0053,male,stool,8 weeks,2022
+MMHP_Lucki_0461,ENA_fam_0131,male,stool,14 months,2023
+MMHP_Lucki_0464,ENA_fam_0101,male,stool,14 months,2021
+MMHP_Lucki_0465,ENA_fam_0099,female,stool,11 months,2021
+MMHP_Lucki_0466,ENA_fam_0094,male,stool,4 months,2022
+MMHP_Lucki_0467,ENA_fam_0094,male,stool,5 months,2022
+MMHP_Lucki_0468,ENA_fam_0094,male,stool,6 months,2022
+MMHP_Lucki_0469,ENA_fam_0087,female,stool,4 months,2022
+MMHP_Lucki_0470,ENA_fam_0067,male,stool,4 months,2022
+MMHP_Lucki_0471,ENA_fam_0066,male,stool,8 weeks,2021
+MMHP_Lucki_0472,ENA_fam_0050,female,stool,4 weeks,2021
+MMHP_Lucki_0473,ENA_fam_0050,female,stool,8 weeks,2021
+MMHP_Lucki_0474,ENA_fam_0115,female,stool,9 months,2022
+MMHP_Lucki_0475,ENA_fam_0095,male,stool,9 months,2021
+MMHP_Lucki_0476,ENA_fam_0082,male,stool,1-2 weeks,2021
+MMHP_Lucki_0477,ENA_fam_0082,male,stool,4 weeks,2021
+MMHP_Lucki_0478,ENA_fam_0082,male,stool,8 weeks,2021
+MMHP_Lucki_0479,ENA_fam_0082,male,stool,4 months,2021
+MMHP_Lucki_0480,ENA_fam_0082,male,stool,5 months,2021
+MMHP_Lucki_0481,ENA_fam_0082,male,stool,6 months,2021
+MMHP_Lucki_0482,ENA_fam_0082,female,stool,NA,1970
+MMHP_Lucki_0483,ENA_fam_0070,male,stool,4 months,2023
+MMHP_Lucki_0484,ENA_fam_0059,male,stool,1-2 weeks,2022
+MMHP_Lucki_0485,ENA_fam_0059,female,stool,NA,1973
+MMHP_Lucki_0486,ENA_fam_0057,female,stool,4 weeks,2021
+MMHP_Lucki_0488,ENA_fam_0048,female,stool,NA,1993
+MMHP_Lucki_0489,ENA_fam_0099,female,stool,14 months,2021
+MMHP_Lucki_0490,ENA_fam_0093,male,stool,9 months,2021
+MMHP_Lucki_0491,ENA_fam_0093,male,stool,11 months,2021
+MMHP_Lucki_0492,ENA_fam_0087,female,stool,5 months,2022
+MMHP_Lucki_0493,ENA_fam_0087,female,stool,6 months,2022
+MMHP_Lucki_0494,ENA_fam_0060,female,stool,8 weeks,2021
+MMHP_Lucki_0495,ENA_fam_0060,female,stool,NA,1993
+MMHP_Lucki_0496,ENA_fam_0059,male,stool,4 weeks,2022
+MMHP_Lucki_0497,ENA_fam_0059,male,stool,8 weeks,2022
+MMHP_Lucki_0498,ENA_fam_0057,female,stool,1-2 weeks,2021
+MMHP_Lucki_0499,ENA_fam_0057,female,stool,8 weeks,2021
+MMHP_Lucki_0500,ENA_fam_0052,male,stool,8 weeks,2021
+MMHP_Lucki_0501,ENA_fam_0051,female,stool,4 months,2023
+MMHP_Lucki_0502,ENA_fam_0051,female,stool,5 months,2023
+MMHP_Lucki_0503,ENA_fam_0100,female,stool,14 months,2021
+MMHP_Lucki_0504,ENA_fam_0076,female,stool,4 months,2022
+MMHP_Lucki_0505,ENA_fam_0076,female,stool,6 months,2022
+MMHP_Lucki_0506,ENA_fam_0115,female,stool,11 months,2022
+MMHP_Lucki_0507,ENA_fam_0110,female,stool,14 months,2023
+MMHP_Lucki_0508,ENA_fam_0083,male,stool,5 months,2023
+MMHP_Lucki_0509,ENA_fam_0081,female,stool,4 months,2021
+MMHP_Lucki_0510,ENA_fam_0072,female,stool,4 months,2022
+MMHP_Lucki_0511,ENA_fam_0072,female,stool,5 months,2022
+MMHP_Lucki_0513,ENA_fam_0061,female,stool,8 weeks,2023
+MMHP_Lucki_0514,ENA_fam_0061,female,stool,4 months,2023
+MMHP_Lucki_0515,ENA_fam_0048,male,stool,8 weeks,2021
+MMHP_Lucki_0516,ENA_fam_0113,female,stool,14 months,2023
+MMHP_Lucki_0517,ENA_fam_0079,male,stool,5 months,2021
+MMHP_Lucki_0518,ENA_fam_0079,male,stool,6 months,2021
+MMHP_Lucki_0519,ENA_fam_0078,male,stool,9 months,2023
+MMHP_Lucki_0520,ENA_fam_0073,male,stool,4 months,2022
+MMHP_Lucki_0521,ENA_fam_0072,female,stool,6 months,2022
+MMHP_Lucki_0522,ENA_fam_0071,male,stool,6 months,2023
+MMHP_Lucki_0524,ENA_fam_0068,female,stool,8 weeks,2023
+MMHP_Lucki_0525,ENA_fam_0068,female,stool,4 months,2023
+MMHP_Lucki_0526,ENA_fam_0061,female,stool,NA,1993
+MMHP_Lucki_0527,ENA_fam_0055,female,stool,1-2 weeks,2022
+MMHP_Lucki_0528,ENA_fam_0055,female,stool,4 weeks,2022
+MMHP_Lucki_0529,ENA_fam_0055,female,stool,8 weeks,2022
+MMHP_Lucki_0530,ENA_fam_0055,female,stool,NA,1974
+MMHP_Lucki_0531,ENA_fam_0125,female,stool,14 months,2022
+MMHP_Lucki_0532,ENA_fam_0122,female,stool,14 months,2022
+MMHP_Lucki_0533,ENA_fam_0086,female,stool,9 months,2021
+MMHP_Lucki_0534,ENA_fam_0065,male,stool,4 months,2023
+MMHP_Lucki_0535,ENA_fam_0065,male,stool,5 months,2023
+MMHP_Lucki_0536,ENA_fam_0065,male,stool,6 months,2023
+MMHP_Lucki_0537,ENA_fam_0058,male,stool,4 months,2023
+MMHP_Lucki_0538,ENA_fam_0058,male,stool,5 months,2023
+MMHP_Lucki_0539,ENA_fam_0058,male,stool,6 months,2023
+MMHP_Lucki_0540,ENA_fam_0115,female,stool,14 months,2022
+MMHP_Lucki_0543,ENA_fam_0082,male,stool,9 months,2021
+MMHP_Lucki_0544,ENA_fam_0081,female,stool,5 months,2021
+MMHP_Lucki_0545,ENA_fam_0081,female,stool,6 months,2021
+MMHP_Lucki_0546,ENA_fam_0079,male,stool,9 months,2021
+MMHP_Lucki_0548,ENA_fam_0061,female,stool,5 months,2023
+MMHP_Lucki_0549,ENA_fam_0061,female,stool,6 months,2023
+MMHP_Lucki_0550,ENA_fam_0060,female,stool,4 months,2021
+MMHP_Lucki_0551,ENA_fam_0060,female,stool,5 months,2021
+MMHP_Lucki_0552,ENA_fam_0057,female,stool,4 months,2021
+MMHP_Lucki_0553,ENA_fam_0057,female,stool,5 months,2021
+MMHP_Lucki_0554,ENA_fam_0055,female,stool,4 months,2022
+MMHP_Lucki_0555,ENA_fam_0054,male,stool,4 months,2021
+MMHP_Lucki_0556,ENA_fam_0054,male,stool,5 months,2021
+MMHP_Lucki_0557,ENA_fam_0054,male,stool,6 months,2021
+MMHP_Lucki_0558,ENA_fam_0106,female,stool,14 months,2023
+MMHP_Lucki_0559,ENA_fam_0096,male,stool,9 months,2023
+MMHP_Lucki_0560,ENA_fam_0096,male,stool,11 months,2023
+MMHP_Lucki_0561,ENA_fam_0094,male,stool,1-2 weeks,2022
+MMHP_Lucki_0562,ENA_fam_0094,male,stool,9 months,2022
+MMHP_Lucki_0563,ENA_fam_0094,female,stool,NA,1981
+MMHP_Lucki_0565,ENA_fam_0092,male,stool,11 months,2021
+MMHP_Lucki_0566,ENA_fam_0089,male,stool,9 months,2022
+MMHP_Lucki_0567,ENA_fam_0089,male,stool,11 months,2022
+MMHP_Lucki_0568,ENA_fam_0069,female,stool,5 months,2023
+MMHP_Lucki_0570,ENA_fam_0066,male,stool,4 months,2021
+MMHP_Lucki_0571,ENA_fam_0066,male,stool,5 months,2021
+MMHP_Lucki_0572,ENA_fam_0066,male,stool,6 months,2021
+MMHP_Lucki_0573,ENA_fam_0052,male,stool,4 months,2021
+MMHP_Lucki_0574,ENA_fam_0047,male,stool,4 weeks,2021
+MMHP_Lucki_0575,ENA_fam_0047,male,stool,8 weeks,2021
+MMHP_Lucki_0576,ENA_fam_0046,female,stool,NA,1987
+MMHP_Lucki_0577,ENA_fam_0093,male,stool,14 months,2021
+MMHP_Lucki_0580,ENA_fam_0052,male,stool,6 months,2021
+MMHP_Lucki_0581,ENA_fam_0050,female,stool,4 months,2021
+MMHP_Lucki_0582,ENA_fam_0050,female,stool,5 months,2021
+MMHP_Lucki_0583,ENA_fam_0050,female,stool,6 months,2021
+MMHP_Lucki_0584,ENA_fam_0081,female,stool,9 months,2021
+MMHP_Lucki_0585,ENA_fam_0079,male,stool,11 months,2021
+MMHP_Lucki_0586,ENA_fam_0071,male,stool,11 months,2023
+MMHP_Lucki_0587,ENA_fam_0060,female,stool,6 months,2021
+MMHP_Lucki_0589,ENA_fam_0059,male,stool,4 months,2022
+MMHP_Lucki_0590,ENA_fam_0059,male,stool,5 months,2022
+MMHP_Lucki_0591,ENA_fam_0057,female,stool,6 months,2021
+MMHP_Lucki_0592,ENA_fam_0057,female,stool,9 months,2021
+MMHP_Lucki_0593,ENA_fam_0095,male,stool,14 months,2021
+MMHP_Lucki_0594,ENA_fam_0088,male,stool,4 months,2023
+MMHP_Lucki_0595,ENA_fam_0086,female,stool,11 months,2021
+MMHP_Lucki_0596,ENA_fam_0074,male,stool,8 weeks,2021
+MMHP_Lucki_0598,ENA_fam_0074,male,stool,5 months,2021
+MMHP_Lucki_0599,ENA_fam_0074,male,stool,6 months,2021
+MMHP_Lucki_0600,ENA_fam_0068,female,stool,5 months,2023
+MMHP_Lucki_0601,ENA_fam_0068,female,stool,6 months,2023
+MMHP_Lucki_0602,ENA_fam_0065,male,stool,9 months,2023
+MMHP_Lucki_0603,ENA_fam_0063,male,stool,8 weeks,2021
+MMHP_Lucki_0604,ENA_fam_0063,male,stool,5 months,2021
+MMHP_Lucki_0606,ENA_fam_0062,male,stool,8 weeks,2023
+MMHP_Lucki_0607,ENA_fam_0062,male,stool,5 months,2023
+MMHP_Lucki_0609,ENA_fam_0058,male,stool,9 months,2023
+MMHP_Lucki_0610,ENA_fam_0055,female,stool,5 months,2022
+MMHP_Lucki_0612,ENA_fam_0049,female,stool,1-2 weeks,2022
+MMHP_Lucki_0613,ENA_fam_0049,female,stool,4 weeks,2022
+MMHP_Lucki_0614,ENA_fam_0049,female,stool,8 weeks,2022
+MMHP_Lucki_0616,ENA_fam_0116,female,stool,11 months,2021
+MMHP_Lucki_0617,ENA_fam_0116,female,stool,14 months,2021
+MMHP_Lucki_0618,ENA_fam_0078,male,stool,11 months,2023
+MMHP_Lucki_0619,ENA_fam_0075,female,stool,5 months,2021
+MMHP_Lucki_0621,ENA_fam_0075,female,stool,11 months,2021
+MMHP_Lucki_0623,ENA_fam_0073,male,stool,6 months,2022
+MMHP_Lucki_0624,ENA_fam_0072,female,stool,9 months,2022
+MMHP_Lucki_0625,ENA_fam_0072,female,stool,11 months,2022
+MMHP_Lucki_0629,ENA_fam_0045,male,stool,1-2 weeks,2023
+MMHP_Lucki_0630,ENA_fam_0045,male,stool,4 weeks,2023
+MMHP_Lucki_0631,ENA_fam_0045,male,stool,8 weeks,2023
+MMHP_Lucki_0632,ENA_fam_0045,female,stool,NA,1977
+MMHP_Lucki_0634,ENA_fam_0092,male,stool,14 months,2021
+MMHP_Lucki_0635,ENA_fam_0089,male,stool,14 months,2022
+MMHP_Lucki_0637,ENA_fam_0069,female,stool,9 months,2023
+MMHP_Lucki_0638,ENA_fam_0069,female,stool,11 months,2023
+MMHP_Lucki_0641,ENA_fam_0056,female,stool,6 months,2022
+MMHP_Lucki_0642,ENA_fam_0056,female,stool,9 months,2022
+MMHP_Lucki_0643,ENA_fam_0056,female,stool,11 months,2022
+MMHP_Lucki_0644,ENA_fam_0046,female,stool,4 months,2022
+MMHP_Lucki_0645,ENA_fam_0046,female,stool,5 months,2022
+MMHP_Lucki_0646,ENA_fam_0073,male,stool,9 months,2022
+MMHP_Lucki_0647,ENA_fam_0061,female,stool,9 months,2023
+MMHP_Lucki_0651,ENA_fam_0044,female,stool,1-2 weeks,2023
+MMHP_Lucki_0652,ENA_fam_0044,female,stool,4 weeks,2023
+MMHP_Lucki_0653,ENA_fam_0044,female,stool,NA,1977
+MMHP_Lucki_0656,ENA_fam_0082,male,stool,11 months,2021
+MMHP_Lucki_0657,ENA_fam_0082,male,stool,14 months,2021
+MMHP_Lucki_0658,ENA_fam_0070,male,stool,9 months,2023
+MMHP_Lucki_0660,ENA_fam_0068,female,stool,9 months,2023
+MMHP_Lucki_0661,ENA_fam_0063,male,stool,9 months,2021
+MMHP_Lucki_0662,ENA_fam_0063,male,stool,11 months,2021
+MMHP_Lucki_0663,ENA_fam_0062,male,stool,9 months,2023
+MMHP_Lucki_0664,ENA_fam_0062,male,stool,11 months,2023
+MMHP_Lucki_0665,ENA_fam_0055,female,stool,9 months,2022
+MMHP_Lucki_0666,ENA_fam_0054,male,stool,9 months,2021
+MMHP_Lucki_0667,ENA_fam_0049,female,stool,4 months,2022
+MMHP_Lucki_0668,ENA_fam_0044,female,stool,8 weeks,2023
+MMHP_Lucki_0669,ENA_fam_0130,male,stool,11 months,2021
+MMHP_Lucki_0670,ENA_fam_0086,female,stool,14 months,2021
+MMHP_Lucki_0672,ENA_fam_0078,male,stool,14 months,2023
+MMHP_Lucki_0673,ENA_fam_0060,female,stool,11 months,2021
+MMHP_Lucki_0675,ENA_fam_0059,male,stool,9 months,2022
+MMHP_Lucki_0677,ENA_fam_0057,female,stool,11 months,2021
+MMHP_Lucki_0678,ENA_fam_0054,male,stool,11 months,2021
+MMHP_Lucki_0679,ENA_fam_0049,female,stool,5 months,2022
+MMHP_Lucki_0681,ENA_fam_0081,female,stool,11 months,2021
+MMHP_Lucki_0685,ENA_fam_0073,male,stool,11 months,2022
+MMHP_Lucki_0686,ENA_fam_0071,male,stool,14 months,2023
+MMHP_Lucki_0688,ENA_fam_0066,male,stool,11 months,2021
+MMHP_Lucki_0690,ENA_fam_0058,male,stool,11 months,2023
+MMHP_Lucki_0691,ENA_fam_0052,male,stool,9 months,2021
+MMHP_Lucki_0692,ENA_fam_0051,female,stool,6 months,2023
+MMHP_Lucki_0693,ENA_fam_0051,female,stool,9 months,2023
+MMHP_Lucki_0694,ENA_fam_0050,female,stool,9 months,2021
+MMHP_Lucki_0695,ENA_fam_0047,male,stool,4 months,2021
+MMHP_Lucki_0696,ENA_fam_0047,male,stool,5 months,2021
+MMHP_Lucki_0697,ENA_fam_0047,male,stool,6 months,2021
+MMHP_Lucki_0698,ENA_fam_0047,male,stool,9 months,2021
+MMHP_Lucki_0699,ENA_fam_0046,female,stool,6 months,2022
+MMHP_Lucki_0701,ENA_fam_0043,male,stool,4 weeks,2021
+MMHP_Lucki_0702,ENA_fam_0043,male,stool,8 weeks,2021
+MMHP_Lucki_0703,ENA_fam_0043,female,stool,NA,1979
+MMHP_Lucki_0706,ENA_fam_0045,male,stool,4 months,2023
+MMHP_Lucki_0707,ENA_fam_0045,male,stool,5 months,2023
+MMHP_Lucki_0708,ENA_fam_0045,male,stool,6 months,2023
+MMHP_Lucki_0709,ENA_fam_0043,male,stool,4 months,2021
+MMHP_Lucki_0710,ENA_fam_0043,male,stool,5 months,2021
+MMHP_Lucki_0711,ENA_fam_0043,male,stool,6 months,2021
+MMHP_Lucki_0713,ENA_fam_0069,female,stool,14 months,2023
+MMHP_Lucki_0714,ENA_fam_0068,female,stool,11 months,2023
+MMHP_Lucki_0715,ENA_fam_0067,male,stool,14 months,2022
+MMHP_Lucki_0716,ENA_fam_0058,male,stool,14 months,2023
+MMHP_Lucki_0719,ENA_fam_0062,male,stool,14 months,2023
+MMHP_Lucki_0721,ENA_fam_0055,female,stool,11 months,2022
+MMHP_Lucki_0724,ENA_fam_0051,female,stool,14 months,2023
+MMHP_Lucki_0725,ENA_fam_0050,female,stool,11 months,2021
+MMHP_Lucki_0726,ENA_fam_0047,male,stool,11 months,2021
+MMHP_Lucki_0727,ENA_fam_0044,female,stool,4 months,2023
+MMHP_Lucki_0728,ENA_fam_0081,female,stool,14 months,2021
+MMHP_Lucki_0730,ENA_fam_0044,female,stool,5 months,2023
+MMHP_Lucki_0731,ENA_fam_0044,female,stool,6 months,2023
+MMHP_Lucki_0732,ENA_fam_0059,male,stool,14 months,2022
+MMHP_Lucki_0733,ENA_fam_0055,female,stool,14 months,2022
+MMHP_Lucki_0734,ENA_fam_0052,male,stool,14 months,2021
+MMHP_Lucki_0742,ENA_fam_0038,male,stool,4 weeks,2023
+MMHP_Lucki_0743,ENA_fam_0037,male,stool,8 weeks,2022
+MMHP_Lucki_0744,ENA_fam_0037,female,stool,NA,1984
+MMHP_Lucki_0745,ENA_fam_0054,male,stool,14 months,2021
+MMHP_Lucki_0746,ENA_fam_0041,female,stool,8 weeks,2021
+MMHP_Lucki_0747,ENA_fam_0041,female,stool,4 months,2021
+MMHP_Lucki_0748,ENA_fam_0041,female,stool,5 months,2021
+MMHP_Lucki_0749,ENA_fam_0041,female,stool,6 months,2021
+MMHP_Lucki_0751,ENA_fam_0036,male,stool,4 weeks,2021
+MMHP_Lucki_0752,ENA_fam_0036,male,stool,8 weeks,2021
+MMHP_Lucki_0753,ENA_fam_0036,male,stool,4 months,2021
+MMHP_Lucki_0755,ENA_fam_0036,female,stool,NA,1971
+MMHP_Lucki_0756,ENA_fam_0048,male,stool,11 months,2021
+MMHP_Lucki_0757,ENA_fam_0046,female,stool,11 months,2022
+MMHP_Lucki_0759,ENA_fam_0042,female,stool,1-2 weeks,2023
+MMHP_Lucki_0760,ENA_fam_0042,female,stool,8 weeks,2023
+MMHP_Lucki_0761,ENA_fam_0042,female,stool,NA,1983
+MMHP_Lucki_0762,ENA_fam_0040,male,stool,8 weeks,2021
+MMHP_Lucki_0763,ENA_fam_0040,female,stool,NA,1994
+MMHP_Lucki_0764,ENA_fam_0039,male,stool,4 weeks,2021
+MMHP_Lucki_0765,ENA_fam_0039,male,stool,5 months,2021
+MMHP_Lucki_0766,ENA_fam_0039,female,stool,NA,1973
+MMHP_Lucki_0767,ENA_fam_0041,female,stool,NA,1986
+MMHP_Lucki_0768,ENA_fam_0032,male,stool,8 weeks,2022
+MMHP_Lucki_0769,ENA_fam_0031,male,stool,4 weeks,2022
+MMHP_Lucki_0770,ENA_fam_0031,male,stool,8 weeks,2022
+MMHP_Lucki_0771,ENA_fam_0028,female,stool,NA,1988
+MMHP_Lucki_0772,ENA_fam_0025,male,stool,1-2 weeks,2022
+MMHP_Lucki_0773,ENA_fam_0025,male,stool,4 weeks,2022
+MMHP_Lucki_0774,ENA_fam_0025,female,stool,NA,1992
+MMHP_Lucki_0775,ENA_fam_0016,male,stool,4 weeks,2023
+MMHP_Lucki_0776,ENA_fam_0016,female,stool,NA,1972
+MMHP_Lucki_0777,ENA_fam_0015,male,stool,1-2 weeks,2022
+MMHP_Lucki_0778,ENA_fam_0015,male,stool,8 weeks,2022
+MMHP_Lucki_0779,ENA_fam_0010,female,stool,NA,1978
+MMHP_Lucki_0781,ENA_fam_0048,male,stool,14 months,2021
+MMHP_Lucki_0783,ENA_fam_0045,male,stool,9 months,2023
+MMHP_Lucki_0784,ENA_fam_0038,female,stool,NA,1987
+MMHP_Lucki_0786,ENA_fam_0034,male,stool,4 weeks,2021
+MMHP_Lucki_0787,ENA_fam_0026,female,stool,4 weeks,2021
+MMHP_Lucki_0788,ENA_fam_0014,female,stool,NA,1987
+MMHP_Lucki_0789,ENA_fam_0035,female,stool,4 weeks,2021
+MMHP_Lucki_0790,ENA_fam_0035,female,stool,NA,1994
+MMHP_Lucki_0791,ENA_fam_0029,female,stool,8 weeks,2022
+MMHP_Lucki_0792,ENA_fam_0027,female,stool,NA,1990
+MMHP_Lucki_0793,ENA_fam_0021,male,stool,8 weeks,2023
+MMHP_Lucki_0794,ENA_fam_0020,female,stool,1-2 weeks,2021
+MMHP_Lucki_0795,ENA_fam_0019,male,stool,1-2 weeks,2021
+MMHP_Lucki_0797,ENA_fam_0019,female,stool,NA,1976
+MMHP_Lucki_0798,ENA_fam_0017,female,stool,1-2 weeks,2023
+MMHP_Lucki_0799,ENA_fam_0017,female,stool,4 weeks,2023
+MMHP_Lucki_0800,ENA_fam_0017,female,stool,4 months,2023
+MMHP_Lucki_0801,ENA_fam_0017,female,stool,NA,1992
+MMHP_Lucki_0802,ENA_fam_0032,male,stool,1-2 weeks,2022
+MMHP_Lucki_0803,ENA_fam_0032,female,stool,NA,1993
+MMHP_Lucki_0804,ENA_fam_0031,male,stool,1-2 weeks,2022
+MMHP_Lucki_0805,ENA_fam_0028,male,stool,1-2 weeks,2022
+MMHP_Lucki_0806,ENA_fam_0028,male,stool,8 weeks,2022
+MMHP_Lucki_0807,ENA_fam_0016,male,stool,1-2 weeks,2023
+MMHP_Lucki_0808,ENA_fam_0016,male,stool,8 weeks,2023
+MMHP_Lucki_0809,ENA_fam_0015,male,stool,4 weeks,2022
+MMHP_Lucki_0810,ENA_fam_0015,female,stool,NA,1992
+MMHP_Lucki_0811,ENA_fam_0013,male,stool,4 weeks,2022
+MMHP_Lucki_0812,ENA_fam_0013,female,stool,NA,1982
+MMHP_Lucki_0813,ENA_fam_0010,male,stool,1-2 weeks,2023
+MMHP_Lucki_0814,ENA_fam_0010,male,stool,4 weeks,2023
+MMHP_Lucki_0815,ENA_fam_0066,male,stool,14 months,2021
+MMHP_Lucki_0816,ENA_fam_0050,female,stool,14 months,2021
+MMHP_Lucki_0817,ENA_fam_0042,female,stool,4 months,2023
+MMHP_Lucki_0818,ENA_fam_0039,male,stool,1-2 weeks,2021
+MMHP_Lucki_0819,ENA_fam_0039,male,stool,4 months,2021
+MMHP_Lucki_0820,ENA_fam_0038,male,stool,8 weeks,2023
+MMHP_Lucki_0821,ENA_fam_0034,male,stool,8 weeks,2021
+MMHP_Lucki_0822,ENA_fam_0030,male,stool,1-2 weeks,2021
+MMHP_Lucki_0823,ENA_fam_0030,female,stool,NA,1971
+MMHP_Lucki_0824,ENA_fam_0024,male,stool,1-2 weeks,2023
+MMHP_Lucki_0825,ENA_fam_0024,male,stool,4 weeks,2023
+MMHP_Lucki_0826,ENA_fam_0024,male,stool,8 weeks,2023
+MMHP_Lucki_0827,ENA_fam_0024,female,stool,NA,1976
+MMHP_Lucki_0828,ENA_fam_0018,female,stool,8 weeks,2021
+MMHP_Lucki_0829,ENA_fam_0029,female,stool,1-2 weeks,2022
+MMHP_Lucki_0830,ENA_fam_0029,female,stool,NA,1982
+MMHP_Lucki_0831,ENA_fam_0027,female,stool,4 months,2021
+MMHP_Lucki_0833,ENA_fam_0017,female,stool,8 weeks,2023
+MMHP_Lucki_0835,ENA_fam_0034,female,stool,NA,1971
+MMHP_Lucki_0836,ENA_fam_0031,female,stool,NA,1978
+MMHP_Lucki_0837,ENA_fam_0028,male,stool,4 weeks,2022
+MMHP_Lucki_0838,ENA_fam_0026,female,stool,1-2 weeks,2021
+MMHP_Lucki_0839,ENA_fam_0026,female,stool,NA,1970
+MMHP_Lucki_0840,ENA_fam_0025,male,stool,8 weeks,2022
+MMHP_Lucki_0841,ENA_fam_0022,male,stool,1-2 weeks,2021
+MMHP_Lucki_0842,ENA_fam_0022,female,stool,NA,1995
+MMHP_Lucki_0843,ENA_fam_0018,female,stool,4 weeks,2021
+MMHP_Lucki_0844,ENA_fam_0018,female,stool,NA,1981
+MMHP_Lucki_0846,ENA_fam_0013,male,stool,8 weeks,2022
+MMHP_Lucki_0847,ENA_fam_0012,male,stool,1-2 weeks,2021
+MMHP_Lucki_0848,ENA_fam_0012,male,stool,4 weeks,2021
+MMHP_Lucki_0849,ENA_fam_0012,male,stool,8 weeks,2021
+MMHP_Lucki_0850,ENA_fam_0012,female,stool,NA,1992
+MMHP_Lucki_0851,ENA_fam_0038,male,stool,5 months,2023
+MMHP_Lucki_0852,ENA_fam_0022,male,stool,8 weeks,2021
+MMHP_Lucki_0853,ENA_fam_0019,male,stool,8 weeks,2021
+MMHP_Lucki_0854,ENA_fam_0030,male,stool,8 weeks,2021
+MMHP_Lucki_0855,ENA_fam_0039,male,stool,6 months,2021
+MMHP_Lucki_0856,ENA_fam_0009,female,stool,NA,1971
+MMHP_Lucki_0857,ENA_fam_0009,female,stool,4 months,2021
+MMHP_Lucki_0858,ENA_fam_0009,female,stool,8 weeks,2021
+MMHP_Lucki_0859,ENA_fam_0009,female,stool,4 weeks,2021
+MMHP_Lucki_0860,ENA_fam_0017,female,stool,5 months,2023
+MMHP_Lucki_0861,ENA_fam_0034,male,stool,4 months,2021
+MMHP_Lucki_0862,ENA_fam_0030,male,stool,4 weeks,2021
+MMHP_Lucki_0865,ENA_fam_0022,male,stool,5 months,2021
+MMHP_Lucki_0866,ENA_fam_0038,male,stool,6 months,2023
+MMHP_Lucki_0868,ENA_fam_0010,male,stool,8 weeks,2023
+MMHP_Lucki_0870,ENA_fam_0024,male,stool,4 months,2023
+MMHP_Lucki_0871,ENA_fam_0010,male,stool,4 months,2023
+MMHP_Lucki_0872,ENA_fam_0022,male,stool,4 weeks,2021
+MMHP_Lucki_0873,ENA_fam_0030,male,stool,4 months,2021
+MMHP_Lucki_0874,ENA_fam_0034,male,stool,5 months,2021
+MMHP_Lucki_0875,ENA_fam_0024,male,stool,6 months,2023
+MMHP_Lucki_0877,ENA_fam_0024,male,stool,5 months,2023
+MMHP_Lucki_0878,ENA_fam_0034,male,stool,6 months,2021
+MMHP_Lucki_0879,ENA_fam_0033,female,stool,4 weeks,2021
+MMHP_Lucki_0880,ENA_fam_0033,female,stool,8 weeks,2021
+MMHP_Lucki_0882,ENA_fam_0033,female,stool,NA,1983
+MMHP_Lucki_0883,ENA_fam_0029,female,stool,5 months,2022
+MMHP_Lucki_0884,ENA_fam_0041,female,stool,11 months,2021
+MMHP_Lucki_0886,ENA_fam_0021,male,stool,5 months,2023
+MMHP_Lucki_0887,ENA_fam_0025,male,stool,5 months,2022
+MMHP_Lucki_0889,ENA_fam_0006,female,stool,NA,1986
+MMHP_Lucki_0891,ENA_fam_0015,male,stool,4 months,2022
+MMHP_Lucki_0893,ENA_fam_0026,female,stool,8 weeks,2021
+MMHP_Lucki_0894,ENA_fam_0006,female,stool,1-2 weeks,2022
+MMHP_Lucki_0895,ENA_fam_0010,male,stool,6 months,2023
+MMHP_Lucki_0896,ENA_fam_0037,male,stool,5 months,2022
+MMHP_Lucki_0898,ENA_fam_0025,male,stool,4 months,2022
+MMHP_Lucki_0899,ENA_fam_0014,female,stool,4 months,2021
+MMHP_Lucki_0900,ENA_fam_0020,female,stool,4 months,2021
+MMHP_Lucki_0901,ENA_fam_0037,male,stool,4 months,2022
+MMHP_Lucki_0902,ENA_fam_0023,male,stool,6 months,2021
+MMHP_Lucki_0903,ENA_fam_0014,female,stool,5 months,2021
+MMHP_Lucki_0904,ENA_fam_0020,female,stool,5 months,2021
+MMHP_Lucki_0905,ENA_fam_0011,female,stool,NA,1982
+MMHP_Lucki_0906,ENA_fam_0044,female,stool,14 months,2023
+MMHP_Lucki_0907,ENA_fam_0008,male,stool,1-2 weeks,2022
+MMHP_Lucki_0908,ENA_fam_0036,male,stool,6 months,2021
+MMHP_Lucki_0909,ENA_fam_0028,male,stool,6 months,2022
+MMHP_Lucki_0911,ENA_fam_0011,male,stool,8 weeks,2021
+MMHP_Lucki_0913,ENA_fam_0019,male,stool,5 months,2021
+MMHP_Lucki_0914,ENA_fam_0008,male,stool,8 weeks,2022
+MMHP_Lucki_0915,ENA_fam_0019,male,stool,4 months,2021
+MMHP_Lucki_0916,ENA_fam_0028,male,stool,5 months,2022
+MMHP_Lucki_0917,ENA_fam_0016,male,stool,5 months,2023
+MMHP_Lucki_0918,ENA_fam_0037,male,stool,6 months,2022
+MMHP_Lucki_0919,ENA_fam_0008,female,stool,NA,1985
+MMHP_Lucki_0921,ENA_fam_0015,male,stool,6 months,2022
+MMHP_Lucki_0922,ENA_fam_0008,male,stool,4 weeks,2022
+MMHP_Lucki_0923,ENA_fam_0006,female,stool,4 weeks,2022
+MMHP_Lucki_0924,ENA_fam_0016,male,stool,4 months,2023
+MMHP_Lucki_0925,ENA_fam_0015,male,stool,5 months,2022
+MMHP_Lucki_0926,ENA_fam_0007,female,stool,4 weeks,2021
+MMHP_Lucki_0927,ENA_fam_0011,male,stool,6 months,2021
+MMHP_Lucki_0928,ENA_fam_0006,female,stool,8 weeks,2022
+MMHP_Lucki_0929,ENA_fam_0018,female,stool,6 months,2021
+MMHP_Lucki_0930,ENA_fam_0017,female,stool,11 months,2023
+MMHP_Lucki_0931,ENA_fam_0018,female,stool,9 months,2021
+MMHP_Lucki_0932,ENA_fam_0005,male,stool,1-2 weeks,2023
+MMHP_Lucki_0933,ENA_fam_0018,female,stool,4 months,2021
+MMHP_Lucki_0934,ENA_fam_0005,female,stool,NA,1975
+MMHP_Lucki_0935,ENA_fam_0010,male,stool,9 months,2023
+MMHP_Lucki_0936,ENA_fam_0018,female,stool,5 months,2021
+MMHP_Lucki_0937,ENA_fam_0029,female,stool,6 months,2022
+MMHP_Lucki_0938,ENA_fam_0007,female,stool,NA,1971
+MMHP_Lucki_0939,ENA_fam_0011,male,stool,4 months,2021
+MMHP_Lucki_0940,ENA_fam_0011,male,stool,5 months,2021
+MMHP_Lucki_0941,ENA_fam_0008,male,stool,4 months,2022
+MMHP_Lucki_0942,ENA_fam_0008,male,stool,5 months,2022
+MMHP_Lucki_0943,ENA_fam_0007,male,stool,NA,1993
+MMHP_Lucki_0944,ENA_fam_0005,male,stool,4 weeks,2023
+MMHP_Lucki_0945,ENA_fam_0036,male,stool,11 months,2021
+MMHP_Lucki_0946,ENA_fam_0005,male,stool,NA,1975
+MMHP_Lucki_0947,ENA_fam_0014,female,stool,9 months,2021
+MMHP_Lucki_0948,ENA_fam_0014,female,stool,6 months,2021
+MMHP_Lucki_0949,ENA_fam_0030,male,stool,6 months,2021
+MMHP_Lucki_0950,ENA_fam_0022,male,stool,6 months,2021
+MMHP_Lucki_0951,ENA_fam_0024,male,stool,9 months,2023
+MMHP_Lucki_0952,ENA_fam_0041,female,stool,14 months,2021
+MMHP_Lucki_0953,ENA_fam_0042,female,stool,9 months,2023
+MMHP_Lucki_0954,ENA_fam_0042,female,stool,6 months,2023
+MMHP_Lucki_0955,ENA_fam_0028,male,stool,9 months,2022
+MMHP_Lucki_0956,ENA_fam_0021,male,stool,9 months,2023
+MMHP_Lucki_0957,ENA_fam_0032,male,stool,5 months,2022
+MMHP_Lucki_0958,ENA_fam_0032,male,stool,6 months,2022
+MMHP_Lucki_0959,ENA_fam_0022,male,stool,9 months,2021
+MMHP_Lucki_0960,ENA_fam_0026,female,stool,6 months,2021
+MMHP_Lucki_0961,ENA_fam_0021,male,stool,11 months,2023
+MMHP_Lucki_0962,ENA_fam_0032,male,stool,4 months,2022
+MMHP_Lucki_0963,ENA_fam_0026,female,stool,9 months,2021
+MMHP_Lucki_0964,ENA_fam_0042,female,stool,11 months,2023
+MMHP_Lucki_0965,ENA_fam_0028,male,stool,11 months,2022
+MMHP_Lucki_0966,ENA_fam_0030,male,stool,9 months,2021
+MMHP_Lucki_0967,ENA_fam_0025,male,stool,11 months,2022
+MMHP_Lucki_0968,ENA_fam_0025,male,stool,9 months,2022
+MMHP_Lucki_0969,ENA_fam_0026,female,stool,5 months,2021
+MMHP_Lucki_0970,ENA_fam_0009,female,stool,5 months,2021
+MMHP_Lucki_0971,ENA_fam_0009,female,stool,6 months,2021
+MMHP_Lucki_0972,ENA_fam_0042,female,stool,5 months,2023
+MMHP_Lucki_0973,ENA_fam_0036,male,stool,9 months,2021
+MMHP_Lucki_0974,ENA_fam_0038,male,stool,9 months,2023
+MMHP_Lucki_0975,ENA_fam_0038,male,stool,11 months,2023
+MMHP_Lucki_0976,ENA_fam_0016,male,stool,9 months,2023
+MMHP_Lucki_0977,ENA_fam_0016,male,stool,6 months,2023
+MMHP_Lucki_0978,ENA_fam_0015,male,stool,9 months,2022
+MMHP_Lucki_0979,ENA_fam_0004,male,stool,1-2 weeks,2021
+MMHP_Lucki_0980,ENA_fam_0004,male,stool,4 weeks,2021
+MMHP_Lucki_0981,ENA_fam_0004,female,stool,NA,1985
+MMHP_Lucki_0982,ENA_fam_0004,male,stool,NA,1994
+MMHP_Lucki_0983,ENA_fam_0029,female,stool,11 months,2022
+MMHP_Lucki_0984,ENA_fam_0027,female,stool,5 months,2021
+MMHP_Lucki_0985,ENA_fam_0027,female,stool,6 months,2021
+MMHP_Lucki_0986,ENA_fam_0027,female,stool,9 months,2021
+MMHP_Lucki_0987,ENA_fam_0027,female,stool,11 months,2021
+MMHP_Lucki_0988,ENA_fam_0027,female,stool,14 months,2021
+MMHP_Lucki_0989,ENA_fam_0019,male,stool,6 months,2021
+MMHP_Lucki_0990,ENA_fam_0017,female,stool,14 months,2023
+MMHP_Lucki_0991,ENA_fam_0024,male,stool,11 months,2023
+MMHP_Lucki_0992,ENA_fam_0033,female,stool,11 months,2021
+MMHP_Lucki_0993,ENA_fam_0014,female,stool,11 months,2021
+MMHP_Lucki_0994,ENA_fam_0007,female,stool,5 months,2021
+MMHP_Lucki_0995,ENA_fam_0023,male,stool,11 months,2021
+MMHP_Lucki_0996,ENA_fam_0023,male,stool,9 months,2021
+MMHP_Lucki_0997,ENA_fam_0020,female,stool,6 months,2021
+MMHP_Lucki_0998,ENA_fam_0020,female,stool,9 months,2021
+MMHP_Lucki_0999,ENA_fam_0030,male,stool,11 months,2021
+MMHP_Lucki_1000,ENA_fam_0026,female,stool,11 months,2021
+MMHP_Lucki_1001,ENA_fam_0022,male,stool,11 months,2021
+MMHP_Lucki_1002,ENA_fam_0042,female,stool,14 months,2023
+MMHP_Lucki_1003,ENA_fam_0025,male,stool,14 months,2022
+MMHP_Lucki_1004,ENA_fam_0018,female,stool,14 months,2021
+MMHP_Lucki_1005,ENA_fam_0029,female,stool,9 months,2022
+MMHP_Lucki_1006,ENA_fam_0033,female,stool,9 months,2021
+MMHP_Lucki_1007,ENA_fam_0033,female,stool,14 months,2021
+MMHP_Lucki_1008,ENA_fam_0034,male,stool,14 months,2021
+MMHP_Lucki_1009,ENA_fam_0024,male,stool,14 months,2023
+MMHP_Lucki_1010,ENA_fam_0033,female,stool,5 months,2021
+MMHP_Lucki_1011,ENA_fam_0018,female,stool,11 months,2021
+MMHP_Lucki_1012,ENA_fam_0039,male,stool,14 months,2021
+MMHP_Lucki_1013,ENA_fam_0010,male,stool,11 months,2023
+MMHP_Lucki_1014,ENA_fam_0007,female,stool,4 months,2021
+MMHP_Lucki_1015,ENA_fam_0031,male,stool,9 months,2022
+MMHP_Lucki_1016,ENA_fam_0036,male,stool,14 months,2021
+MMHP_Lucki_1017,ENA_fam_0028,male,stool,14 months,2022
+MMHP_Lucki_1018,ENA_fam_0006,female,stool,5 months,2022
+MMHP_Lucki_1019,ENA_fam_0031,male,stool,11 months,2022
+MMHP_Lucki_1020,ENA_fam_0037,male,stool,9 months,2022
+MMHP_Lucki_1021,ENA_fam_0006,female,stool,4 months,2022
+MMHP_Lucki_1022,ENA_fam_0007,female,stool,8 weeks,2021
+MMHP_Lucki_1023,ENA_fam_0037,male,stool,11 months,2022
+MMHP_Lucki_1024,ENA_fam_0031,male,stool,6 months,2022
+MMHP_Lucki_1025,ENA_fam_0039,male,stool,11 months,2021
+MMHP_Lucki_1026,ENA_fam_0039,male,stool,9 months,2021
+MMHP_Lucki_1027,ENA_fam_0019,male,stool,9 months,2021
+MMHP_Lucki_1028,ENA_fam_0009,female,stool,9 months,2021
+MMHP_Lucki_1029,ENA_fam_0029,female,stool,14 months,2022
+MMHP_Lucki_1030,ENA_fam_0009,female,stool,11 months,2021
+MMHP_Lucki_1031,ENA_fam_0009,female,stool,14 months,2021
+MMHP_Lucki_1032,ENA_fam_0004,male,stool,8 weeks,2021
+MMHP_Lucki_1033,ENA_fam_0004,male,stool,5 months,2021
+MMHP_Lucki_1034,ENA_fam_0007,female,stool,9 months,2021
+MMHP_Lucki_1035,ENA_fam_0007,female,stool,6 months,2021
+MMHP_Lucki_1036,ENA_fam_0026,female,stool,14 months,2021
+MMHP_Lucki_1037,ENA_fam_0014,female,stool,14 months,2021
+MMHP_Lucki_1038,ENA_fam_0021,male,stool,14 months,2023
+MMHP_Lucki_1039,ENA_fam_0022,male,stool,14 months,2021
+MMHP_Lucki_1040,ENA_fam_0030,male,stool,14 months,2021
+MMHP_Lucki_1041,ENA_fam_0002,female,stool,NA,1989
+MMHP_Lucki_1042,ENA_fam_0002,female,stool,8 weeks,2023
+MMHP_Lucki_1043,ENA_fam_0002,female,stool,4 months,2023
+MMHP_Lucki_1044,ENA_fam_0010,male,stool,14 months,2023
+MMHP_Lucki_1045,ENA_fam_0006,female,stool,9 months,2022
+MMHP_Lucki_1046,ENA_fam_0006,female,stool,6 months,2022
+MMHP_Lucki_1047,ENA_fam_0002,female,stool,4 weeks,2023
+MMHP_Lucki_1048,ENA_fam_0019,male,stool,14 months,2021
+MMHP_Lucki_1049,ENA_fam_0002,male,stool,NA,1976
+MMHP_Lucki_1050,ENA_fam_0019,male,stool,11 months,2021
+MMHP_Lucki_1051,ENA_fam_0002,female,stool,1-2 weeks,2023
+MMHP_Lucki_1052,ENA_fam_0023,male,stool,14 months,2021
+MMHP_Lucki_1053,ENA_fam_0003,male,stool,4 months,2022
+MMHP_Lucki_1054,ENA_fam_0032,male,stool,14 months,2022
+MMHP_Lucki_1055,ENA_fam_0003,male,stool,8 weeks,2022
+MMHP_Lucki_1056,ENA_fam_0003,male,stool,5 months,2022
+MMHP_Lucki_1057,ENA_fam_0032,male,stool,11 months,2022
+MMHP_Lucki_1058,ENA_fam_0032,male,stool,9 months,2022
+MMHP_Lucki_1059,ENA_fam_0003,male,stool,1-2 weeks,2022
+MMHP_Lucki_1060,ENA_fam_0003,female,stool,NA,1973
+MMHP_Lucki_1061,ENA_fam_0003,male,stool,4 weeks,2022
+MMHP_Lucki_1062,ENA_fam_0003,male,stool,NA,1971
+MMHP_Lucki_1063,ENA_fam_0007,female,stool,14 months,2021
+MMHP_Lucki_1064,ENA_fam_0001,female,stool,8 weeks,2023
+MMHP_Lucki_1065,ENA_fam_0007,female,stool,11 months,2021
+MMHP_Lucki_1066,ENA_fam_0001,male,stool,NA,1994
+MMHP_Lucki_1067,ENA_fam_0001,female,stool,NA,1977
+MMHP_Lucki_1068,ENA_fam_0011,male,stool,14 months,2021
+MMHP_Lucki_1069,ENA_fam_0001,female,stool,4 weeks,2023
+MMHP_Lucki_1070,ENA_fam_0011,male,stool,9 months,2021
+MMHP_Lucki_1071,ENA_fam_0011,male,stool,11 months,2021
+MMHP_Lucki_1072,ENA_fam_0001,female,stool,1-2 weeks,2023
+MMHP_Lucki_1073,ENA_fam_0001,female,stool,4 months,2023
+MMHP_Lucki_1074,ENA_fam_0001,female,stool,5 months,2023
+MMHP_Lucki_1075,ENA_fam_0007,female,stool,1-2 weeks,2021
+MMHP_Lucki_1076,ENA_fam_0098,female,stool,4 months,2023
