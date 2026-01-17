@@ -59,7 +59,7 @@ class GatekeeperLayer(layers.Layer):
         return inputs * self.w
 
 
-def run_nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
+def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
     X_train_tf = X_train.astype('float32')
     y_train_tf = Y_train.values.astype('float32')
     penalties = [0.5, 1.0, 2.0, 3.0, 5.0, 7.5, 10.0]
@@ -107,7 +107,7 @@ def run_nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
 # =========================================================
 # 3. CLASSICAL ML BENCHMARKS (XGB & RF)
 # =========================================================
-def run_xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
+def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"🚀 Initializing XGBoost Engine: {label}")
     X_train_clean = X_train_df.copy()
     X_test_clean = X_test_df.copy()
@@ -145,7 +145,7 @@ def run_xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset
     return ModelResult(best_model, rmse, r2, search_xgb.best_params_, elapsed)
 
 
-def run_random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
+def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"🌲 Initializing Random Forest Engine: {label}")
     search = RandomizedSearchCV(
         estimator=RandomForestRegressor(random_state=42, n_jobs=-1),
@@ -179,7 +179,7 @@ def run_random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="D
 # =========================================================
 # 4. REPEATED CV BATTLE (5x5 Arena)
 # =========================================================
-def run_final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5):
+def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5):
     rkf = RepeatedKFold(n_splits=n_splits, n_repeats=n_repeats, random_state=42)
     models_to_test = {
         "XGBoost": xgb.XGBRegressor(n_estimators=1000, learning_rate=0.01, max_depth=3, subsample=0.7,
