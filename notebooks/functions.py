@@ -4,6 +4,7 @@ import time
 import re
 import random
 import os
+import gc
 from collections import namedtuple
 
 # Machine Learning & Stats
@@ -22,8 +23,15 @@ from sklearn.preprocessing import StandardScaler
 ModelResult = namedtuple('ModelResult', ['model', 'rmse', 'r2', 'best_params', 'runtime', 'top_features'])
 NNResult = namedtuple('NNResult', ['X_train_elite', 'X_test_elite', 'feature_names', 'rmse', 'n_features'])
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
 tf.get_logger().setLevel('ERROR')
-
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+    except RuntimeError as e:
+        print(e)
 def set_global_seeds(seed=42):
     """Ensure reproducibility across TF, Numpy, and Python"""
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -44,7 +52,7 @@ class GatekeeperLayer(layers.Layer):
     def build(self, input_shape):
         self.w = self.add_weight(
             shape=(self.num_features,),
-            initializer=initializers.HeNormal(),
+            initializer=initializers.RandomUniform(minval=0.001, maxval=0.01),
             trainable=True,
             constraint=constraints.NonNeg(),
             regularizer=regularizers.l1(self.l1_penalty)
@@ -58,8 +66,8 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
     X_train_scaled = scaler.fit_transform(X_train)
     X_train_tf = X_train_scaled.astype('float32')
     y_train_tf = Y_train.values.astype('float32')
-    penalties = [3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
-    repeats = 7
+    penalties = [2.0, 3.5, 5.0, 6.5, 8.0]
+    repeats = 10
     champion = {'rmse': float('inf'), 'weights': None, 'n_features': 0, 'penalty': 0}
 
     print(f"🔬 Starting NN Sparsity Search on {X_train.shape[1]} features...")
@@ -69,16 +77,17 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
     for p in penalties:
         for i in range(repeats):
             tf.keras.backend.clear_session()
+            gc.collect()
             inputs = layers.Input(shape=(X_train_tf.shape[1],))
             gate = GatekeeperLayer(X_train_tf.shape[1], l1_penalty=p)(inputs)
             x = layers.Dense(32, activation='relu')(gate)
             outputs = layers.Dense(1, activation='linear')(x)
             model = models.Model(inputs=inputs, outputs=outputs)
-            model.compile(optimizer=tf.keras.optimizers.Adam(0.005), loss='mse')
+            model.compile(optimizer=tf.keras.optimizers.Adam(0.001), loss='mse')
 
-            history = model.fit(X_train_tf, y_train_tf, epochs=200, batch_size=64,
+            history = model.fit(X_train_tf, y_train_tf, epochs=250, batch_size=128,
                                 validation_split=0.2, verbose=0,
-                                callbacks=[callbacks.EarlyStopping(patience=20, restore_best_weights=True)])
+                                callbacks=[callbacks.EarlyStopping(patience=30, restore_best_weights=True)])
 
             weights = model.layers[1].get_weights()[0]
             n_feats = np.sum(weights > 1e-3)
