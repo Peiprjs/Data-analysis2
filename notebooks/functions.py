@@ -14,19 +14,12 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV, RepeatedKFold, cross_validate
 from sklearn.metrics import mean_squared_error, r2_score
 
-# Visualization
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# To keep style uniform
-sns.set_theme(style="whitegrid", palette="muted")
-
 # =========================================================
 # 1. GLOBAL CONFIG & STRUCTURES
 # =========================================================
-ModelResult = namedtuple('ModelResult', ['model', 'rmse', 'r2', 'best_params', 'runtime'])
+# Added 'top_features' to the tuple for easy inspection
+ModelResult = namedtuple('ModelResult', ['model', 'rmse', 'r2', 'best_params', 'runtime', 'top_features'])
 NNResult = namedtuple('NNResult', ['X_train_elite', 'X_test_elite', 'feature_names', 'rmse', 'n_features'])
-
 
 def set_global_seeds(seed=42):
     """Ensure reproducibility across TF, Numpy, and Python"""
@@ -35,7 +28,6 @@ def set_global_seeds(seed=42):
     np.random.seed(seed)
     tf.random.set_seed(seed)
     print(f"✅ Global seeds set to {seed}")
-
 
 # =========================================================
 # 2. NEURAL NETWORK SELECTOR (The "Gatekeeper")
@@ -57,7 +49,6 @@ class GatekeeperLayer(layers.Layer):
 
     def call(self, inputs):
         return inputs * self.w
-
 
 def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
     X_train_tf = X_train.astype('float32')
@@ -94,15 +85,13 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
                 if val_rmse < champion['rmse']:
                     champion.update({'rmse': val_rmse, 'weights': weights, 'n_features': n_feats, 'penalty': p})
                     status = "🏆 NEW BEST"
-            print(f"{p:<8} | {i + 1:<4} | {n_feats:<10} | {val_rmse:<10.2f} | {status}")
+            print(f"{p:<8} | {i+1:<4} | {n_feats:<10} | {val_rmse:<10.2f} | {status}")
 
     if champion['weights'] is not None:
         df_imp = pd.DataFrame({'Bacteria': X_train.columns, 'Score': champion['weights']})
         elite_names = df_imp[df_imp['Score'] > 1e-5].sort_values('Score', ascending=False)['Bacteria'].tolist()
-        return NNResult(X_train[elite_names], X_test[elite_names], elite_names, champion['rmse'],
-                        champion['n_features'])
+        return NNResult(X_train[elite_names], X_test[elite_names], elite_names, champion['rmse'], champion['n_features'])
     return None
-
 
 # =========================================================
 # 3. CLASSICAL ML BENCHMARKS (XGB & RF)
@@ -131,18 +120,13 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     r2 = r2_score(y_test, y_pred)
 
+    # Calculate Top Drivers
+    feat_df = pd.DataFrame({'Bacteria': X_train_df.columns, 'Importance': best_model.feature_importances_})
+    top_drivers = feat_df.sort_values('Importance', ascending=False).head(20).reset_index(drop=True)
+
     print(f"\n✅ {label} Complete ({elapsed:.1f}s) | R2: {r2:.3f}")
 
-    # Plotting Top 20
-    feat_df = pd.DataFrame({'Bacteria': X_train_df.columns, 'Importance': best_model.feature_importances_})
-    feat_df = feat_df.sort_values('Importance', ascending=False).head(20)
-    plt.figure(figsize=(10, 6))
-    sns.barplot(data=feat_df, x='Importance', y='Bacteria', palette='magma')
-    plt.title(f'Top 20 Drivers (XGB) - {label}')
-    plt.tight_layout()
-    plt.show()
-
-    return ModelResult(best_model, rmse, r2, search_xgb.best_params_, elapsed)
+    return ModelResult(best_model, rmse, r2, search_xgb.best_params_, elapsed, top_drivers)
 
 
 def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
@@ -163,17 +147,13 @@ def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Datas
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     r2 = r2_score(y_test, y_pred)
 
+    # Calculate Top Drivers
+    feat_df = pd.DataFrame({'Bacteria': X_train_df.columns, 'Importance': best_model.feature_importances_})
+    top_drivers = feat_df.sort_values('Importance', ascending=False).head(20).reset_index(drop=True)
+
     print(f"\n✅ {label} RF Complete ({elapsed:.1f}s) | R2: {r2:.3f}")
 
-    feat_df = pd.DataFrame({'Bacteria': X_train_df.columns, 'Importance': best_model.feature_importances_})
-    feat_df = feat_df.sort_values('Importance', ascending=False).head(20)
-    plt.figure(figsize=(10, 6))
-    sns.barplot(data=feat_df, x='Importance', y='Bacteria', palette='viridis')
-    plt.title(f'Top 20 Drivers (RF) - {label}')
-    plt.tight_layout()
-    plt.show()
-
-    return ModelResult(best_model, rmse, r2, search.best_params_, elapsed)
+    return ModelResult(best_model, rmse, r2, search.best_params_, elapsed, top_drivers)
 
 
 # =========================================================
