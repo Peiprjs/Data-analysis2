@@ -13,6 +13,7 @@ from tensorflow.keras import layers, models, constraints, callbacks, initializer
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV, RepeatedKFold, cross_validate
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
 
 # =========================================================
 # 1. GLOBAL CONFIG & STRUCTURES
@@ -43,7 +44,7 @@ class GatekeeperLayer(layers.Layer):
     def build(self, input_shape):
         self.w = self.add_weight(
             shape=(self.num_features,),
-            initializer=initializers.RandomUniform(minval=0.0, maxval=0.002),
+            initializer=initializers.RandomUniform(minval=0.0, maxval=0.05),
             trainable=True,
             constraint=constraints.NonNeg(),
             regularizer=regularizers.l1(self.l1_penalty)
@@ -53,10 +54,12 @@ class GatekeeperLayer(layers.Layer):
         return inputs * self.w
 
 def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
     X_train_tf = X_train.astype('float32')
     y_train_tf = Y_train.values.astype('float32')
-    penalties = [0.5, 1.0, 2.0, 3.0, 5.0, 7.5, 10.0]
-    repeats = 5
+    penalties = [2.0, 3.0, 5.0, 7.5, 10.0]
+    repeats = 10
     champion = {'rmse': float('inf'), 'weights': None, 'n_features': 0, 'penalty': 0}
 
     print(f"🔬 Starting NN Sparsity Search on {X_train.shape[1]} features...")
@@ -71,11 +74,11 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
             x = layers.Dense(32, activation='relu')(gate)
             outputs = layers.Dense(1, activation='linear')(x)
             model = models.Model(inputs=inputs, outputs=outputs)
-            model.compile(optimizer=tf.keras.optimizers.Adam(0.005), loss='mse')
+            model.compile(optimizer=tf.keras.optimizers.Adam(0.001), loss='mse')
 
-            history = model.fit(X_train_tf, y_train_tf, epochs=120, batch_size=32,
+            history = model.fit(X_train_tf, y_train_tf, epochs=200, batch_size=64,
                                 validation_split=0.2, verbose=0,
-                                callbacks=[callbacks.EarlyStopping(patience=8, restore_best_weights=True)])
+                                callbacks=[callbacks.EarlyStopping(patience=20, restore_best_weights=True)])
 
             weights = model.layers[1].get_weights()[0]
             n_feats = np.sum(weights > 1e-5)
