@@ -56,9 +56,9 @@ class GatekeeperLayer(layers.Layer):
 def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
-    X_train_tf = X_train.astype('float32')
+    X_train_tf = X_train_scaled.astype('float32')
     y_train_tf = Y_train.values.astype('float32')
-    penalties = [2.0, 3.0, 5.0, 7.5, 10.0]
+    penalties = [2.5, 3.0, 4.0, 5.0, 6.0, 7.0]
     repeats = 10
     champion = {'rmse': float('inf'), 'weights': None, 'n_features': 0, 'penalty': 0}
 
@@ -81,7 +81,7 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
                                 callbacks=[callbacks.EarlyStopping(patience=20, restore_best_weights=True)])
 
             weights = model.layers[1].get_weights()[0]
-            n_feats = np.sum(weights > 1e-5)
+            n_feats = np.sum(weights > 1e-3)
             val_rmse = min(history.history['val_loss']) ** 0.5
 
             status = "❌"
@@ -165,13 +165,8 @@ def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Datas
 # 4. REPEATED CV BATTLE (5x5 Arena)
 # =========================================================
 def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5, xgb_params=None, rf_params=None):
-    """
-    High-stability 5x5 CV battle.
-    Uses 'Champion' defaults unless the user provides their own parameter dictionaries.
-    """
     rkf = RepeatedKFold(n_splits=n_splits, n_repeats=n_repeats, random_state=42)
 
-    # 1. SMART DEFAULTS (Your discovered best settings)
     default_xgb = {
         'n_estimators': 1000, 'learning_rate': 0.01, 'max_depth': 3,
         'subsample': 0.7, 'colsample_bytree': 0.2, 'reg_alpha': 0.1,
@@ -179,12 +174,10 @@ def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5, xgb_params=Non
     }
 
     default_rf = {
-        'n_estimators': 1000, 'max_depth': None,  # Let it grow deep as per our discovery
+        'n_estimators': 1000, 'max_depth': None,
         'max_features': 'sqrt', 'n_jobs': -1, 'random_state': 42
     }
 
-    # 2. OVERRIDE LOGIC
-    # Use user params if provided, otherwise use defaults
     current_xgb_params = xgb_params if xgb_params else default_xgb
     current_rf_params = rf_params if rf_params else default_rf
 
@@ -195,32 +188,36 @@ def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5, xgb_params=Non
 
     battle_results = []
     print(f"⚔️ Starting Battle Arena ({n_splits}x{n_repeats} = {n_splits * n_repeats} runs)")
-    # We switch to RMSE as you requested earlier for better 'Days' intuition
-    print(f"{'Dataset':<20} | {'Model':<15} | {'Avg RMSE':<12} | {'Std Dev':<10}")
-    print("-" * 70)
+    # Expanded headers to include R2
+    print(f"{'Dataset':<20} | {'Model':<15} | {'Avg RMSE':<12} | {'Avg R2':<10} | {'Std Dev':<10}")
+    print("-" * 85)
 
     for data_name, X_data in datasets_dict.items():
         X_clean = X_data.copy()
         X_clean.columns = [re.sub('[^A-Za-z0-9_]+', '', str(col)) for col in X_clean.columns]
 
         for model_name, model_obj in models_to_test.items():
+            # Modified scoring to capture both RMSE and R2
             cv_metrics = cross_validate(
                 model_obj, X_clean, y_train,
                 cv=rkf,
-                scoring='neg_root_mean_squared_error',
+                scoring={'rmse': 'neg_root_mean_squared_error', 'r2': 'r2'},
                 n_jobs=-1
             )
 
-            # Convert to positive RMSE (Days)
-            mean_rmse = -np.mean(cv_metrics['test_score'])
-            std_rmse = np.std(cv_metrics['test_score'])
+            mean_rmse = -np.mean(cv_metrics['test_rmse'])
+            std_rmse = np.std(cv_metrics['test_rmse'])
+            mean_r2 = np.mean(cv_metrics['test_r2'])
 
-            print(f"{data_name:<20} | {model_name:<15} | {mean_rmse:.2f} days   | ±{std_rmse:.2f}")
+            # Print updated table row
+            print(f"{data_name:<20} | {model_name:<15} | {mean_rmse:.2f} days   | {mean_r2:.3f}    | ±{std_rmse:.2f}")
+
             battle_results.append({
                 'Dataset': data_name,
                 'Model': model_name,
                 'RMSE_Mean': mean_rmse,
-                'RMSE_Std': std_rmse
+                'RMSE_Std': std_rmse,
+                'R2_Mean': mean_r2
             })
 
     return battle_results
