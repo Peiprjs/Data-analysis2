@@ -161,25 +161,63 @@ def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Datas
 # =========================================================
 # 4. REPEATED CV BATTLE (5x5 Arena)
 # =========================================================
-def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5):
+def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5, xgb_params=None, rf_params=None):
+    """
+    High-stability 5x5 CV battle.
+    Uses 'Champion' defaults unless the user provides their own parameter dictionaries.
+    """
     rkf = RepeatedKFold(n_splits=n_splits, n_repeats=n_repeats, random_state=42)
-    models_to_test = {
-        "XGBoost": xgb.XGBRegressor(n_estimators=1000, learning_rate=0.01, max_depth=3, subsample=0.7,
-                                    colsample_bytree=0.2, reg_alpha=0.1, reg_lambda=1.0, n_jobs=-1, random_state=42),
-        "Random Forest": RandomForestRegressor(n_estimators=1000, max_depth=20, max_features='sqrt', n_jobs=-1,
-                                               random_state=42)
+
+    # 1. SMART DEFAULTS (Your discovered best settings)
+    default_xgb = {
+        'n_estimators': 1000, 'learning_rate': 0.01, 'max_depth': 3,
+        'subsample': 0.7, 'colsample_bytree': 0.2, 'reg_alpha': 0.1,
+        'reg_lambda': 1.0, 'n_jobs': -1, 'random_state': 42
     }
+
+    default_rf = {
+        'n_estimators': 1000, 'max_depth': None,  # Let it grow deep as per our discovery
+        'max_features': 'sqrt', 'n_jobs': -1, 'random_state': 42
+    }
+
+    # 2. OVERRIDE LOGIC
+    # Use user params if provided, otherwise use defaults
+    current_xgb_params = xgb_params if xgb_params else default_xgb
+    current_rf_params = rf_params if rf_params else default_rf
+
+    models_to_test = {
+        "XGBoost": xgb.XGBRegressor(**current_xgb_params),
+        "Random Forest": RandomForestRegressor(**current_rf_params)
+    }
+
     battle_results = []
     print(f"⚔️ Starting Battle Arena ({n_splits}x{n_repeats} = {n_splits * n_repeats} runs)")
-    print(f"{'Dataset':<20} | {'Model':<15} | {'Avg R2':<10} | {'Std Dev':<10}")
-    print("-" * 65)
+    # We switch to RMSE as you requested earlier for better 'Days' intuition
+    print(f"{'Dataset':<20} | {'Model':<15} | {'Avg RMSE':<12} | {'Std Dev':<10}")
+    print("-" * 70)
 
     for data_name, X_data in datasets_dict.items():
         X_clean = X_data.copy()
         X_clean.columns = [re.sub('[^A-Za-z0-9_]+', '', str(col)) for col in X_clean.columns]
+
         for model_name, model_obj in models_to_test.items():
-            cv_metrics = cross_validate(model_obj, X_clean, y_train, cv=rkf, scoring='r2', n_jobs=-1)
-            mean_r2, std_r2 = np.mean(cv_metrics['test_score']), np.std(cv_metrics['test_score'])
-            print(f"{data_name:<20} | {model_name:<15} | {mean_r2:.4f}     | ±{std_r2:.3f}")
-            battle_results.append({'Dataset': data_name, 'Model': model_name, 'R2_Mean': mean_r2, 'R2_Std': std_r2})
+            cv_metrics = cross_validate(
+                model_obj, X_clean, y_train,
+                cv=rkf,
+                scoring='neg_root_mean_squared_error',
+                n_jobs=-1
+            )
+
+            # Convert to positive RMSE (Days)
+            mean_rmse = -np.mean(cv_metrics['test_score'])
+            std_rmse = np.std(cv_metrics['test_score'])
+
+            print(f"{data_name:<20} | {model_name:<15} | {mean_rmse:.2f} days   | ±{std_rmse:.2f}")
+            battle_results.append({
+                'Dataset': data_name,
+                'Model': model_name,
+                'RMSE_Mean': mean_rmse,
+                'RMSE_Std': std_rmse
+            })
+
     return battle_results
