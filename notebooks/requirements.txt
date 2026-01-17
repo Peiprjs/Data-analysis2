@@ -6,3 +6,5 @@ scikit-learn
 click
 colorama
 supertree
+xgboost
+collections
