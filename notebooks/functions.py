@@ -23,7 +23,9 @@ from sklearn.preprocessing import StandardScaler
 ModelResult = namedtuple('ModelResult', ['model', 'rmse', 'r2', 'best_params', 'runtime', 'top_features'])
 NNResult = namedtuple('NNResult', ['X_train_elite', 'X_test_elite', 'feature_names', 'rmse', 'n_features'])
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
+os.environ['HSA_OVERRIDE_GFX_VERSION'] = '11.0.0'
+os.environ['ROCM_PATH'] = '/opt/rocm-7.1.1'
+
 tf.get_logger().setLevel('ERROR')
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
@@ -52,7 +54,7 @@ class GatekeeperLayer(layers.Layer):
     def build(self, input_shape):
         self.w = self.add_weight(
             shape=(self.num_features,),
-            initializer=initializers.RandomUniform(minval=0.001, maxval=0.01),
+            initializer=initializers.Constant(value=self.l1_penalty),
             trainable=True,
             constraint=constraints.NonNeg(),
             regularizer=regularizers.l1(self.l1_penalty)
@@ -78,16 +80,17 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250)):
         for i in range(repeats):
             tf.keras.backend.clear_session()
             gc.collect()
-            inputs = layers.Input(shape=(X_train_tf.shape[1],))
-            gate = GatekeeperLayer(X_train_tf.shape[1], l1_penalty=p)(inputs)
-            x = layers.Dense(32, activation='relu')(gate)
-            outputs = layers.Dense(1, activation='linear')(x)
-            model = models.Model(inputs=inputs, outputs=outputs)
-            model.compile(optimizer=tf.keras.optimizers.Adam(0.001), loss='mse')
+            with tf.device('/GPU:0'):
+                inputs = layers.Input(shape=(X_train_tf.shape[1],))
+                gate = GatekeeperLayer(X_train_tf.shape[1], l1_penalty=p)(inputs)
+                x = layers.Dense(32, activation='relu')(gate)
+                outputs = layers.Dense(1, activation='linear')(x)
+                model = models.Model(inputs=inputs, outputs=outputs)
+                model.compile(optimizer=tf.keras.optimizers.Adam(0.001), loss='mse')
 
-            history = model.fit(X_train_tf, y_train_tf, epochs=250, batch_size=128,
-                                validation_split=0.2, verbose=0,
-                                callbacks=[callbacks.EarlyStopping(patience=30, restore_best_weights=True)])
+                history = model.fit(X_train_tf, y_train_tf, epochs=250, batch_size=256,
+                                    validation_split=0.2, verbose=0,
+                                    callbacks=[callbacks.EarlyStopping(patience=30, restore_best_weights=True)])
 
             weights = model.layers[1].get_weights()[0]
             n_feats = np.sum(weights > 1e-3)
