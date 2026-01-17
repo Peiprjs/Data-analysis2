@@ -20,6 +20,8 @@ from sklearn.metrics import mean_squared_error, r2_score
 # Added 'top_features' to the tuple for easy inspection
 ModelResult = namedtuple('ModelResult', ['model', 'rmse', 'r2', 'best_params', 'runtime', 'top_features'])
 NNResult = namedtuple('NNResult', ['X_train_elite', 'X_test_elite', 'feature_names', 'rmse', 'n_features'])
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+tf.get_logger().setLevel('ERROR')
 
 def set_global_seeds(seed=42):
     """Ensure reproducibility across TF, Numpy, and Python"""
