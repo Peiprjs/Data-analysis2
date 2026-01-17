@@ -88,8 +88,8 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250), consens
     y_train_tf = Y_train.values.astype('float32')
 
     # Your requested penalty range
-    penalties = [2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
-    repeats = 5
+    penalties = [2.0, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 12.0, 15.0]
+    repeats = 10
 
     # Storage for stability selection
     penalty_results = []
@@ -153,23 +153,30 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250), consens
 
     # Find the "Scientific Champion"
     # Criteria: Within target range, then highest R2
+
+    for res in penalty_results:
+        # We want a balance: High R2, Low RMSE, and manageable feature count
+        # This prevents the model from just picking the highest penalty
+        res['efficiency'] = res['r2'] / np.log1p(res['n_features'])
+
+        # Find the "Scientific Sweet Spot"
+        # We look for the penalty that maximizes Efficiency within the target range
     valid_results = [r for r in penalty_results if target_range[0] < r['n_features'] < target_range[1]]
 
     if not valid_results:
         print("🛑 No penalty level met the consensus target range.")
         return None
 
-    champion = max(valid_results, key=lambda x: x['r2'])
+    # CHOOSE THE SWEET SPOT (Not just the highest penalty)
+    champion = max(valid_results, key=lambda x: x['efficiency'])
 
-    # Identify elite names based on the frequency mask
+    print(f"\n🎯 Sweet Spot Found at Penalty {champion['penalty']}")
+    print(f"Features: {champion['n_features']} | R2: {champion['r2']:.3f} | RMSE: {champion['rmse']:.2f}")
+
     elite_mask = champion['freq_mask'] >= consensus_threshold
     elite_names = X_train.columns[elite_mask].tolist()
 
-    print(f"\n✅ Scientific Selection Complete!")
-    print(f"Final Model: {len(elite_names)} bacteria selected by {consensus_threshold * 100}% of runs.")
-
     return NNResult(X_train[elite_names], X_test[elite_names], elite_names, champion['rmse'], champion['n_features'])
-
 
 # =========================================================
 # 3. CLASSICAL ML BENCHMARKS (XGB & RF)
