@@ -1,15 +1,6 @@
 name: Run Jupyter Notebook
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'notebooks/data-pipeline.ipynb'
-      - 'notebooks/requirements.txt'
-      - 'notebooks/functions.py'
-      - 'data/**'
-      - '.github/workflows/run-notebook.yml'
   workflow_dispatch:
 
 permissions:
