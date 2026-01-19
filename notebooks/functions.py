@@ -6,6 +6,7 @@ import random
 import os
 import gc
 from collections import namedtuple
+from tqdm import tqdm
 
 # Machine Learning & Stats
 import xgboost as xgb
@@ -116,12 +117,12 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250), consens
     print(f"{'Penalty':<8} | {'Avg Feats':<10} | {'Avg RMSE':<10} | {'Avg R2':<8} | {'Stability'}")
     print("-" * 75)
 
-    for p in penalties:
+    for p in tqdm(penalties, desc="Testing penalties", unit="penalty"):
         batch_weights = []
         batch_rmse = []
         batch_r2 = []
 
-        for i in range(repeats):
+        for i in tqdm(range(repeats), desc=f"Testing penalty {p}", leave=False):
             tf.keras.backend.clear_session()
             gc.collect()
 
@@ -152,7 +153,8 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250), consens
                 model.fit(
                     X_train_tf, y_train_tf,
                     epochs=400, batch_size=64, validation_split=0.2,
-                    verbose=0, callbacks=callback_list
+                    verbose=0, callbacks=callback_list,
+                    use_multiprocessing=True
                 )
 
             # Record weights and metrics
