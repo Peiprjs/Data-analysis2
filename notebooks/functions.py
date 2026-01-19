@@ -100,7 +100,7 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250), consens
     y_train_tf = Y_train.values.astype('float32')
 
     # Create checkpoint directory if it doesn't exist
-    checkpoint_dir = '/tmp/nn_checkpoints'
+    checkpoint_dir = 'tmp/nn_checkpoints'
     if use_checkpointing and not os.path.exists(checkpoint_dir):
         os.makedirs(checkpoint_dir)
 
@@ -154,7 +154,6 @@ def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250), consens
                     X_train_tf, y_train_tf,
                     epochs=400, batch_size=64, validation_split=0.2,
                     verbose=0, callbacks=callback_list,
-                    use_multiprocessing=True
                 )
 
             # Record weights and metrics
