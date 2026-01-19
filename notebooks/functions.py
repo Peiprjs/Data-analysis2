@@ -485,7 +485,7 @@ def explain_with_lime(model, X_train, X_test, feature_names, num_samples=5, num_
     )
     
     explanations = {}
-    print(f"🔍 Generating LIME explanations for {num_samples} samples...")
+    print(f"Generating LIME explanations for {num_samples} samples...")
     
     for i in range(min(num_samples, len(X_test_np))):
         exp = explainer.explain_instance(
