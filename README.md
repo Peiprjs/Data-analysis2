@@ -1,6 +1,123 @@
-# Documentation
+# Minor AI Microbiome Data analysis project
 
-## UML activity diagram
+## Overview
+
+This project analyses and predicts microbiome data on a selected subset from the LucKi cohort. The analysis focuses on bacterial abundance patterns across different age groups and samples, using MetaPhlAn 4.1.1 taxonomic profiles.
+
+### Key Features
+
+- **Data Integration**: Merges abundance tables with sample metadata
+- **Preprocessing Pipeline**: Processing data via CLR
+- **Exploratory Analysis**: Visualizes sample distributions and bacterial abundance patterns
+- **Machine Learning**: Implements Random Forest regression models for predictive analysis
+- **Feature Engineering**: Performs PCA and feature selection on taxonomic data
+- **Branches expansion**: Experimenting with alternative methods like Neural Networks to improve the features selection
+
+## Getting Started
+
+## Prerequisites
+- Python 3.x
+- Jupyter Notebook
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/MAI-David/Data-analysis.git
+cd Data-analysis
+```
+
+2. Install required packages:
+```bash
+cd notebooks
+pip install -r requirements.txt
+```
+
+### Dependencies
+
+The project requires the following Python packages:
+- pandas
+- numpy
+- matplotlib
+- seaborn
+- scikit-learn
+- click
+- colorama
+- supertree
+- xgboost
+- lightgbm
+- lime
+- shap
+
+In order to run branch with Neural Networks feature selection, these optional dependencies are required:
+- tensorflow
+
+## Usage
+
+The main analysis is contained in the Jupyter notebook:
+
+```bash
+cd notebooks
+jupyter notebook data-pipeline.ipynb
+```
+
+The notebook is organized into the following sections:
+1. **Housekeeping**: Library imports, settings, and function definitions
+2. **Data Preprocessing**: Data import, merging, encoding, and cleaning
+3. **Exploratory Data Analysis**: Visualizations and statistical summaries
+4. **Model Training**: Random Forest regressor development with genus-level features
+
+Cross-validation and Neural Networks functions are kept in a separate python file:
+
+```bash
+cd notebooks
+nano functions.py
+```
+
+## Data
+
+The analysis uses two main data sources located in `data/raw/`:
+
+- **MAI3004_lucki_mpa411.csv**: MetaPhlAn 4.1.1 abundance table (6903 × 932)
+  - Contains taxonomic profiles with relative abundances for each sample
+  - Each row represents a taxonomic clade
+  - Columns are prefixed with `mpa411_` for sample identifiers
+  - **Note**: Data was manually converted from TSV to CSV format for proper Pandas loading
+
+- **MAI3004_lucki_metadata_safe.csv**: Sample metadata (930 × 6)
+  - Contains demographic and sample information
+  - Includes family ID, sex, age group, and collection details
+
+### Dataset Characteristics
+
+The LucKi cohort subdataset consists of **930 stool samples** collected from multiple individuals across different families. Key characteristics include:
+
+- **High-dimensional data**: Approximately 6,900 microbiome features
+- **Sparse dataset**: Each sample contains on average ~1200 geni and ~300 taxa  
+- **Consistent sequencing depth**: Total microbial abundance per sample is relatively stable
+- **Rare taxa dominance**: Most taxa occur in only a small fraction of samples
+- **Prevalent taxa subset**: A small subset of taxa is highly prevalent across the cohort
+- **Log-normal distribution**: Non-zero abundances follow an approximately log-normal shape (typical for microbiome sequencing data)
+
+## Project Structure
+
+```
+Data-analysis/
+├── README.md                 # This file
+├── data/
+│   └── raw/                  # Raw data files
+│       ├── MAI3004_lucki_mpa411.csv
+│       ├── MAI3004_lucki_metadata_safe.csv
+│       └── metaphlan411_data_description.md
+└── notebooks/
+    ├── data-pipeline.ipynb   # Main analysis notebook
+    ├── functions.py          # Support functions for time-consuming operations
+    └── requirements.txt      # Python dependencies
+```
+
+## Documentation
+
+### UML activity diagram
 
 ```mermaid
 ---
@@ -42,7 +159,7 @@ flowchart TB
     style n2 color:#000000
 ```
 
-## Important variables and objects
+### Important variables and objects
 
 | Name                                         | Purpose                                                                                                                                                                                        |
 |----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -58,3 +175,29 @@ flowchart TB
 | `normalized_samples`                         | Copy used for Shapiro-Wilk normality checks across `numeric_cols`.                                                                                                                             |
 | `X`, `feature_cols`                          | Feature matrix derived from `merged_samples` after removing metadata columns; drives prevalence and PCA analysis.                                                                              |
 | `top_features`, `X_sub`, `X_scaled`, `X_pca` | PCA prep artifacts: top 500 prevalent features, their subset matrix, scaled values, and resulting 2D projection.                                                                               |
+
+
+## Analysis Workflow
+
+The data pipeline follows these main steps:
+
+1. **Data Loading**: Import raw abundance data and metadata (manually converted from TSV to CSV format)
+2. **Data Merging**: Combine abundance profiles with sample metadata
+3. **Preprocessing**:
+   - Label encoding for categorical variables (family_id, sex, age_group)
+   - Handle missing values
+   - Detect and analyze outliers using IQR method
+   - Check normality assumptions with Shapiro-Wilk tests
+4. **Train-Test Split**: Separate data before further processing
+5. **Normalization**: Apply log transformation to abundance data
+6. **Exploratory Data Analysis**:
+   - Analyze sample distributions and shapes
+   - Examine bacterial abundance patterns and prevalence
+   - Perform PCA for dimensionality reduction
+   - **Key Finding**: PCA projection shows a gradual age-related gradient, indicating age-related variation in microbiome composition represents a limited fraction of total variance
+7. **Feature Selection**: Filter features at the genus level for model training
+8. **Model Training**: 
+   - Train Random Forest regressor models
+   - Base model evaluation with train/test split
+   - Hyperparameter tuning to find optimal model configuration
+
