@@ -14,9 +14,8 @@ jupyter nbconvert --to pdf data-pipeline.ipynb
 
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
-cd notebooks
-mv data-pipeline.ipynb data-pipeline-${TIMESTAMP}.ipynb
-mv data-pipeline.html data-pipeline-${TIMESTAMP}.html
-mv data-pipeline.pdf data-pipeline-${TIMESTAMP}.pdf
+cp data-pipeline.ipynb ../outputs/data-pipeline-${TIMESTAMP}.ipynb
+mv data-pipeline.html ../outputs/data-pipeline-${TIMESTAMP}.html
+mv data-pipeline.pdf ../outputs/data-pipeline-${TIMESTAMP}.pdf
 
 echo "Done with running!"
