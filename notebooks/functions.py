@@ -897,3 +897,66 @@ def plot_learning_curves(model, X_train, y_train, cv_folds=5, title="Learning Cu
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.show()
+
+# =========================================================
+# 8. PRE FILTERING OF FEATURES BASED ON ABUNDANCE, VARIATION, COLLINEARITY, PREVALENCE
+# =========================================================
+
+## Feature Selection Pipeline
+def feature_selection_pipeline(X, prevalence_thresh=0.05, abundance_thresh=1e-4, variance_thresh=1e-5,
+                                   corr_thresh=0.9):
+    """
+    Feature filtering pipeline for microbiome data.
+
+    Parameters:
+        X: pd.DataFrame
+            Feature matrix (samples x taxa)
+        prevalence_thresh: float
+            Minimum fraction of samples a feature must appear in
+        abundance_thresh: float
+            Minimum mean abundance for a feature to be kept
+        variance_thresh: float
+            Minimum variance threshold
+        corr_thresh: float
+            Maximum allowed correlation between features
+
+    Returns:
+        X_filtered: pd.DataFrame
+            Filtered feature matrix
+        removed_features: list
+            Names of removed features
+    """
+    X_filtered = X.copy()
+    removed_features = []
+
+    # Prevalence filtering
+    prevalence = (X_filtered > 0).sum(axis=0) / X_filtered.shape[0]
+    low_prev = prevalence[prevalence < prevalence_thresh].index.tolist()
+    X_filtered.drop(columns=low_prev, inplace=True)
+    removed_features.extend(low_prev)
+    print(f"Prevalence filtering: removed {len(low_prev)} features")
+
+    # Mean abundance filtering
+    mean_abundance = X_filtered.mean(axis=0)
+    low_abundance = mean_abundance[mean_abundance < abundance_thresh].index.tolist()
+    X_filtered.drop(columns=low_abundance, inplace=True)
+    removed_features.extend(low_abundance)
+    print(f"Abundance filtering: removed {len(low_abundance)} features")
+
+    # Low variance filtering
+    variance = X_filtered.var(axis=0)
+    low_variance = variance[variance < variance_thresh].index.tolist()
+    X_filtered.drop(columns=low_variance, inplace=True)
+    removed_features.extend(low_variance)
+    print(f"Variance filtering: removed {len(low_variance)} features")
+
+    # Collinearity filtering (remove one of each pair of highly correlated features)
+    corr_matrix = X_filtered.corr().abs()
+    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    to_drop = [col for col in upper.columns if any(upper[col] > corr_thresh)]
+    X_filtered.drop(columns=to_drop, inplace=True)
+    removed_features.extend(to_drop)
+    print(f"Collinearity filtering: removed {len(to_drop)} features")
+
+    print(f"Remaining features: {X_filtered.shape[1]}")
+    return X_filtered, removed_features
