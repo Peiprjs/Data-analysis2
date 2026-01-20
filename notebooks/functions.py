@@ -309,9 +309,9 @@ def gradient_boosting_benchmark(X_train_df, X_test_df, y_train, y_test, label="D
         param_distributions={
             "n_estimators": [100, 200, 300, 500],
             "learning_rate": [0.01, 0.05, 0.1],
-            "max_depth": [3, 4, 5, 6],
-            "min_samples_split": [2, 5, 10],
-            "min_samples_leaf": [1, 2, 4],
+            "max_depth": [3, 4, 5, 6, 10, 15, 20, 40],
+            "min_samples_split": [2, 5, 10, 20, 50],
+            "min_samples_leaf": [1, 2, 4, 10, 50],
             "subsample": [0.6, 0.7, 0.8, 0.9, 1.0],
             "max_features": ["sqrt", "log2", None]
         },
@@ -342,9 +342,9 @@ def lightgbm_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
         param_distributions={
             "n_estimators": [100, 200, 500, 1000],
             "learning_rate": [0.01, 0.05, 0.1],
-            "max_depth": [3, 5, 7, -1],
+            "max_depth": [3, 5, 7, -1, 10, 20],
             "num_leaves": [15, 31, 63, 127],
-            "min_child_samples": [5, 10, 20],
+            "min_child_samples": [5, 10, 20, 30, 40],
             "subsample": [0.6, 0.7, 0.8, 1.0],
             "colsample_bytree": [0.6, 0.8, 1.0],
             "reg_alpha": [0, 0.1, 0.5, 1.0],
@@ -617,7 +617,7 @@ def filter_features_by_level(X, max_level='Genus'):
     return X[selected_features]
 
 
-def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_type='RandomForest', cv_folds=5):
+def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_type='RandomForest', cv_folds=5): #TODO: check also different hyperparameters
     """
     Cross-validate model performance at different taxonomic feature levels.
     
