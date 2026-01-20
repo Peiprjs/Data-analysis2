@@ -18,3 +18,5 @@ cd notebooks
 mv data-pipeline.ipynb data-pipeline-${TIMESTAMP}.ipynb
 mv data-pipeline.html data-pipeline-${TIMESTAMP}.html
 mv data-pipeline.pdf data-pipeline-${TIMESTAMP}.pdf
+
+echo "Done with running!"
