@@ -458,7 +458,7 @@ def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5, xgb_params=Non
 # =========================================================
 # 5. MODEL INTERPRETABILITY (LIME & SHAP)
 # =========================================================
-def explain_with_lime(model, X_train, X_test, y_test, feature_names, num_samples=5, num_features=10):
+def explain_with_lime(model, X_train, X_test, feature_names, num_samples=5, num_features=10):
     """
     Generate LIME explanations for individual predictions.
     
@@ -466,18 +466,16 @@ def explain_with_lime(model, X_train, X_test, y_test, feature_names, num_samples
     - model: trained model with predict method
     - X_train: training data (pandas DataFrame or numpy array)
     - X_test: test data (pandas DataFrame or numpy array)
-    - y_test: true target values for X_test (pandas Series or numpy array)
     - feature_names: list of feature names
     - num_samples: number of test samples to explain
     - num_features: number of top features to show in explanation
     
     Returns:
-    - Dictionary with explanations for each sample, including prediction and actual value
+    - Dictionary with explanations for each sample
     """
     # Convert to numpy if needed
     X_train_np = X_train.values if hasattr(X_train, 'values') else X_train
     X_test_np = X_test.values if hasattr(X_test, 'values') else X_test
-    y_test_np = y_test.values if hasattr(y_test, 'values') else y_test
     
     # Initialize LIME explainer
     explainer = lime.lime_tabular.LimeTabularExplainer(
@@ -496,16 +494,12 @@ def explain_with_lime(model, X_train, X_test, y_test, feature_names, num_samples
             model.predict,
             num_features=num_features
         )
-        pred = float(model.predict([X_test_np[i]])[0])
-        actual = float(y_test_np[i])
-
         explanations[f'sample_{i}'] = {
-            'prediction': pred,
-            'actual': actual,
+            'prediction': model.predict([X_test_np[i]])[0],
             'explanation': exp.as_list(),
             'score': exp.score
         }
-        print(f"  Sample {i}: Prediction = {pred:.2f} | Actual = {actual:.2f}")
+        print(f"  Sample {i}: Prediction = {explanations[f'sample_{i}']['prediction']:.2f}")
     
     return explanations
 
