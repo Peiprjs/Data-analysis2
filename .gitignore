@@ -206,3 +206,20 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 /.idea
+
+# Local requirement overrides
+notebooks/requirements-local.txt
+
+# Keras / TensorFlow temporary files
+checkpoint
+*.ckpt
+*.ckpt.meta
+*.h5
+*.keras
+nn_feature_search_tmp/
+tmp_keras/
+checkpoint_temp/
+
+# Log files
+*.log
+tfevents*
