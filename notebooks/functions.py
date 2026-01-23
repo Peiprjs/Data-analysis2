@@ -897,8 +897,17 @@ def plot_learning_curves(model, X_train, y_train, cv_folds=5, title="Learning Cu
 # =========================================================
 
 ## Feature Selection Pipeline
-def feature_selection_pipeline(X, prevalence_thresh=0.05, abundance_thresh=1e-4, variance_thresh=1e-5,
-                                   corr_thresh=0.9):
+def feature_selection_pipeline(X, prevalence_thresh=0.0633342156194934, abundance_thresh=0.00015905606434428443, variance_thresh=5.3173754852092485e-06,
+                                   corr_thresh=0.9795715454616797):
+    #defaults for genus level:
+    #Best parameters: {'prevalence_thresh': 0.0633342156194934, 'abundance_thresh': 0.00015905606434428443, 'variance_thresh': 5.3173754852092485e-06, 'corr_thresh': 0.9795715454616797}
+    #Best RMSE: 60.973, Best R2: 0.801
+
+    #defaults for species level:
+    #Best parameters: {'prevalence_thresh': 0.0632320223420868, 'abundance_thresh': 1.4626891739832243e-05, 'variance_thresh': 1.9229266155638468e-05, 'corr_thresh': 0.8932026069893284}
+    #Best RMSE: 56.463, Best R2: 0.829
+
+
     """
     Feature filtering pipeline for microbiome data.
 
