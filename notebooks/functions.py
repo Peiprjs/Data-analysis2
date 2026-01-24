@@ -94,116 +94,110 @@ class GatekeeperLayer(layers.Layer):
         return inputs * self.w
 
 
-def nn_feature_search(X_train, X_test, Y_train, target_range=(50, 1250), consensus_threshold=0.7, use_checkpointing=True):
+def nn_feature_search(
+        X_train, X_test, Y_train,
+        target_range=(50, 1250),
+        consensus_threshold=0.7,
+        # Hardware/Speed Parameters
+        batch_size=64,  # 1024 for Radeon 7900 / 64 for CPU
+        jit_compile=False,  # True for 7900 (XLA) / False for CPU
+        mixed_precision=False,  # True for 7900 (FP16) / False for CPU
+        device="/CPU:0"  # "/GPU:0" for GPU or Mac M-chips
+):
+    base_lr = 0.01 if batch_size >= 4096 else (0.004 if batch_size > 512 else 0.001)
+    repeats = 10
+    epochs = 400
+    patience = 50
+    penalties = [2.0, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 12.0, 15.0]
+
+    # Global Mixed Precision Setup
+    if mixed_precision:
+        from tensorflow.keras import mixed_precision as mp
+        mp.set_global_policy('mixed_float16')
+    else:
+        from tensorflow.keras import mixed_precision as mp
+        mp.set_global_policy('float32')
+
     scaler_x = StandardScaler()
     X_train_tf = scaler_x.fit_transform(X_train).astype('float32')
     y_train_tf = Y_train.values.astype('float32')
 
-    # Create checkpoint directory if it doesn't exist
-    checkpoint_dir = 'tmp/nn_checkpoints'
-    if use_checkpointing and not os.path.exists(checkpoint_dir):
-        os.makedirs(checkpoint_dir)
-
-    # Your requested penalty range
-    penalties = [2.0, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 12.0, 15.0]
-    repeats = 10
-
-    # Storage for stability selection
     penalty_results = []
+    print(f"🧬 Search Started | Device: {device} | Batch: {batch_size}")
+    print("-" * 85)
+    print(f"{'Penalty':<8} | {'Features':<10} | {'RMSE (Avg)':<12} | {'R2 (Avg)':<10} | {'Efficiency'}")
+    print("-" * 85)
 
-    print(f"Starting Scientific Stability Search on {X_train.shape[1]} features...")
-    if use_checkpointing:
-        print(f"Checkpointing enabled - saving to {checkpoint_dir}")
-    print(f"{'Penalty':<8} | {'Avg Feats':<10} | {'Avg RMSE':<10} | {'Avg R2':<8} | {'Stability'}")
-    print("-" * 75)
+    for p in tqdm(penalties, desc="Testing penalties"):
+        batch_weights, batch_rmse, batch_r2 = [], [], []
+        tf.keras.backend.clear_session()
+        gc.collect()
 
-    for p in tqdm(penalties, desc="Testing penalties", unit="penalty"):
-        batch_weights = []
-        batch_rmse = []
-        batch_r2 = []
-
-        for i in tqdm(range(repeats), desc=f"Testing penalty {p}", leave=False):
-            tf.keras.backend.clear_session()
-            gc.collect()
-
-            with tf.device(DEVICE):
+        for i in tqdm(range(repeats), desc=f"Penalty {p}", leave=False):
+            with tf.device(device):
+                # ARCHITECTURE: Fixed logic to ensure scientific consistency
                 inputs = layers.Input(shape=(X_train_tf.shape[1],))
                 gate = GatekeeperLayer(X_train_tf.shape[1], l1_penalty=p)(inputs)
-                x = layers.Dense(128, activation='relu')(gate)
-                x = layers.Dropout(0.2)(x)
-                x = layers.Dense(64, activation='relu')(x)
-                outputs = layers.Dense(1, activation='linear')(x)
+
+                # L2 Regularization and Dropout are "Hardcoded" to prevent overfitting
+                x = layers.Dense(128, activation='relu', kernel_regularizer='l2')(gate)
+                x = layers.Dropout(0.3)(x)
+                x = layers.Dense(64, activation='relu', kernel_regularizer='l2')(x)
+                outputs = layers.Dense(1, activation='linear', dtype="float32")(x)
 
                 model = models.Model(inputs=inputs, outputs=outputs)
-                model.compile(optimizer=tf.keras.optimizers.Adam(0.001), loss='mse')
+                steps_per_epoch = int(np.ceil(len(X_train_tf) / batch_size))
 
-                # Setup callbacks with checkpointing
-                callback_list = [callbacks.EarlyStopping(patience=40, restore_best_weights=True)]
-                if use_checkpointing:
-                    checkpoint_path = os.path.join(checkpoint_dir, f'model_p{p}_r{i}.keras')
-                    checkpoint_callback = callbacks.ModelCheckpoint(
-                        filepath=checkpoint_path,
-                        monitor='val_loss',
-                        save_best_only=True,
-                        save_weights_only=False,
-                        verbose=0
-                    )
-                    callback_list.append(checkpoint_callback)
+                # LEARNING RATE: Adaptive schedule to handle large batches safely
+                lr_schedule = tf.keras.optimizers.schedules.CosineDecay(
+                    initial_learning_rate=0.0,
+                    decay_steps=epochs*steps_per_epoch,
+                    warmup_target=base_lr,
+                    warmup_steps=20 * steps_per_epoch
+                )
+
+                model.compile(
+                    optimizer=tf.keras.optimizers.Adam(learning_rate=lr_schedule),
+                    loss='mse',
+                    jit_compile=jit_compile
+                )
 
                 model.fit(
                     X_train_tf, y_train_tf,
-                    epochs=400, batch_size=64, validation_split=0.2,
-                    verbose=0, callbacks=callback_list,
+                    epochs=epochs,
+                    batch_size=batch_size,
+                    validation_split=0.2,
+                    verbose=0,
+                    callbacks=[callbacks.EarlyStopping(patience=patience, restore_best_weights=True)],
                 )
 
-            # Record weights and metrics
+            # Record weights and predict
             w = model.layers[1].get_weights()[0]
-            batch_weights.append(w > 1e-2)  # Binary mask of selected features
-
-            y_pred = model.predict(X_train_tf, verbose=0)
+            batch_weights.append(w > 1e-2)
+            y_pred = model.predict(X_train_tf, batch_size=batch_size, verbose=0)
             batch_rmse.append(np.sqrt(mean_squared_error(y_train_tf, y_pred)))
             batch_r2.append(r2_score(y_train_tf, y_pred))
 
-        # Calculate Consensus for this penalty
-        # How many times was each feature selected?
-        selection_frequency = np.mean(batch_weights, axis=0)
-        consensus_feats = np.sum(selection_frequency >= consensus_threshold)
-
         avg_rmse = np.mean(batch_rmse)
         avg_r2 = np.mean(batch_r2)
-
-        print(
-            f"{p:<8} | {consensus_feats:<10} | {avg_rmse:<10.2f} | {avg_r2:<8.2f} | {consensus_threshold * 100:.0f}% Match")
+        selection_frequency = np.mean(batch_weights, axis=0)
+        consensus_feats = np.sum(selection_frequency >= consensus_threshold)
+        eff = avg_r2 / np.log1p(consensus_feats) if consensus_feats > 0 else 0
+        print(f"{p:<8} | {consensus_feats:<10} | {avg_rmse:<12.2f} | {avg_r2:<10.2f} | {eff:.4f}")
 
         penalty_results.append({
             'penalty': p,
             'n_features': consensus_feats,
             'rmse': avg_rmse,
             'r2': avg_r2,
+            'efficiency': eff,  # Store this so champion logic can find it
             'freq_mask': selection_frequency
         })
 
-    # Find the "Scientific Champion"
-    # Criteria: Within target range, then highest R2
-
-    for res in penalty_results:
-        # We want a balance: High R2, Low RMSE, and manageable feature count
-        # This prevents the model from just picking the highest penalty
-        res['efficiency'] = res['r2'] / np.log1p(res['n_features'])
-
-        # Find the "Scientific Sweet Spot"
-        # We look for the penalty that maximizes Efficiency within the target range
+    # Champion Selection...
     valid_results = [r for r in penalty_results if target_range[0] < r['n_features'] < target_range[1]]
-
-    if not valid_results:
-        print("No penalty level met the consensus target range.")
-        return None
-
-    # CHOOSE THE SWEET SPOT (Not just the highest penalty)
+    if not valid_results: return None
     champion = max(valid_results, key=lambda x: x['efficiency'])
-
-    print(f"\nSweet Spot Found at Penalty {champion['penalty']}")
-    print(f"Features: {champion['n_features']} | R2: {champion['r2']:.3f} | RMSE: {champion['rmse']:.2f}")
 
     elite_mask = champion['freq_mask'] >= consensus_threshold
     elite_names = X_train.columns[elite_mask].tolist()
@@ -338,7 +332,7 @@ def gradient_boosting_benchmark(X_train_df, X_test_df, y_train, y_test, label="D
 def lightgbm_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing LightGBM Engine: {label}")
     search = RandomizedSearchCV(
-        estimator=lgb.LGBMRegressor(random_state=42, n_jobs=-1, verbose=-1),
+        estimator=lgb.LGBMRegressor(random_state=42, device = "cpu", n_jobs=1, verbose=1, importance_type="gain"),
         param_distributions={
             "n_estimators": [100, 200, 500, 1000],
             "learning_rate": [0.01, 0.05, 0.1],
@@ -458,7 +452,7 @@ def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5, xgb_params=Non
 # =========================================================
 # 5. MODEL INTERPRETABILITY (LIME & SHAP)
 # =========================================================
-def explain_with_lime(model, X_train, X_test, y_test, feature_names, num_samples=5, num_features=10):
+def explain_with_lime(model, X_train, X_test, feature_names, num_samples=5, num_features=10):
     """
     Generate LIME explanations for individual predictions.
     
@@ -466,18 +460,16 @@ def explain_with_lime(model, X_train, X_test, y_test, feature_names, num_samples
     - model: trained model with predict method
     - X_train: training data (pandas DataFrame or numpy array)
     - X_test: test data (pandas DataFrame or numpy array)
-    - y_test: true target values for X_test (pandas Series or numpy array)
     - feature_names: list of feature names
     - num_samples: number of test samples to explain
     - num_features: number of top features to show in explanation
     
     Returns:
-    - Dictionary with explanations for each sample, including prediction and actual value
+    - Dictionary with explanations for each sample
     """
     # Convert to numpy if needed
     X_train_np = X_train.values if hasattr(X_train, 'values') else X_train
     X_test_np = X_test.values if hasattr(X_test, 'values') else X_test
-    y_test_np = y_test.values if hasattr(y_test, 'values') else y_test
     
     # Initialize LIME explainer
     explainer = lime.lime_tabular.LimeTabularExplainer(
@@ -496,16 +488,12 @@ def explain_with_lime(model, X_train, X_test, y_test, feature_names, num_samples
             model.predict,
             num_features=num_features
         )
-        pred = float(model.predict([X_test_np[i]])[0])
-        actual = float(y_test_np[i])
-
         explanations[f'sample_{i}'] = {
-            'prediction': pred,
-            'actual': actual,
+            'prediction': model.predict([X_test_np[i]])[0],
             'explanation': exp.as_list(),
             'score': exp.score
         }
-        print(f"  Sample {i}: Prediction = {pred:.2f} | Actual = {actual:.2f}")
+        print(f"  Sample {i}: Prediction = {explanations[f'sample_{i}']['prediction']:.2f}")
     
     return explanations
 
@@ -909,8 +897,17 @@ def plot_learning_curves(model, X_train, y_train, cv_folds=5, title="Learning Cu
 # =========================================================
 
 ## Feature Selection Pipeline
-def feature_selection_pipeline(X, prevalence_thresh=0.05, abundance_thresh=1e-4, variance_thresh=1e-5,
-                                   corr_thresh=0.9):
+def feature_selection_pipeline(X, prevalence_thresh=0.0633342156194934, abundance_thresh=0.00015905606434428443, variance_thresh=5.3173754852092485e-06,
+                                   corr_thresh=0.9795715454616797):
+    #defaults for genus level:
+    #Best parameters: {'prevalence_thresh': 0.0633342156194934, 'abundance_thresh': 0.00015905606434428443, 'variance_thresh': 5.3173754852092485e-06, 'corr_thresh': 0.9795715454616797}
+    #Best RMSE: 60.973, Best R2: 0.801
+
+    #defaults for species level:
+    #Best parameters: {'prevalence_thresh': 0.0632320223420868, 'abundance_thresh': 1.4626891739832243e-05, 'variance_thresh': 1.9229266155638468e-05, 'corr_thresh': 0.8932026069893284}
+    #Best RMSE: 56.463, Best R2: 0.829
+
+
     """
     Feature filtering pipeline for microbiome data.
 
