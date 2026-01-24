@@ -1349,3 +1349,232 @@ def feature_selection_pipeline(X, prevalence_thresh=0.0633342156194934, abundanc
 
     print(f"Remaining features: {X_filtered.shape[1]}")
     return X_filtered, removed_features
+
+
+def pca_feature_selection(X, n_components=0.95, scale=True):
+    """
+    Apply PCA for dimensionality reduction.
+    
+    Parameters:
+    - X: Feature matrix (DataFrame or array)
+    - n_components: Number of components or variance ratio to retain
+    - scale: Whether to scale features before PCA
+    
+    Returns:
+    - X_pca: Transformed features
+    - pca: Fitted PCA object
+    """
+    X_arr = X.values if isinstance(X, pd.DataFrame) else X
+    
+    if scale:
+        scaler = StandardScaler()
+        X_arr = scaler.fit_transform(X_arr)
+    
+    pca = PCA(n_components=n_components, random_state=42)
+    X_pca = pca.fit_transform(X_arr)
+    
+    print(f"PCA: reduced to {X_pca.shape[1]} components")
+    print(f"Explained variance ratio: {pca.explained_variance_ratio_.sum():.3f}")
+    
+    return X_pca, pca
+
+
+def feature_importance_selection(X_train, y_train, X_test=None, n_features=100, model_type='RandomForest'):
+    """
+    Select features based on model feature importance.
+    
+    Parameters:
+    - X_train: Training features
+    - y_train: Training target
+    - X_test: Test features (optional)
+    - n_features: Number of top features to select
+    - model_type: Model to use for importance ('RandomForest', 'XGBoost', 'GradientBoosting')
+    
+    Returns:
+    - X_train_selected: Selected training features
+    - X_test_selected: Selected test features (if X_test provided)
+    - selected_features: List of selected feature names
+    """
+    if model_type == 'RandomForest':
+        model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+    elif model_type == 'XGBoost':
+        model = xgb.XGBRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+    elif model_type == 'GradientBoosting':
+        model = GradientBoostingRegressor(n_estimators=100, random_state=42)
+    else:
+        raise ValueError(f"Unknown model_type: {model_type}")
+    
+    X_train_arr = X_train.values if isinstance(X_train, pd.DataFrame) else X_train
+    feature_names = X_train.columns.tolist() if isinstance(X_train, pd.DataFrame) else [f"feature_{i}" for i in range(X_train_arr.shape[1])]
+    
+    model.fit(X_train_arr, y_train)
+    importances = model.feature_importances_
+    
+    indices = np.argsort(importances)[::-1][:n_features]
+    selected_features = [feature_names[i] for i in indices]
+    
+    if isinstance(X_train, pd.DataFrame):
+        X_train_selected = X_train[selected_features]
+        X_test_selected = X_test[selected_features] if X_test is not None else None
+    else:
+        X_train_selected = X_train_arr[:, indices]
+        X_test_selected = X_test[:, indices] if X_test is not None else None
+    
+    print(f"Feature importance selection: selected {len(selected_features)} features using {model_type}")
+    
+    if X_test is not None:
+        return X_train_selected, X_test_selected, selected_features
+    return X_train_selected, selected_features
+
+
+def anova_feature_selection(X_train, y_train, X_test=None, n_features=100, mode='regression'):
+    """
+    Select features based on ANOVA F-statistic.
+    
+    Parameters:
+    - X_train: Training features
+    - y_train: Training target
+    - X_test: Test features (optional)
+    - n_features: Number of top features to select
+    - mode: 'regression' or 'classification'
+    
+    Returns:
+    - X_train_selected: Selected training features
+    - X_test_selected: Selected test features (if X_test provided)
+    - selected_features: List of selected feature names
+    """
+    score_func = f_regression if mode == 'regression' else f_classif
+    selector = SelectKBest(score_func=score_func, k=min(n_features, X_train.shape[1]))
+    
+    X_train_arr = X_train.values if isinstance(X_train, pd.DataFrame) else X_train
+    feature_names = X_train.columns.tolist() if isinstance(X_train, pd.DataFrame) else [f"feature_{i}" for i in range(X_train_arr.shape[1])]
+    
+    X_train_selected = selector.fit_transform(X_train_arr, y_train)
+    selected_indices = selector.get_support(indices=True)
+    selected_features = [feature_names[i] for i in selected_indices]
+    
+    if X_test is not None:
+        X_test_arr = X_test.values if isinstance(X_test, pd.DataFrame) else X_test
+        X_test_selected = selector.transform(X_test_arr)
+    else:
+        X_test_selected = None
+    
+    print(f"ANOVA feature selection: selected {len(selected_features)} features for {mode}")
+    
+    if isinstance(X_train, pd.DataFrame):
+        X_train_selected = pd.DataFrame(X_train_selected, columns=selected_features, index=X_train.index)
+        if X_test_selected is not None:
+            X_test_selected = pd.DataFrame(X_test_selected, columns=selected_features, index=X_test.index)
+    
+    if X_test is not None:
+        return X_train_selected, X_test_selected, selected_features
+    return X_train_selected, selected_features
+
+
+def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=['importance', 'anova', 'pca'], 
+                                       n_features=100, model_for_eval='RandomForest'):
+    """
+    Compare different feature selection methods.
+    
+    Parameters:
+    - X_train, y_train: Training data
+    - X_test, y_test: Test data
+    - methods: List of methods to compare ('importance', 'anova', 'pca', 'baseline')
+    - n_features: Number of features to select
+    - model_for_eval: Model to use for evaluation
+    
+    Returns:
+    - results: Dictionary with performance metrics for each method
+    """
+    results = {}
+    
+    if model_for_eval == 'RandomForest':
+        eval_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+    elif model_for_eval == 'XGBoost':
+        eval_model = xgb.XGBRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+    elif model_for_eval == 'GradientBoosting':
+        eval_model = GradientBoostingRegressor(n_estimators=100, random_state=42)
+    else:
+        eval_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+    
+    print(f"Comparing feature selection methods using {model_for_eval}...")
+    print(f"{'Method':<20} | {'# Features':<12} | {'RMSE':<12} | {'R2':<10}")
+    print("-" * 60)
+    
+    if 'baseline' in methods:
+        eval_model.fit(X_train, y_train)
+        y_pred = eval_model.predict(X_test)
+        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+        r2 = r2_score(y_test, y_pred)
+        results['baseline'] = {'n_features': X_train.shape[1], 'rmse': rmse, 'r2': r2}
+        print(f"{'Baseline':<20} | {X_train.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+    
+    if 'importance' in methods:
+        X_train_sel, X_test_sel, _ = feature_importance_selection(X_train, y_train, X_test, n_features, 'RandomForest')
+        eval_model.fit(X_train_sel, y_train)
+        y_pred = eval_model.predict(X_test_sel)
+        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+        r2 = r2_score(y_test, y_pred)
+        results['importance'] = {'n_features': X_train_sel.shape[1], 'rmse': rmse, 'r2': r2}
+        print(f"{'Feature Importance':<20} | {X_train_sel.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+    
+    if 'anova' in methods:
+        X_train_sel, X_test_sel, _ = anova_feature_selection(X_train, y_train, X_test, n_features, 'regression')
+        eval_model.fit(X_train_sel, y_train)
+        y_pred = eval_model.predict(X_test_sel)
+        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+        r2 = r2_score(y_test, y_pred)
+        results['anova'] = {'n_features': X_train_sel.shape[1], 'rmse': rmse, 'r2': r2}
+        print(f"{'ANOVA':<20} | {X_train_sel.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+    
+    if 'pca' in methods:
+        X_train_pca, pca_obj = pca_feature_selection(X_train, n_components=n_features if n_features < X_train.shape[1] else 0.95)
+        X_test_pca = pca_obj.transform(X_test)
+        eval_model.fit(X_train_pca, y_train)
+        y_pred = eval_model.predict(X_test_pca)
+        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+        r2 = r2_score(y_test, y_pred)
+        results['pca'] = {'n_features': X_train_pca.shape[1], 'rmse': rmse, 'r2': r2}
+        print(f"{'PCA':<20} | {X_train_pca.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+    
+    return results
+
+
+def find_best_evaluation_metric(y_true, y_pred, task='regression'):
+    """
+    Calculate and compare different evaluation metrics.
+    
+    Parameters:
+    - y_true: True values
+    - y_pred: Predicted values
+    - task: 'regression' or 'classification'
+    
+    Returns:
+    - metrics: Dictionary of metric values
+    """
+    metrics = {}
+    
+    if task == 'regression':
+        metrics['RMSE'] = np.sqrt(mean_squared_error(y_true, y_pred))
+        metrics['MAE'] = mean_absolute_error(y_true, y_pred)
+        metrics['R2'] = r2_score(y_true, y_pred)
+        metrics['MAPE'] = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+        
+        print("Regression Metrics:")
+        for metric_name, value in metrics.items():
+            print(f"  {metric_name}: {value:.4f}")
+    
+    elif task == 'classification':
+        metrics['Accuracy'] = accuracy_score(y_true, y_pred)
+        metrics['F1'] = f1_score(y_true, y_pred, average='weighted')
+        try:
+            metrics['ROC_AUC'] = roc_auc_score(y_true, y_pred, average='weighted', multi_class='ovr')
+        except (ValueError, TypeError):
+            metrics['ROC_AUC'] = None
+        
+        print("Classification Metrics:")
+        for metric_name, value in metrics.items():
+            if value is not None:
+                print(f"  {metric_name}: {value:.4f}")
+    
+    return metrics
