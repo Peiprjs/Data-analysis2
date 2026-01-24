@@ -322,13 +322,13 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     r2 = r2_score(y_test, y_pred)
 
-    # Calculate Top Drivers
     feat_df = pd.DataFrame({'Bacteria': X_train_df.columns, 'Importance': best_model.feature_importances_})
     top_drivers = feat_df.sort_values('Importance', ascending=False).head(20).reset_index(drop=True)
 
     print(f"\n{label} Complete ({elapsed:.1f}s) | R2: {r2:.3f}")
 
     return ModelResult(best_model, rmse, r2, search_xgb.best_params_, elapsed, top_drivers)
+
 
 
 def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
@@ -1223,13 +1223,13 @@ def plot_residuals_analysis(y_true, y_pred, title="Residuals Analysis"):
     plt.tight_layout()
     plt.show()
     
-    # Print residual statistics
-    print(f"\n📊 Residual Statistics:")
+    print(f"\nResidual Statistics:")
     print(f"  Mean: {np.mean(residuals):.4f}")
     print(f"  Std Dev: {np.std(residuals):.4f}")
     print(f"  Min: {np.min(residuals):.4f}")
     print(f"  Max: {np.max(residuals):.4f}")
     print(f"  MAE: {np.mean(np.abs(residuals)):.4f}")
+
 
 
 def plot_learning_curves(model, X_train, y_train, cv_folds=5, title="Learning Curves"):
