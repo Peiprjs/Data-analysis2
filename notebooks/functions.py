@@ -455,6 +455,298 @@ def lightgbm_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     return ModelResult(best_model, rmse, r2, search.best_params_, elapsed, top_drivers)
 
 
+def stochastic_gradient_boosting_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
+    print(f"Initializing Stochastic Gradient Boosting: {label}")
+    search = RandomizedSearchCV(
+        estimator=GradientBoostingRegressor(random_state=42),
+        param_distributions={
+            "n_estimators": [100, 200, 300, 500],
+            "learning_rate": [0.01, 0.05, 0.1, 0.2],
+            "max_depth": [3, 4, 5, 6, 7],
+            "min_samples_split": [2, 5, 10, 20],
+            "min_samples_leaf": [1, 2, 4, 8],
+            "subsample": [0.6, 0.7, 0.8, 0.9, 1.0],
+            "max_features": ["sqrt", "log2", 0.5, 0.7, 1.0],
+            "loss": ["squared_error", "absolute_error", "huber"]
+        },
+        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
+    )
+    start_time = time.time()
+    search.fit(X_train_df, y_train)
+    elapsed = time.time() - start_time
+
+    best_model = search.best_estimator_
+    y_pred = best_model.predict(X_test_df)
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    r2 = r2_score(y_test, y_pred)
+
+    feat_df = pd.DataFrame({'Bacteria': X_train_df.columns, 'Importance': best_model.feature_importances_})
+    top_drivers = feat_df.sort_values('Importance', ascending=False).head(20).reset_index(drop=True)
+
+    print(f"\n{label} Stochastic GB Complete ({elapsed:.1f}s) | R2: {r2:.3f}")
+
+    return ModelResult(best_model, rmse, r2, search.best_params_, elapsed, top_drivers)
+
+
+def svc_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
+    print(f"Initializing SVC Classifier: {label}")
+    search = RandomizedSearchCV(
+        estimator=SVC(random_state=42),
+        param_distributions={
+            "C": [0.1, 1, 10, 100],
+            "kernel": ["linear", "rbf", "poly"],
+            "gamma": ["scale", "auto", 0.001, 0.01, 0.1],
+            "degree": [2, 3, 4]
+        },
+        n_iter=15, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
+    )
+    start_time = time.time()
+    search.fit(X_train_df, y_train)
+    elapsed = time.time() - start_time
+
+    best_model = search.best_estimator_
+    y_pred = best_model.predict(X_test_df)
+    accuracy = accuracy_score(y_test, y_pred)
+    
+    print(f"\n{label} SVC Complete ({elapsed:.1f}s) | Accuracy: {accuracy:.3f}")
+    
+    return {'model': best_model, 'accuracy': accuracy, 'best_params': search.best_params_, 'runtime': elapsed}
+
+
+def logistic_regression_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
+    print(f"Initializing Logistic Regression: {label}")
+    search = RandomizedSearchCV(
+        estimator=LogisticRegression(random_state=42, max_iter=1000),
+        param_distributions={
+            "C": [0.01, 0.1, 1, 10, 100],
+            "penalty": ["l1", "l2", "elasticnet", None],
+            "solver": ["lbfgs", "saga", "liblinear"],
+            "class_weight": [None, "balanced"]
+        },
+        n_iter=15, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
+    )
+    start_time = time.time()
+    search.fit(X_train_df, y_train)
+    elapsed = time.time() - start_time
+
+    best_model = search.best_estimator_
+    y_pred = best_model.predict(X_test_df)
+    accuracy = accuracy_score(y_test, y_pred)
+    
+    print(f"\n{label} Logistic Regression Complete ({elapsed:.1f}s) | Accuracy: {accuracy:.3f}")
+    
+    return {'model': best_model, 'accuracy': accuracy, 'best_params': search.best_params_, 'runtime': elapsed}
+
+
+def random_forest_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
+    print(f"Initializing Random Forest Classifier: {label}")
+    search = RandomizedSearchCV(
+        estimator=RandomForestClassifier(random_state=42, n_jobs=-1),
+        param_distributions={
+            "n_estimators": [100, 200, 500],
+            "max_depth": [None, 5, 10, 20, 30],
+            "min_samples_split": [2, 5, 10],
+            "min_samples_leaf": [1, 2, 4],
+            "max_features": ["sqrt", "log2", 0.5],
+            "class_weight": [None, "balanced", "balanced_subsample"]
+        },
+        n_iter=20, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
+    )
+    start_time = time.time()
+    search.fit(X_train_df, y_train)
+    elapsed = time.time() - start_time
+
+    best_model = search.best_estimator_
+    y_pred = best_model.predict(X_test_df)
+    accuracy = accuracy_score(y_test, y_pred)
+    
+    feat_df = pd.DataFrame({'Bacteria': X_train_df.columns, 'Importance': best_model.feature_importances_})
+    top_drivers = feat_df.sort_values('Importance', ascending=False).head(20).reset_index(drop=True)
+    
+    print(f"\n{label} RF Classifier Complete ({elapsed:.1f}s) | Accuracy: {accuracy:.3f}")
+    
+    return {'model': best_model, 'accuracy': accuracy, 'best_params': search.best_params_, 'runtime': elapsed, 'top_features': top_drivers}
+
+
+def gradient_boosting_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
+    print(f"Initializing Gradient Boosting Classifier: {label}")
+    search = RandomizedSearchCV(
+        estimator=GradientBoostingClassifier(random_state=42),
+        param_distributions={
+            "n_estimators": [100, 200, 300],
+            "learning_rate": [0.01, 0.05, 0.1],
+            "max_depth": [3, 5, 7],
+            "min_samples_split": [2, 5, 10],
+            "min_samples_leaf": [1, 2, 4],
+            "subsample": [0.7, 0.8, 0.9, 1.0],
+            "max_features": ["sqrt", "log2", 0.5]
+        },
+        n_iter=20, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
+    )
+    start_time = time.time()
+    search.fit(X_train_df, y_train)
+    elapsed = time.time() - start_time
+
+    best_model = search.best_estimator_
+    y_pred = best_model.predict(X_test_df)
+    accuracy = accuracy_score(y_test, y_pred)
+    
+    feat_df = pd.DataFrame({'Bacteria': X_train_df.columns, 'Importance': best_model.feature_importances_})
+    top_drivers = feat_df.sort_values('Importance', ascending=False).head(20).reset_index(drop=True)
+    
+    print(f"\n{label} GB Classifier Complete ({elapsed:.1f}s) | Accuracy: {accuracy:.3f}")
+    
+    return {'model': best_model, 'accuracy': accuracy, 'best_params': search.best_params_, 'runtime': elapsed, 'top_features': top_drivers}
+
+
+def kernel_random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset", kernel_method='nystroem'):
+    """
+    Kernel Random Forest using kernel approximation followed by Random Forest.
+    
+    Parameters:
+    - X_train_df, X_test_df: Training and test features
+    - y_train, y_test: Training and test targets
+    - label: Dataset label for logging
+    - kernel_method: 'nystroem' or 'rbf' for kernel approximation method
+    
+    Returns:
+    - ModelResult with performance metrics
+    """
+    print(f"Initializing Kernel Random Forest ({kernel_method}): {label}")
+    
+    param_distributions = {
+        'kernel_approx__gamma': [0.001, 0.01, 0.1, 1.0, 10.0],
+        'kernel_approx__n_components': [50, 100, 200, 300],
+        'rf__n_estimators': [100, 200, 500],
+        'rf__max_depth': [None, 10, 20, 30],
+        'rf__min_samples_split': [2, 5, 10],
+        'rf__max_features': ['sqrt', 'log2', 0.5]
+    }
+    
+    if kernel_method == 'nystroem':
+        kernel_approx = Nystroem(kernel='rbf', random_state=42)
+    elif kernel_method == 'rbf':
+        kernel_approx = RBFSampler(random_state=42)
+    else:
+        raise ValueError(f"Unknown kernel_method: {kernel_method}. Use 'nystroem' or 'rbf'")
+    
+    pipeline = Pipeline([
+        ('scaler', StandardScaler()),
+        ('kernel_approx', kernel_approx),
+        ('rf', RandomForestRegressor(random_state=42, n_jobs=-1))
+    ])
+    
+    search = RandomizedSearchCV(
+        estimator=pipeline,
+        param_distributions=param_distributions,
+        n_iter=20,
+        cv=5,
+        scoring='neg_mean_squared_error',
+        random_state=42,
+        n_jobs=-1,
+        verbose=1
+    )
+    
+    start_time = time.time()
+    search.fit(X_train_df, y_train)
+    elapsed = time.time() - start_time
+    
+    best_model = search.best_estimator_
+    y_pred = best_model.predict(X_test_df)
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    r2 = r2_score(y_test, y_pred)
+    
+    rf_model = best_model.named_steps['rf']
+    kernel_transformed_feature_names = [f"kernel_feature_{i}" for i in range(best_model.named_steps['kernel_approx'].n_components)]
+    feat_df = pd.DataFrame({
+        'Feature': kernel_transformed_feature_names,
+        'Importance': rf_model.feature_importances_
+    })
+    top_drivers = feat_df.sort_values('Importance', ascending=False).head(20).reset_index(drop=True)
+    
+    print(f"\n{label} Kernel RF Complete ({elapsed:.1f}s) | R2: {r2:.3f}")
+    print(f"Kernel method: {kernel_method}, n_components: {best_model.named_steps['kernel_approx'].n_components}")
+    
+    return ModelResult(best_model, rmse, r2, search.best_params_, elapsed, top_drivers)
+
+
+def kernel_random_forest_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset", kernel_method='nystroem'):
+    """
+    Kernel Random Forest Classifier using kernel approximation followed by Random Forest Classifier.
+    
+    Parameters:
+    - X_train_df, X_test_df: Training and test features
+    - y_train, y_test: Training and test targets
+    - label: Dataset label for logging
+    - kernel_method: 'nystroem' or 'rbf' for kernel approximation method
+    
+    Returns:
+    - Dict with model, accuracy, and other metrics
+    """
+    print(f"Initializing Kernel Random Forest Classifier ({kernel_method}): {label}")
+    
+    param_distributions = {
+        'kernel_approx__gamma': [0.001, 0.01, 0.1, 1.0, 10.0],
+        'kernel_approx__n_components': [50, 100, 200, 300],
+        'rf__n_estimators': [100, 200, 500],
+        'rf__max_depth': [None, 10, 20, 30],
+        'rf__min_samples_split': [2, 5, 10],
+        'rf__max_features': ['sqrt', 'log2', 0.5],
+        'rf__class_weight': [None, 'balanced']
+    }
+    
+    if kernel_method == 'nystroem':
+        kernel_approx = Nystroem(kernel='rbf', random_state=42)
+    elif kernel_method == 'rbf':
+        kernel_approx = RBFSampler(random_state=42)
+    else:
+        raise ValueError(f"Unknown kernel_method: {kernel_method}. Use 'nystroem' or 'rbf'")
+    
+    pipeline = Pipeline([
+        ('scaler', StandardScaler()),
+        ('kernel_approx', kernel_approx),
+        ('rf', RandomForestClassifier(random_state=42, n_jobs=-1))
+    ])
+    
+    search = RandomizedSearchCV(
+        estimator=pipeline,
+        param_distributions=param_distributions,
+        n_iter=20,
+        cv=5,
+        scoring='accuracy',
+        random_state=42,
+        n_jobs=-1,
+        verbose=1
+    )
+    
+    start_time = time.time()
+    search.fit(X_train_df, y_train)
+    elapsed = time.time() - start_time
+    
+    best_model = search.best_estimator_
+    y_pred = best_model.predict(X_test_df)
+    accuracy = accuracy_score(y_test, y_pred)
+    
+    rf_model = best_model.named_steps['rf']
+    kernel_transformed_feature_names = [f"kernel_feature_{i}" for i in range(best_model.named_steps['kernel_approx'].n_components)]
+    feat_df = pd.DataFrame({
+        'Feature': kernel_transformed_feature_names,
+        'Importance': rf_model.feature_importances_
+    })
+    top_drivers = feat_df.sort_values('Importance', ascending=False).head(20).reset_index(drop=True)
+    
+    print(f"\n{label} Kernel RF Classifier Complete ({elapsed:.1f}s) | Accuracy: {accuracy:.3f}")
+    print(f"Kernel method: {kernel_method}, n_components: {best_model.named_steps['kernel_approx'].n_components}")
+    
+    return {
+        'model': best_model,
+        'accuracy': accuracy,
+        'best_params': search.best_params_,
+        'runtime': elapsed,
+        'top_features': top_drivers
+    }
+
+
 # =========================================================
 # 4. REPEATED CV BATTLE (5x5 Arena)
 # =========================================================
