@@ -13,10 +13,16 @@ import xgboost as xgb
 import lightgbm as lgb
 import tensorflow as tf
 from tensorflow.keras import layers, models, constraints, callbacks, initializers, regularizers
-from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, GradientBoostingRegressor
-from sklearn.model_selection import RandomizedSearchCV, RepeatedKFold, cross_validate, cross_val_score, learning_curve
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, GradientBoostingRegressor, RandomForestClassifier, GradientBoostingClassifier
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import RandomizedSearchCV, RepeatedKFold, cross_validate, cross_val_score, learning_curve, GridSearchCV
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, accuracy_score, f1_score, roc_auc_score, classification_report
+from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import f_regression, f_classif, SelectKBest, RFE
+from sklearn.kernel_approximation import Nystroem, RBFSampler
+from sklearn.pipeline import Pipeline
 
 # Model Interpretability
 import lime
@@ -207,6 +213,91 @@ def nn_feature_search(
 # =========================================================
 # 3. CLASSICAL ML BENCHMARKS (XGB & RF)
 # =========================================================
+
+def run_model_benchmark(estimator, param_distributions, X_train_df, X_test_df, y_train, y_test, 
+                        label="Dataset", n_iter=15, cv=5, task='regression', clean_columns=False):
+    """
+    Generic function to run model benchmarking with hyperparameter search.
+    
+    Parameters:
+    - estimator: Model estimator
+    - param_distributions: Dictionary of hyperparameter distributions
+    - X_train_df, X_test_df: Training and test features
+    - y_train, y_test: Training and test targets
+    - label: Dataset label for logging
+    - n_iter: Number of iterations for RandomizedSearchCV
+    - cv: Number of cross-validation folds
+    - task: 'regression' or 'classification'
+    - clean_columns: Whether to clean column names
+    
+    Returns:
+    - ModelResult for regression or dict for classification
+    """
+    X_train_clean = X_train_df.copy()
+    X_test_clean = X_test_df.copy()
+    
+    if clean_columns:
+        X_train_clean.columns = [re.sub('[^A-Za-z0-9_]+', '', str(col)) for col in X_train_clean.columns]
+        X_test_clean.columns = [re.sub('[^A-Za-z0-9_]+', '', str(col)) for col in X_test_clean.columns]
+    
+    scoring = 'neg_mean_squared_error' if task == 'regression' else 'accuracy'
+    
+    search = RandomizedSearchCV(
+        estimator=estimator,
+        param_distributions=param_distributions,
+        n_iter=n_iter,
+        cv=cv,
+        scoring=scoring,
+        random_state=42,
+        n_jobs=-1,
+        verbose=1
+    )
+    
+    start_time = time.time()
+    search.fit(X_train_clean, y_train)
+    elapsed = time.time() - start_time
+    
+    best_model = search.best_estimator_
+    y_pred = best_model.predict(X_test_clean)
+    
+    if task == 'regression':
+        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+        r2 = r2_score(y_test, y_pred)
+        
+        if hasattr(best_model, 'feature_importances_'):
+            feat_df = pd.DataFrame({
+                'Bacteria': X_train_df.columns,
+                'Importance': best_model.feature_importances_
+            })
+            top_drivers = feat_df.sort_values('Importance', ascending=False).head(20).reset_index(drop=True)
+        else:
+            top_drivers = None
+        
+        print(f"\n{label} Complete ({elapsed:.1f}s) | R2: {r2:.3f}")
+        return ModelResult(best_model, rmse, r2, search.best_params_, elapsed, top_drivers)
+    
+    else:
+        accuracy = accuracy_score(y_test, y_pred)
+        
+        if hasattr(best_model, 'feature_importances_'):
+            feat_df = pd.DataFrame({
+                'Bacteria': X_train_df.columns,
+                'Importance': best_model.feature_importances_
+            })
+            top_drivers = feat_df.sort_values('Importance', ascending=False).head(20).reset_index(drop=True)
+        else:
+            top_drivers = None
+        
+        print(f"\n{label} Complete ({elapsed:.1f}s) | Accuracy: {accuracy:.3f}")
+        return {
+            'model': best_model,
+            'accuracy': accuracy,
+            'best_params': search.best_params_,
+            'runtime': elapsed,
+            'top_features': top_drivers
+        }
+
+
 def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing XGBoost Engine: {label}")
     X_train_clean = X_train_df.copy()
@@ -611,74 +702,77 @@ def filter_features_by_level(X, max_level='Genus'):
     return X[selected_features]
 
 
-def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_type='RandomForest', cv_folds=5): #TODO: check also different hyperparameters
+def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_configs=None, cv_folds=5):
     """
-    Cross-validate model performance at different taxonomic feature levels.
+    Cross-validate model performance at different taxonomic feature levels with various models and hyperparameters.
     
     Parameters:
     - X_train: Training features DataFrame
     - y_train: Training target
     - feature_levels: List of taxonomic levels to test (default: all)
-    - model_type: Type of model to use ('RandomForest', 'XGBoost', 'LightGBM', 'GradientBoosting')
+    - model_configs: List of dict with 'name', 'model', and 'params' (default: multiple configs)
     - cv_folds: Number of cross-validation folds
     
     Returns:
-    - Dictionary with results for each level
+    - Dictionary with results for each level and model combination
     """
     if feature_levels is None:
         feature_levels = ['Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species']
     
-    # Select model
-    if model_type == 'RandomForest':
-        model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-    elif model_type == 'XGBoost':
-        model = xgb.XGBRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-    elif model_type == 'LightGBM':
-        model = lgb.LGBMRegressor(n_estimators=100, random_state=42, n_jobs=-1, verbose=-1)
-    elif model_type == 'GradientBoosting':
-        model = GradientBoostingRegressor(n_estimators=100, random_state=42)
-    else:
-        raise ValueError(f"Unknown model_type: {model_type}")
+    if model_configs is None:
+        model_configs = [
+            {'name': 'RF_100', 'model': RandomForestRegressor, 'params': {'n_estimators': 100, 'random_state': 42, 'n_jobs': -1}},
+            {'name': 'RF_200', 'model': RandomForestRegressor, 'params': {'n_estimators': 200, 'max_depth': 10, 'random_state': 42, 'n_jobs': -1}},
+            {'name': 'XGB_100', 'model': xgb.XGBRegressor, 'params': {'n_estimators': 100, 'random_state': 42, 'n_jobs': -1}},
+            {'name': 'XGB_lr01', 'model': xgb.XGBRegressor, 'params': {'n_estimators': 200, 'learning_rate': 0.01, 'max_depth': 5, 'random_state': 42, 'n_jobs': -1}},
+            {'name': 'GB_100', 'model': GradientBoostingRegressor, 'params': {'n_estimators': 100, 'random_state': 42}},
+            {'name': 'LightGBM', 'model': lgb.LGBMRegressor, 'params': {'n_estimators': 100, 'random_state': 42, 'n_jobs': -1, 'verbose': -1}},
+        ]
     
-    results = {}
-    print(f"Testing {model_type} across taxonomic levels with {cv_folds}-fold CV...")
-    print(f"{'Level':<15} | {'# Features':<12} | {'Mean RMSE':<12} | {'Std RMSE':<10}")
-    print("-" * 60)
+    all_results = {}
+    print(f"Testing multiple models across taxonomic levels with {cv_folds}-fold CV...")
+    print(f"{'Level':<12} | {'Model':<15} | {'# Features':<12} | {'Mean RMSE':<12} | {'Mean R2':<10} | {'Std RMSE':<10}")
+    print("-" * 90)
     
     for level in feature_levels:
-        # Filter features
         X_filtered = filter_features_by_level(X_train, max_level=level)
-        
-        # Remove non-numeric columns
         numeric_cols = X_filtered.select_dtypes(include=[np.number]).columns
         X_numeric = X_filtered[numeric_cols]
         
         if len(X_numeric.columns) == 0:
-            print(f"{level:<15} | No features available")
+            print(f"{level:<12} | All models   | No features available")
             continue
         
-        # Cross-validate
-        cv_scores = cross_val_score(
-            model, X_numeric, y_train,
-            cv=cv_folds,
-            scoring='neg_root_mean_squared_error',
-            n_jobs=-1
-        )
+        all_results[level] = {}
         
-        rmse_scores = -cv_scores
-        mean_rmse = np.mean(rmse_scores)
-        std_rmse = np.std(rmse_scores)
-        
-        results[level] = {
-            'n_features': len(X_numeric.columns),
-            'mean_rmse': mean_rmse,
-            'std_rmse': std_rmse,
-            'cv_scores': rmse_scores
-        }
-        
-        print(f"{level:<15} | {len(X_numeric.columns):<12} | {mean_rmse:<12.3f} | ±{std_rmse:<10.3f}")
+        for config in model_configs:
+            model = config['model'](**config['params'])
+            
+            cv_metrics = cross_validate(
+                model, X_numeric, y_train,
+                cv=cv_folds,
+                scoring={'rmse': 'neg_root_mean_squared_error', 'r2': 'r2'},
+                n_jobs=-1
+            )
+            
+            rmse_scores = -cv_metrics['test_rmse']
+            r2_scores = cv_metrics['test_r2']
+            mean_rmse = np.mean(rmse_scores)
+            std_rmse = np.std(rmse_scores)
+            mean_r2 = np.mean(r2_scores)
+            
+            all_results[level][config['name']] = {
+                'n_features': len(X_numeric.columns),
+                'mean_rmse': mean_rmse,
+                'std_rmse': std_rmse,
+                'mean_r2': mean_r2,
+                'cv_scores': rmse_scores,
+                'r2_scores': r2_scores
+            }
+            
+            print(f"{level:<12} | {config['name']:<15} | {len(X_numeric.columns):<12} | {mean_rmse:<12.3f} | {mean_r2:<10.3f} | ±{std_rmse:<10.3f}")
     
-    return results
+    return all_results
 
 
 # =========================================================
