@@ -1618,14 +1618,16 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
 
     pbar = tqdm(total=len(methods), desc="Feature selection methods")
     for n in n_list:
-        if 'baseline' in methods:
+        if 'baseline' in methods and 'baseline' not in results:
             pbar.set_description("Baseline (no selection)")
             eval_model.fit(X_train, y_train)
             y_pred = eval_model.predict(X_test)
-            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-            r2 = r2_score(y_test, y_pred)
-            results['baseline'] = {'n_features': X_train.shape[1], 'rmse': rmse, 'r2': r2}
-            print(f"{'Baseline':<20} | {X_train.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+            results['baseline'] = {
+                'n_features': X_train.shape[1],
+                'rmse': np.sqrt(mean_squared_error(y_test, y_pred)),
+                'r2': r2_score(y_test, y_pred)
+            }
+            print(f"{'Baseline':<20} | {X_train.shape[1]:<12} | {results['baseline']['rmse']:<12.3f} | {results['baseline']['r2']:<10.3f}")
             pbar.update(1)
 
         if 'importance' in methods:
@@ -1633,10 +1635,11 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
             X_train_sel, X_test_sel, _ = feature_importance_selection(X_train, y_train, X_test, n, 'RandomForest')
             eval_model.fit(X_train_sel, y_train)
             y_pred = eval_model.predict(X_test_sel)
-            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-            r2 = r2_score(y_test, y_pred)
-            results['importance'] = {'n_features': X_train_sel.shape[1], 'rmse': rmse, 'r2': r2}
-            print(f"{'Feature Importance':<20} | {X_train_sel.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+            results['importance'][n] = {
+                'rmse': np.sqrt(mean_squared_error(y_test, y_pred)),
+                'r2': r2_score(y_test, y_pred)
+            }
+            print(f"{f'Importance (n={n})':<20} | {n:<12} | {results['importance'][n]['rmse']:<12.3f} | {results['importance'][n]['r2']:<10.3f}")
             pbar.update(1)
 
         if 'anova' in methods:
@@ -1644,10 +1647,11 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
             X_train_sel, X_test_sel, _ = anova_feature_selection(X_train, y_train, X_test, n, 'regression')
             eval_model.fit(X_train_sel, y_train)
             y_pred = eval_model.predict(X_test_sel)
-            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-            r2 = r2_score(y_test, y_pred)
-            results['anova'] = {'n_features': X_train_sel.shape[1], 'rmse': rmse, 'r2': r2}
-            print(f"{'ANOVA':<20} | {X_train_sel.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+            results['anova'][n] = {
+                'rmse': np.sqrt(mean_squared_error(y_test, y_pred)),
+                'r2': r2_score(y_test, y_pred)
+            }
+            print(f"{f'ANOVA (n={n})':<20} | {n:<12} | {results['anova'][n]['rmse']:<12.3f} | {results['anova'][n]['r2']:<10.3f}")
             pbar.update(1)
 
         if 'pca' in methods:
@@ -1656,10 +1660,11 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
             X_test_pca = pca_obj.transform(X_test.values)
             eval_model.fit(X_train_pca, y_train)
             y_pred = eval_model.predict(X_test_pca)
-            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-            r2 = r2_score(y_test, y_pred)
-            results['pca'] = {'n_features': X_train_pca.shape[1], 'rmse': rmse, 'r2': r2}
-            print(f"{'PCA':<20} | {X_train_pca.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+            results['pca'][n] = {
+                'rmse': np.sqrt(mean_squared_error(y_test, y_pred)),
+                'r2': r2_score(y_test, y_pred)
+            }
+            print(f"{f'PCA (n={n})':<20} | {X_train_pca.shape[1]:<12} | {results['pca'][n]['rmse']:<12.3f} | {results['pca'][n]['r2']:<10.3f}")
             pbar.update(1)
 
     pbar.close()
