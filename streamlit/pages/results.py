@@ -40,29 +40,42 @@ def app():
         """)
         
         if st.button("Compare Feature Sets", key='fs_compare'):
-            with st.spinner("Training models on different feature sets..."):
-                model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1)
-                
-                model_all = model.fit(X_train_clr, y_train)
-                y_pred_all = model_all.predict(X_test_clr)
-                rmse_all = np.sqrt(mean_squared_error(y_test, y_pred_all))
-                r2_all = r2_score(y_test, y_pred_all)
-                mae_all = mean_absolute_error(y_test, y_pred_all)
-                
-                model_genus = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1)
-                model_genus = model_genus.fit(X_train_genus, y_train)
-                y_pred_genus = model_genus.predict(X_test_genus)
-                rmse_genus = np.sqrt(mean_squared_error(y_test, y_pred_genus))
-                r2_genus = r2_score(y_test, y_pred_genus)
-                mae_genus = mean_absolute_error(y_test, y_pred_genus)
-                
-                results_df = pd.DataFrame({
-                    'Feature Set': ['All Features', 'Genus Only'],
-                    'Num Features': [X_train_clr.shape[1], X_train_genus.shape[1]],
-                    'RMSE': [rmse_all, rmse_genus],
-                    'R2 Score': [r2_all, r2_genus],
-                    'MAE': [mae_all, mae_genus]
-                })
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1)
+            
+            status_text.text("Training on all features... (1/2)")
+            progress_bar.progress(0.25)
+            model_all = model.fit(X_train_clr, y_train)
+            progress_bar.progress(0.5)
+            y_pred_all = model_all.predict(X_test_clr)
+            rmse_all = np.sqrt(mean_squared_error(y_test, y_pred_all))
+            r2_all = r2_score(y_test, y_pred_all)
+            mae_all = mean_absolute_error(y_test, y_pred_all)
+            
+            status_text.text("Training on genus features... (2/2)")
+            progress_bar.progress(0.75)
+            model_genus = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1)
+            model_genus = model_genus.fit(X_train_genus, y_train)
+            progress_bar.progress(0.9)
+            y_pred_genus = model_genus.predict(X_test_genus)
+            rmse_genus = np.sqrt(mean_squared_error(y_test, y_pred_genus))
+            r2_genus = r2_score(y_test, y_pred_genus)
+            mae_genus = mean_absolute_error(y_test, y_pred_genus)
+            
+            progress_bar.progress(1.0)
+            status_text.text("Comparison complete!")
+            progress_bar.empty()
+            status_text.empty()
+            
+            results_df = pd.DataFrame({
+                'Feature Set': ['All Features', 'Genus Only'],
+                'Num Features': [X_train_clr.shape[1], X_train_genus.shape[1]],
+                'RMSE': [rmse_all, rmse_genus],
+                'R2 Score': [r2_all, r2_genus],
+                'MAE': [mae_all, mae_genus]
+            })
                 
                 st.subheader("Performance Comparison")
                 st.dataframe(results_df, use_container_width=True)
@@ -102,27 +115,38 @@ def app():
         cv_folds = st.slider("Number of CV Folds", 3, 10, 5)
         
         if st.button("Run Cross-Validation", key='cv_run'):
-            with st.spinner("Running cross-validation..."):
-                models = {
-                    'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1),
-                    'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1),
-                    'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42),
-                    'AdaBoost': AdaBoostRegressor(n_estimators=100, learning_rate=0.1, random_state=42)
-                }
+            models = {
+                'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1),
+                'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1),
+                'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42),
+                'AdaBoost': AdaBoostRegressor(n_estimators=100, learning_rate=0.1, random_state=42)
+            }
+            
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            cv_results = []
+            total_models = len(models)
+            
+            for idx, (name, model) in enumerate(models.items()):
+                status_text.text(f"Cross-validating {name}... ({idx + 1}/{total_models})")
+                progress_bar.progress((idx + 1) / total_models)
                 
-                cv_results = []
-                for name, model in models.items():
-                    scores = cross_val_score(model, X_train_genus, y_train, cv=cv_folds, 
-                                           scoring='r2', n_jobs=-1)
-                    cv_results.append({
-                        'Model': name,
-                        'Mean R2': scores.mean(),
-                        'Std R2': scores.std(),
-                        'Min R2': scores.min(),
-                        'Max R2': scores.max()
-                    })
-                
-                cv_df = pd.DataFrame(cv_results)
+                scores = cross_val_score(model, X_train_genus, y_train, cv=cv_folds, 
+                                       scoring='r2', n_jobs=-1)
+                cv_results.append({
+                    'Model': name,
+                    'Mean R2': scores.mean(),
+                    'Std R2': scores.std(),
+                    'Min R2': scores.min(),
+                    'Max R2': scores.max()
+                })
+            
+            status_text.text("Cross-validation completed!")
+            progress_bar.empty()
+            status_text.empty()
+            
+            cv_df = pd.DataFrame(cv_results)
                 
                 st.subheader(f"Cross-Validation Results ({cv_folds}-Fold)")
                 st.dataframe(cv_df, use_container_width=True)
@@ -151,19 +175,30 @@ def app():
         """)
         
         if st.button("Generate Prediction Analysis", key='pred_analysis'):
-            with st.spinner("Training models and generating predictions..."):
-                models = {
-                    'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1),
-                    'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1),
-                    'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42),
-                }
+            models = {
+                'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1),
+                'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1),
+                'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42),
+            }
+            
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            predictions = {}
+            total_models = len(models)
+            
+            for idx, (name, model) in enumerate(models.items()):
+                status_text.text(f"Training and predicting with {name}... ({idx + 1}/{total_models})")
+                progress_bar.progress((idx + 1) / total_models)
                 
-                predictions = {}
-                for name, model in models.items():
-                    model.fit(X_train_genus, y_train)
-                    predictions[name] = model.predict(X_test_genus)
-                
-                fig, axes = plt.subplots(2, 2, figsize=(14, 12))
+                model.fit(X_train_genus, y_train)
+                predictions[name] = model.predict(X_test_genus)
+            
+            status_text.text("All predictions generated!")
+            progress_bar.empty()
+            status_text.empty()
+            
+            fig, axes = plt.subplots(2, 2, figsize=(14, 12))
                 axes = axes.ravel()
                 
                 for idx, (name, y_pred) in enumerate(predictions.items()):

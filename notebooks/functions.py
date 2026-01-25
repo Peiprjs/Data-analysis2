@@ -1006,7 +1006,9 @@ def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_
     - cv_folds: Number of cross-validation folds
     
     Returns:
-    - Dictionary with results for each level and model combination
+    - Tuple of (results_dict, results_df):
+        * results_dict: Dictionary with results for each level and model combination
+        * results_df: DataFrame with columns [Level, Model, Num_Features, Mean_RMSE, Std_RMSE, Mean_R2]
     """
     if feature_levels is None:
         feature_levels = ['Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species']
@@ -1022,9 +1024,13 @@ def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_
         ]
     
     all_results = {}
+    df_rows = []
     print(f"Testing multiple models across taxonomic levels with {cv_folds}-fold CV...")
     print(f"{'Level':<12} | {'Model':<15} | {'# Features':<12} | {'Mean RMSE':<12} | {'Mean R2':<10} | {'Std RMSE':<10}")
     print("-" * 90)
+    
+    total_combinations = len(feature_levels) * len(model_configs)
+    pbar = tqdm(total=total_combinations, desc="Cross-validation progress")
     
     for level in feature_levels:
         X_filtered = filter_features_by_level(X_train, max_level=level)
@@ -1033,12 +1039,15 @@ def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_
         
         if len(X_numeric.columns) == 0:
             print(f"{level:<12} | All models   | No features available")
+            pbar.update(len(model_configs))
             continue
         
         all_results[level] = {}
         
         for config in model_configs:
             model = config['model'](**config['params'])
+            
+            pbar.set_description(f"CV: {level} - {config['name']}")
             
             cv_metrics = cross_validate(
                 model, X_numeric, y_train,
@@ -1052,6 +1061,7 @@ def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_
             mean_rmse = np.mean(rmse_scores)
             std_rmse = np.std(rmse_scores)
             mean_r2 = np.mean(r2_scores)
+            std_r2 = np.std(r2_scores)
             
             all_results[level][config['name']] = {
                 'n_features': len(X_numeric.columns),
@@ -1062,9 +1072,22 @@ def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_
                 'r2_scores': r2_scores
             }
             
+            df_rows.append({
+                'Level': level,
+                'Model': config['name'],
+                'Num_Features': len(X_numeric.columns),
+                'Mean_RMSE': mean_rmse,
+                'Std_RMSE': std_rmse,
+                'Mean_R2': mean_r2,
+                'Std_R2': std_r2
+            })
+            
             print(f"{level:<12} | {config['name']:<15} | {len(X_numeric.columns):<12} | {mean_rmse:<12.3f} | {mean_r2:<10.3f} | ±{std_rmse:<10.3f}")
+            pbar.update(1)
     
-    return all_results
+    pbar.close()
+    results_df = pd.DataFrame(df_rows)
+    return all_results, results_df
 
 
 # =========================================================
@@ -1501,15 +1524,20 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
     print(f"{'Method':<20} | {'# Features':<12} | {'RMSE':<12} | {'R2':<10}")
     print("-" * 60)
     
+    pbar = tqdm(total=len(methods), desc="Feature selection methods")
+    
     if 'baseline' in methods:
+        pbar.set_description("Baseline (no selection)")
         eval_model.fit(X_train, y_train)
         y_pred = eval_model.predict(X_test)
         rmse = np.sqrt(mean_squared_error(y_test, y_pred))
         r2 = r2_score(y_test, y_pred)
         results['baseline'] = {'n_features': X_train.shape[1], 'rmse': rmse, 'r2': r2}
         print(f"{'Baseline':<20} | {X_train.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+        pbar.update(1)
     
     if 'importance' in methods:
+        pbar.set_description("Feature importance")
         X_train_sel, X_test_sel, _ = feature_importance_selection(X_train, y_train, X_test, n_features, 'RandomForest')
         eval_model.fit(X_train_sel, y_train)
         y_pred = eval_model.predict(X_test_sel)
@@ -1517,8 +1545,10 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
         r2 = r2_score(y_test, y_pred)
         results['importance'] = {'n_features': X_train_sel.shape[1], 'rmse': rmse, 'r2': r2}
         print(f"{'Feature Importance':<20} | {X_train_sel.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+        pbar.update(1)
     
     if 'anova' in methods:
+        pbar.set_description("ANOVA F-value")
         X_train_sel, X_test_sel, _ = anova_feature_selection(X_train, y_train, X_test, n_features, 'regression')
         eval_model.fit(X_train_sel, y_train)
         y_pred = eval_model.predict(X_test_sel)
@@ -1526,8 +1556,10 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
         r2 = r2_score(y_test, y_pred)
         results['anova'] = {'n_features': X_train_sel.shape[1], 'rmse': rmse, 'r2': r2}
         print(f"{'ANOVA':<20} | {X_train_sel.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+        pbar.update(1)
     
     if 'pca' in methods:
+        pbar.set_description("PCA")
         X_train_pca, pca_obj = pca_feature_selection(X_train, n_components=n_features if n_features < X_train.shape[1] else 0.95)
         X_test_pca = pca_obj.transform(X_test)
         eval_model.fit(X_train_pca, y_train)
@@ -1536,7 +1568,9 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
         r2 = r2_score(y_test, y_pred)
         results['pca'] = {'n_features': X_train_pca.shape[1], 'rmse': rmse, 'r2': r2}
         print(f"{'PCA':<20} | {X_train_pca.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+        pbar.update(1)
     
+    pbar.close()
     return results
 
 

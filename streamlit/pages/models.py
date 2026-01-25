@@ -294,20 +294,31 @@ def app():
         """)
         
         if st.button("Train All Models", key='train_all'):
-            with st.spinner("Training all models..."):
-                models = {
-                    'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1),
-                    'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1),
-                    'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42),
-                    'LightGBM': lgb.LGBMRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1, verbose=-1)
-                }
+            models = {
+                'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1),
+                'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1),
+                'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42),
+                'LightGBM': lgb.LGBMRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1, verbose=-1)
+            }
+            
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            results_list = []
+            total_models = len(models)
+            
+            for idx, (name, model) in enumerate(models.items()):
+                status_text.text(f"Training {name}... ({idx + 1}/{total_models})")
+                progress_bar.progress((idx + 1) / total_models)
                 
-                results_list = []
-                for name, model in models.items():
-                    result = train_and_evaluate_model(model, X_train_genus, X_test_genus, y_train, y_test, name)
-                    results_list.append(result)
-                
-                results_df = pd.DataFrame(results_list)
+                result = train_and_evaluate_model(model, X_train_genus, X_test_genus, y_train, y_test, name)
+                results_list.append(result)
+            
+            status_text.text("All models trained successfully!")
+            progress_bar.empty()
+            status_text.empty()
+            
+            results_df = pd.DataFrame(results_list)
                 
                 st.subheader("Performance Metrics")
                 st.dataframe(results_df, use_container_width=True)
