@@ -514,7 +514,7 @@ def gradient_boosting_benchmark(X_train_df, X_test_df, y_train, y_test, label="D
 def lightgbm_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing LightGBM Engine: {label}")
     search = RandomizedSearchCV(
-        estimator=lgb.LGBMRegressor(random_state=42, device = "cpu", n_jobs=1, verbose=1, importance_type="gain"),
+        estimator=lgb.LGBMRegressor(random_state=42, device = "cpu", n_jobs=1, verbose=-1, importance_type="gain"),
         param_distributions={
             "n_estimators": [100, 200, 500, 1000],
             "learning_rate": [0.01, 0.05, 0.1],
