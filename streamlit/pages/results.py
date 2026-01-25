@@ -76,34 +76,34 @@ def app():
                 'R2 Score': [r2_all, r2_genus],
                 'MAE': [mae_all, mae_genus]
             })
-                
-                st.subheader("Performance Comparison")
-                st.dataframe(results_df, use_container_width=True)
-                
-                fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-                
-                axes[0].bar(results_df['Feature Set'], results_df['RMSE'])
-                axes[0].set_ylabel('RMSE')
-                axes[0].set_title('RMSE by Feature Set')
-                axes[0].tick_params(axis='x', rotation=15)
-                
-                axes[1].bar(results_df['Feature Set'], results_df['R2 Score'])
-                axes[1].set_ylabel('R2 Score')
-                axes[1].set_title('R2 Score by Feature Set')
-                axes[1].tick_params(axis='x', rotation=15)
-                
-                axes[2].bar(results_df['Feature Set'], results_df['MAE'])
-                axes[2].set_ylabel('MAE')
-                axes[2].set_title('MAE by Feature Set')
-                axes[2].tick_params(axis='x', rotation=15)
-                
-                plt.tight_layout()
-                st.pyplot(fig)
-                
-                if r2_genus > r2_all:
-                    st.success("Genus-level features provide better performance with fewer features!")
-                else:
-                    st.info("All features provide slightly better performance, but genus features are more interpretable.")
+            
+            st.subheader("Performance Comparison")
+            st.dataframe(results_df, use_container_width=True)
+            
+            fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+            
+            axes[0].bar(results_df['Feature Set'], results_df['RMSE'])
+            axes[0].set_ylabel('RMSE')
+            axes[0].set_title('RMSE by Feature Set')
+            axes[0].tick_params(axis='x', rotation=15)
+            
+            axes[1].bar(results_df['Feature Set'], results_df['R2 Score'])
+            axes[1].set_ylabel('R2 Score')
+            axes[1].set_title('R2 Score by Feature Set')
+            axes[1].tick_params(axis='x', rotation=15)
+            
+            axes[2].bar(results_df['Feature Set'], results_df['MAE'])
+            axes[2].set_ylabel('MAE')
+            axes[2].set_title('MAE by Feature Set')
+            axes[2].tick_params(axis='x', rotation=15)
+            
+            plt.tight_layout()
+            st.pyplot(fig)
+            
+            if r2_genus > r2_all:
+                st.success("Genus-level features provide better performance with fewer features!")
+            else:
+                st.info("All features provide slightly better performance, but genus features are more interpretable.")
     
     with tabs[1]:
         st.header("Cross-Validation Analysis")
@@ -147,25 +147,25 @@ def app():
             status_text.empty()
             
             cv_df = pd.DataFrame(cv_results)
-                
-                st.subheader(f"Cross-Validation Results ({cv_folds}-Fold)")
-                st.dataframe(cv_df, use_container_width=True)
-                
-                fig, ax = plt.subplots(figsize=(10, 6))
-                x_pos = np.arange(len(cv_df))
-                ax.bar(x_pos, cv_df['Mean R2'], yerr=cv_df['Std R2'], 
-                      capsize=5, alpha=0.7, color='skyblue', edgecolor='black')
-                ax.set_xticks(x_pos)
-                ax.set_xticklabels(cv_df['Model'], rotation=15)
-                ax.set_ylabel('R2 Score')
-                ax.set_title(f'Cross-Validation R2 Scores ({cv_folds}-Fold)')
-                ax.axhline(y=0, color='r', linestyle='--', linewidth=0.5)
-                plt.tight_layout()
-                st.pyplot(fig)
-                
-                best_model = cv_df.loc[cv_df['Mean R2'].idxmax(), 'Model']
-                best_score = cv_df.loc[cv_df['Mean R2'].idxmax(), 'Mean R2']
-                st.success(f"Best Model: {best_model} with Mean R2 = {best_score:.4f}")
+            
+            st.subheader(f"Cross-Validation Results ({cv_folds}-Fold)")
+            st.dataframe(cv_df, use_container_width=True)
+            
+            fig, ax = plt.subplots(figsize=(10, 6))
+            x_pos = np.arange(len(cv_df))
+            ax.bar(x_pos, cv_df['Mean R2'], yerr=cv_df['Std R2'], 
+                  capsize=5, alpha=0.7, color='skyblue', edgecolor='black')
+            ax.set_xticks(x_pos)
+            ax.set_xticklabels(cv_df['Model'], rotation=15)
+            ax.set_ylabel('R2 Score')
+            ax.set_title(f'Cross-Validation R2 Scores ({cv_folds}-Fold)')
+            ax.axhline(y=0, color='r', linestyle='--', linewidth=0.5)
+            plt.tight_layout()
+            st.pyplot(fig)
+            
+            best_model = cv_df.loc[cv_df['Mean R2'].idxmax(), 'Model']
+            best_score = cv_df.loc[cv_df['Mean R2'].idxmax(), 'Mean R2']
+            st.success(f"Best Model: {best_model} with Mean R2 = {best_score:.4f}")
     
     with tabs[2]:
         st.header("Prediction Analysis")
@@ -199,77 +199,77 @@ def app():
             status_text.empty()
             
             fig, axes = plt.subplots(2, 2, figsize=(14, 12))
-                axes = axes.ravel()
-                
-                for idx, (name, y_pred) in enumerate(predictions.items()):
-                    ax = axes[idx]
-                    ax.scatter(y_test, y_pred, alpha=0.5)
-                    ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 
-                           'r--', lw=2, label='Perfect Prediction')
-                    ax.set_xlabel('True Age Group')
-                    ax.set_ylabel('Predicted Age Group')
-                    ax.set_title(f'{name}\nR2 = {r2_score(y_test, y_pred):.3f}')
-                    ax.legend()
-                    ax.grid(True, alpha=0.3)
-                
-                axes[3].axis('off')
-                
-                plt.tight_layout()
-                st.pyplot(fig)
-                
-                st.subheader("Residual Analysis")
-                
-                fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-                
-                for idx, (name, y_pred) in enumerate(predictions.items()):
-                    residuals = y_test - y_pred
-                    axes[idx].hist(residuals, bins=20, edgecolor='black', alpha=0.7)
-                    axes[idx].set_xlabel('Residuals')
-                    axes[idx].set_ylabel('Frequency')
-                    axes[idx].set_title(f'{name}\nMean = {residuals.mean():.3f}')
-                    axes[idx].axvline(x=0, color='r', linestyle='--', linewidth=2)
-                
-                plt.tight_layout()
-                st.pyplot(fig)
-                
-                st.subheader("Error Metrics Summary")
-                
-                error_metrics = []
-                for name, y_pred in predictions.items():
-                    error_metrics.append({
-                        'Model': name,
-                        'RMSE': np.sqrt(mean_squared_error(y_test, y_pred)),
-                        'MAE': mean_absolute_error(y_test, y_pred),
-                        'R2': r2_score(y_test, y_pred),
-                        'Max Error': np.abs(y_test - y_pred).max()
-                    })
-                
-                error_df = pd.DataFrame(error_metrics)
-                st.dataframe(error_df, use_container_width=True)
-                
-                st.subheader("Consensus Prediction")
-                
-                ensemble_pred = np.mean(list(predictions.values()), axis=0)
-                ensemble_r2 = r2_score(y_test, ensemble_pred)
-                ensemble_rmse = np.sqrt(mean_squared_error(y_test, ensemble_pred))
-                
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Ensemble R2", f"{ensemble_r2:.4f}")
-                with col2:
-                    st.metric("Ensemble RMSE", f"{ensemble_rmse:.4f}")
-                with col3:
-                    improvement = ensemble_r2 - error_df['R2'].max()
-                    st.metric("Improvement over Best", f"{improvement:.4f}")
-                
-                fig, ax = plt.subplots(figsize=(8, 6))
-                ax.scatter(y_test, ensemble_pred, alpha=0.5, color='purple')
+            axes = axes.ravel()
+            
+            for idx, (name, y_pred) in enumerate(predictions.items()):
+                ax = axes[idx]
+                ax.scatter(y_test, y_pred, alpha=0.5)
                 ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 
                        'r--', lw=2, label='Perfect Prediction')
                 ax.set_xlabel('True Age Group')
-                ax.set_ylabel('Ensemble Predicted Age Group')
-                ax.set_title(f'Ensemble Predictions (Mean of all models)\nR2 = {ensemble_r2:.3f}')
+                ax.set_ylabel('Predicted Age Group')
+                ax.set_title(f'{name}\nR2 = {r2_score(y_test, y_pred):.3f}')
                 ax.legend()
                 ax.grid(True, alpha=0.3)
-                plt.tight_layout()
-                st.pyplot(fig)
+            
+            axes[3].axis('off')
+            
+            plt.tight_layout()
+            st.pyplot(fig)
+            
+            st.subheader("Residual Analysis")
+            
+            fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+            
+            for idx, (name, y_pred) in enumerate(predictions.items()):
+                residuals = y_test - y_pred
+                axes[idx].hist(residuals, bins=20, edgecolor='black', alpha=0.7)
+                axes[idx].set_xlabel('Residuals')
+                axes[idx].set_ylabel('Frequency')
+                axes[idx].set_title(f'{name}\nMean = {residuals.mean():.3f}')
+                axes[idx].axvline(x=0, color='r', linestyle='--', linewidth=2)
+            
+            plt.tight_layout()
+            st.pyplot(fig)
+            
+            st.subheader("Error Metrics Summary")
+            
+            error_metrics = []
+            for name, y_pred in predictions.items():
+                error_metrics.append({
+                    'Model': name,
+                    'RMSE': np.sqrt(mean_squared_error(y_test, y_pred)),
+                    'MAE': mean_absolute_error(y_test, y_pred),
+                    'R2': r2_score(y_test, y_pred),
+                    'Max Error': np.abs(y_test - y_pred).max()
+                })
+            
+            error_df = pd.DataFrame(error_metrics)
+            st.dataframe(error_df, use_container_width=True)
+            
+            st.subheader("Consensus Prediction")
+            
+            ensemble_pred = np.mean(list(predictions.values()), axis=0)
+            ensemble_r2 = r2_score(y_test, ensemble_pred)
+            ensemble_rmse = np.sqrt(mean_squared_error(y_test, ensemble_pred))
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Ensemble R2", f"{ensemble_r2:.4f}")
+            with col2:
+                st.metric("Ensemble RMSE", f"{ensemble_rmse:.4f}")
+            with col3:
+                improvement = ensemble_r2 - error_df['R2'].max()
+                st.metric("Improvement over Best", f"{improvement:.4f}")
+            
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.scatter(y_test, ensemble_pred, alpha=0.5, color='purple')
+            ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 
+                   'r--', lw=2, label='Perfect Prediction')
+            ax.set_xlabel('True Age Group')
+            ax.set_ylabel('Ensemble Predicted Age Group')
+            ax.set_title(f'Ensemble Predictions (Mean of all models)\nR2 = {ensemble_r2:.3f}')
+            ax.legend()
+            ax.grid(True, alpha=0.3)
+            plt.tight_layout()
+            st.pyplot(fig)

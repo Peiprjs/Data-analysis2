@@ -319,42 +319,42 @@ def app():
             status_text.empty()
             
             results_df = pd.DataFrame(results_list)
-                
-                st.subheader("Performance Metrics")
-                st.dataframe(results_df, use_container_width=True)
-                
-                fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-                
-                axes[0, 0].bar(results_df['Model'], results_df['Test RMSE'])
-                axes[0, 0].set_ylabel('RMSE')
-                axes[0, 0].set_title('Test RMSE by Model')
-                axes[0, 0].tick_params(axis='x', rotation=45)
-                
-                axes[0, 1].bar(results_df['Model'], results_df['Test R2'])
-                axes[0, 1].set_ylabel('R2 Score')
-                axes[0, 1].set_title('Test R2 Score by Model')
-                axes[0, 1].tick_params(axis='x', rotation=45)
-                
-                axes[1, 0].bar(results_df['Model'], results_df['Test MAE'])
-                axes[1, 0].set_ylabel('MAE')
-                axes[1, 0].set_title('Test MAE by Model')
-                axes[1, 0].tick_params(axis='x', rotation=45)
-                
-                x = np.arange(len(results_df))
-                width = 0.35
-                axes[1, 1].bar(x - width/2, results_df['Train RMSE'], width, label='Train')
-                axes[1, 1].bar(x + width/2, results_df['Test RMSE'], width, label='Test')
-                axes[1, 1].set_ylabel('RMSE')
-                axes[1, 1].set_title('Train vs Test RMSE')
-                axes[1, 1].set_xticks(x)
-                axes[1, 1].set_xticklabels(results_df['Model'], rotation=45)
-                axes[1, 1].legend()
-                
-                plt.tight_layout()
-                st.pyplot(fig)
-                
-                best_model_idx = results_df['Test R2'].idxmax()
-                best_model_name = results_df.loc[best_model_idx, 'Model']
-                best_r2 = results_df.loc[best_model_idx, 'Test R2']
-                
-                st.success(f"Best Model: {best_model_name} with Test R2 = {best_r2:.4f}")
+            
+            st.subheader("Performance Metrics")
+            st.dataframe(results_df, use_container_width=True)
+            
+            fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+            
+            axes[0, 0].bar(results_df['Model'], results_df['Test RMSE'])
+            axes[0, 0].set_ylabel('RMSE')
+            axes[0, 0].set_title('Test RMSE by Model')
+            axes[0, 0].tick_params(axis='x', rotation=45)
+            
+            axes[0, 1].bar(results_df['Model'], results_df['Test R2'])
+            axes[0, 1].set_ylabel('R2 Score')
+            axes[0, 1].set_title('Test R2 Score by Model')
+            axes[0, 1].tick_params(axis='x', rotation=45)
+            
+            axes[1, 0].bar(results_df['Model'], results_df['Test MAE'])
+            axes[1, 0].set_ylabel('MAE')
+            axes[1, 0].set_title('Test MAE by Model')
+            axes[1, 0].tick_params(axis='x', rotation=45)
+            
+            x = np.arange(len(results_df))
+            width = 0.35
+            axes[1, 1].bar(x - width/2, results_df['Train RMSE'], width, label='Train')
+            axes[1, 1].bar(x + width/2, results_df['Test RMSE'], width, label='Test')
+            axes[1, 1].set_ylabel('RMSE')
+            axes[1, 1].set_title('Train vs Test RMSE')
+            axes[1, 1].set_xticks(x)
+            axes[1, 1].set_xticklabels(results_df['Model'], rotation=45)
+            axes[1, 1].legend()
+            
+            plt.tight_layout()
+            st.pyplot(fig)
+            
+            best_model_idx = results_df['Test R2'].idxmax()
+            best_model_name = results_df.loc[best_model_idx, 'Model']
+            best_r2 = results_df.loc[best_model_idx, 'Test R2']
+            
+            st.success(f"Best Model: {best_model_name} with Test R2 = {best_r2:.4f}")
