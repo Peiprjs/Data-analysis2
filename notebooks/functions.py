@@ -1631,6 +1631,7 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
             pbar.update(1)
 
         if 'importance' in methods:
+            if 'importance' not in results: results['importance'] = {}
             pbar.set_description(f"Importance (n={n})")
             X_train_sel, X_test_sel, _ = feature_importance_selection(X_train, y_train, X_test, n, 'RandomForest')
             eval_model.fit(X_train_sel, y_train)
@@ -1643,6 +1644,7 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
             pbar.update(1)
 
         if 'anova' in methods:
+            if 'anova' not in results: results['anova'] = {}
             pbar.set_description(f"ANOVA F-value (n={n})")
             X_train_sel, X_test_sel, _ = anova_feature_selection(X_train, y_train, X_test, n, 'regression')
             eval_model.fit(X_train_sel, y_train)
@@ -1655,6 +1657,7 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
             pbar.update(1)
 
         if 'pca' in methods:
+            if 'pca' not in results: results['pca'] = {}
             pbar.set_description(f"PCA (n={n})")
             X_train_pca, pca_obj = pca_feature_selection(X_train, n_components=n if n < X_train.shape[1] else 0.95)
             X_test_pca = pca_obj.transform(X_test.values)
