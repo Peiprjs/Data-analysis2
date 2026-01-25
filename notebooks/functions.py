@@ -79,78 +79,42 @@ def set_global_seeds(seed=42):
 # =========================================================
 # 2. NEURAL NETWORK SELECTOR (Robust Version)
 # =========================================================
-import tensorflow as tf
-from tensorflow.keras import layers, regularizers, initializers, constraints, models, callbacks
-import numpy as np
-import pandas as pd
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import StandardScaler
-from tqdm import tqdm
-import gc
-
-
-# 1. Helper Class for Results
-class NNResult:
-    def __init__(self, X_train, X_test, features, rmse, n_features):
-        self.X_train = X_train
-        self.X_test = X_test
-        self.features = features
-        self.rmse = rmse
-        self.n_features = n_features
-
-
-# 2. The New Elastic Gatekeeper Layer
-class ElasticGatekeeper(layers.Layer):
-    def __init__(self, num_features, l1=0.01, l2=0.01, **kwargs):
-        super(ElasticGatekeeper, self).__init__(**kwargs)
+class GatekeeperLayer(layers.Layer):
+    def __init__(self, num_features, l1_penalty=0.01, **kwargs):
+        super(GatekeeperLayer, self).__init__(**kwargs)
         self.num_features = num_features
-        self.l1 = float(l1)
-        self.l2 = float(l2)
+        self.l1_penalty = float(l1_penalty)  # Cast early to avoid tensor issues
 
     def build(self, input_shape):
+        # We use a lambda for the initializer to ensure it's created on the correct device
         self.w = self.add_weight(
             name="gate_weights",
             shape=(self.num_features,),
             initializer=initializers.Ones(),
             trainable=True,
-            constraint=constraints.NonNeg(),  # Keeps weights 0 to 1
-            # Elastic Net: L1 for sparsity, L2 for stability
-            regularizer=regularizers.L1L2(l1=self.l1, l2=self.l2)
+            constraint=constraints.NonNeg(),
+            regularizer=regularizers.l1(self.l1_penalty)
         )
 
     def call(self, inputs):
         return inputs * self.w
 
 
-# 3. Main Search Function
 def nn_feature_search(
         X_train, X_test, Y_train,
-        penalty_pairs=None,
-        target_range=(250, 1250),
+        target_range=(50, 1250),
         consensus_threshold=0.7,
         # Hardware/Speed Parameters
-        batch_size=64,
-        jit_compile=False,
-        mixed_precision=False,
-        device="/CPU:0"
+        batch_size=64,  # 1024 for Radeon 7900 / 64 for CPU
+        jit_compile=False,  # True for 7900 (XLA) / False for CPU
+        mixed_precision=False,  # True for 7900 (FP16) / False for CPU
+        device="/CPU:0"  # "/GPU:0" for GPU or Mac M-chips
 ):
-    # --- Setup ---
-    if penalty_pairs is None:
-        # Default list of penalties
-        penalty_pairs = [
-            (35.0, 35.0),
-            (37.5, 37.5),
-            (40.0, 40.0),
-            (42.5, 42.5),
-            (45.0, 45.0),
-            (47.5, 47.5),
-            (50.0, 50.0)
-        ]
-
-    base_lr = 0.01 if batch_size >= 4096 else (0.005 if batch_size > 512 else 0.001)
+    base_lr = 0.01 if batch_size >= 4096 else (0.004 if batch_size > 512 else 0.001)
     repeats = 10
     epochs = 400
     patience = 50
+    penalties = [2.0, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 12.0, 15.0]
 
     # Global Mixed Precision Setup
     if mixed_precision:
@@ -160,33 +124,28 @@ def nn_feature_search(
         from tensorflow.keras import mixed_precision as mp
         mp.set_global_policy('float32')
 
-    # Data Prep
     scaler_x = StandardScaler()
     X_train_tf = scaler_x.fit_transform(X_train).astype('float32')
     y_train_tf = Y_train.values.astype('float32')
 
     penalty_results = []
-
-    # --- Reporting Header ---
     print(f"🧬 Search Started | Device: {device} | Batch: {batch_size}")
     print("-" * 85)
-    print(f"{'Penalty (L1/L2)':<18} | {'Features':<10} | {'RMSE (Avg)':<12} | {'R2 (Avg)':<10} | {'Efficiency'}")
+    print(f"{'Penalty':<8} | {'Features':<10} | {'RMSE (Avg)':<12} | {'R2 (Avg)':<10} | {'Efficiency'}")
     print("-" * 85)
 
-    # --- Search Loop ---
-    for l1, l2 in tqdm(penalty_pairs, desc="Testing Elastic Pairs"):
+    for p in tqdm(penalties, desc="Testing penalties"):
         batch_weights, batch_rmse, batch_r2 = [], [], []
         tf.keras.backend.clear_session()
         gc.collect()
 
-        for i in tqdm(range(repeats), desc=f"L1:{l1}/L2:{l2}", leave=False):
+        for i in tqdm(range(repeats), desc=f"Penalty {p}", leave=False):
             with tf.device(device):
+                # ARCHITECTURE: Fixed logic to ensure scientific consistency
                 inputs = layers.Input(shape=(X_train_tf.shape[1],))
+                gate = GatekeeperLayer(X_train_tf.shape[1], l1_penalty=p)(inputs)
 
-                # Use ElasticGatekeeper
-                gate = ElasticGatekeeper(X_train_tf.shape[1], l1=l1, l2=l2)(inputs)
-
-                # Standard Architecture
+                # L2 Regularization and Dropout are "Hardcoded" to prevent overfitting
                 x = layers.Dense(128, activation='relu', kernel_regularizer='l2')(gate)
                 x = layers.Dropout(0.3)(x)
                 x = layers.Dense(64, activation='relu', kernel_regularizer='l2')(x)
@@ -195,10 +154,10 @@ def nn_feature_search(
                 model = models.Model(inputs=inputs, outputs=outputs)
                 steps_per_epoch = int(np.ceil(len(X_train_tf) / batch_size))
 
-                # LR Schedule
+                # LEARNING RATE: Adaptive schedule to handle large batches safely
                 lr_schedule = tf.keras.optimizers.schedules.CosineDecay(
                     initial_learning_rate=0.0,
-                    decay_steps=epochs * steps_per_epoch,
+                    decay_steps=epochs*steps_per_epoch,
                     warmup_target=base_lr,
                     warmup_steps=20 * steps_per_epoch
                 )
@@ -218,86 +177,36 @@ def nn_feature_search(
                     callbacks=[callbacks.EarlyStopping(patience=patience, restore_best_weights=True)],
                 )
 
-            # Record weights and metrics
+            # Record weights and predict
             w = model.layers[1].get_weights()[0]
             batch_weights.append(w > 1e-2)
-
             y_pred = model.predict(X_train_tf, batch_size=batch_size, verbose=0)
             batch_rmse.append(np.sqrt(mean_squared_error(y_train_tf, y_pred)))
             batch_r2.append(r2_score(y_train_tf, y_pred))
 
-        # --- Aggregate Results ---
         avg_rmse = np.mean(batch_rmse)
         avg_r2 = np.mean(batch_r2)
         selection_frequency = np.mean(batch_weights, axis=0)
         consensus_feats = np.sum(selection_frequency >= consensus_threshold)
-
-        # Efficiency Calculation (Kept for logging, ignored for selection)
         eff = avg_r2 / np.log1p(consensus_feats) if consensus_feats > 0 else 0
-
-        # Print Row
-        p_str = f"{l1}/{l2}"
-        print(f"{p_str:<18} | {consensus_feats:<10} | {avg_rmse:<12.2f} | {avg_r2:<10.2f} | {eff:.4f}")
+        print(f"{p:<8} | {consensus_feats:<10} | {avg_rmse:<12.2f} | {avg_r2:<10.2f} | {eff:.4f}")
 
         penalty_results.append({
-            'l1': l1, 'l2': l2,
+            'penalty': p,
             'n_features': consensus_feats,
             'rmse': avg_rmse,
-            'rmse_list': batch_rmse,  # <--- CRITICAL: Store raw list for SE calc
             'r2': avg_r2,
-            'efficiency': eff,
+            'efficiency': eff,  # Store this so champion logic can find it
             'freq_mask': selection_frequency
         })
 
-    # --- SCIENTIFIC CHAMPION SELECTION (1-SE Rule) ---
-
-    # 1. Strict Range Filter
+    # Champion Selection...
     valid_results = [r for r in penalty_results if target_range[0] < r['n_features'] < target_range[1]]
-
-    if not valid_results:
-        print("\nNo penalties fell within target feature range. Defaulting to Best RMSE overall.")
-        champion = min(penalty_results, key=lambda x: x['rmse'])
-    else:
-        # 2. Find the "Gold Standard" (Model with absolute lowest RMSE)
-        best_run = min(valid_results, key=lambda x: x['rmse'])
-        best_rmse = best_run['rmse']
-
-        # 3. Calculate Standard Error (SE)
-        # Formula: SE = StdDev / sqrt(N_repeats)
-        rmse_std = np.std(best_run['rmse_list'])
-        n_repeats = len(best_run['rmse_list'])
-        standard_error = rmse_std / np.sqrt(n_repeats)
-
-        # Safety fallback if SE is 0 (shouldn't happen with 5 repeats)
-        if standard_error == 0: standard_error = 0.1
-
-        # 4. Define Threshold (Best RMSE + 1 Standard Error)
-        rmse_threshold = best_rmse + standard_error
-
-        # 5. Filter Candidates (Statistically Indistinguishable)
-        candidates = [r for r in valid_results if r['rmse'] <= rmse_threshold]
-
-        # 6. Select Winner (Parsimony Principle: The simplest model wins)
-        champion = min(candidates, key=lambda x: x['n_features'])
-
-        # --- Detailed Report ---
-        print(f"\nScientific Selection (1-Standard-Error Rule):")
-        print(f"Gold Standard RMSE: {best_rmse:.2f} ± {standard_error:.2f} (SE)")
-        print(f"Selection Threshold: <= {rmse_threshold:.2f} (Best + 1 SE)")
-        print(f"Candidates in Statistical Range: {len(candidates)}")
-
-        if champion != best_run:
-            diff = best_run['n_features'] - champion['n_features']
-            print(f"DECISION: Selected simpler model. Saved {diff} features within error margin.")
-        else:
-            print(f"DECISION: The most accurate model was selected (no simpler model was within 1 SE).")
+    if not valid_results: return None
+    champion = max(valid_results, key=lambda x: x['efficiency'])
 
     elite_mask = champion['freq_mask'] >= consensus_threshold
     elite_names = X_train.columns[elite_mask].tolist()
-
-    print(f"\n🏆 Champion Selected: L1={champion['l1']}, L2={champion['l2']}")
-    print(f"   Features: {champion['n_features']}")
-    print(f"   RMSE: {champion['rmse']:.2f}")
 
     return NNResult(X_train[elite_names], X_test[elite_names], elite_names, champion['rmse'], champion['n_features'])
 
