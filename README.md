@@ -2,7 +2,6 @@
 
 ![image](https://img.shields.io/badge/python-3.8%2B-blue) 
 ![image](https://img.shields.io/badge/license-AGPL%203.0-green) 
-![image](https://img.shields.io/badge/code%20style-black-black)
 
 ## Overview
 
