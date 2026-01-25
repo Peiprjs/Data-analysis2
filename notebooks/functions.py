@@ -306,7 +306,7 @@ def nn_feature_search(
 # =========================================================
 
 def run_model_benchmark(estimator, param_distributions, X_train_df, X_test_df, y_train, y_test, 
-                        label="Dataset", n_iter=15, cv=5, task='regression', clean_columns=False):
+                        label="Dataset", n_iter=20, cv=5, task='regression', clean_columns=False):
     """
     Generic function to run model benchmarking with hyperparameter search.
     
@@ -401,7 +401,7 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
         param_distributions={"n_estimators": [500, 1000], "learning_rate": [0.01, 0.05], "max_depth": [3, 4, 5],
                              "subsample": [0.7, 0.8], "colsample_bytree": [0.1, 0.2], "reg_alpha": [0.1, 0.5, 1.0],
                              "reg_lambda": [1.0, 5.0]},
-        n_iter=15, cv=5, scoring="neg_root_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
+        n_iter=25, cv=5, scoring="neg_root_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
     )
 
     start_time = time.time()
@@ -458,7 +458,7 @@ def adaboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
             "learning_rate": [0.01, 0.05, 0.1, 0.5, 1.0],
             "loss": ["linear", "square", "exponential"]
         },
-        n_iter=15, cv=5, scoring="neg_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -589,7 +589,7 @@ def svc_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, label="Data
             "gamma": ["scale", "auto", 0.001, 0.01, 0.1],
             "degree": [2, 3, 4]
         },
-        n_iter=15, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -614,7 +614,7 @@ def logistic_regression_benchmark(X_train_df, X_test_df, y_train, y_test, label=
             "solver": ["lbfgs", "saga", "liblinear"],
             "class_weight": [None, "balanced"]
         },
-        n_iter=15, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -1585,23 +1585,24 @@ def anova_feature_selection(X_train, y_train, X_test=None, n_features=100, mode=
     return X_train_selected, selected_features
 
 
-def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=['importance', 'anova', 'pca'], 
+def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=['importance', 'anova', 'pca'],
                                        n_features=100, model_for_eval='RandomForest'):
     """
     Compare different feature selection methods.
-    
+
     Parameters:
     - X_train, y_train: Training data
     - X_test, y_test: Test data
     - methods: List of methods to compare ('importance', 'anova', 'pca', 'baseline')
     - n_features: Number of features to select
     - model_for_eval: Model to use for evaluation
-    
+
     Returns:
     - results: Dictionary with performance metrics for each method
     """
     results = {}
-    
+    n_list = n_features if isinstance(n_features, list) else [n_features]
+
     if model_for_eval == 'RandomForest':
         eval_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
     elif model_for_eval == 'XGBoost':
@@ -1610,57 +1611,57 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
         eval_model = GradientBoostingRegressor(n_estimators=100, random_state=42)
     else:
         eval_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-    
+
     print(f"Comparing feature selection methods using {model_for_eval}...")
     print(f"{'Method':<20} | {'# Features':<12} | {'RMSE':<12} | {'R2':<10}")
     print("-" * 60)
-    
+
     pbar = tqdm(total=len(methods), desc="Feature selection methods")
-    
-    if 'baseline' in methods:
-        pbar.set_description("Baseline (no selection)")
-        eval_model.fit(X_train, y_train)
-        y_pred = eval_model.predict(X_test)
-        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-        r2 = r2_score(y_test, y_pred)
-        results['baseline'] = {'n_features': X_train.shape[1], 'rmse': rmse, 'r2': r2}
-        print(f"{'Baseline':<20} | {X_train.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
-        pbar.update(1)
-    
-    if 'importance' in methods:
-        pbar.set_description("Feature importance")
-        X_train_sel, X_test_sel, _ = feature_importance_selection(X_train, y_train, X_test, n_features, 'RandomForest')
-        eval_model.fit(X_train_sel, y_train)
-        y_pred = eval_model.predict(X_test_sel)
-        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-        r2 = r2_score(y_test, y_pred)
-        results['importance'] = {'n_features': X_train_sel.shape[1], 'rmse': rmse, 'r2': r2}
-        print(f"{'Feature Importance':<20} | {X_train_sel.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
-        pbar.update(1)
-    
-    if 'anova' in methods:
-        pbar.set_description("ANOVA F-value")
-        X_train_sel, X_test_sel, _ = anova_feature_selection(X_train, y_train, X_test, n_features, 'regression')
-        eval_model.fit(X_train_sel, y_train)
-        y_pred = eval_model.predict(X_test_sel)
-        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-        r2 = r2_score(y_test, y_pred)
-        results['anova'] = {'n_features': X_train_sel.shape[1], 'rmse': rmse, 'r2': r2}
-        print(f"{'ANOVA':<20} | {X_train_sel.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
-        pbar.update(1)
-    
-    if 'pca' in methods:
-        pbar.set_description("PCA")
-        X_train_pca, pca_obj = pca_feature_selection(X_train, n_components=n_features if n_features < X_train.shape[1] else 0.95)
-        X_test_pca = pca_obj.transform(X_test)
-        eval_model.fit(X_train_pca, y_train)
-        y_pred = eval_model.predict(X_test_pca)
-        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-        r2 = r2_score(y_test, y_pred)
-        results['pca'] = {'n_features': X_train_pca.shape[1], 'rmse': rmse, 'r2': r2}
-        print(f"{'PCA':<20} | {X_train_pca.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
-        pbar.update(1)
-    
+    for n in n_list:
+        if 'baseline' in methods:
+            pbar.set_description("Baseline (no selection)")
+            eval_model.fit(X_train, y_train)
+            y_pred = eval_model.predict(X_test)
+            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+            r2 = r2_score(y_test, y_pred)
+            results['baseline'] = {'n_features': X_train.shape[1], 'rmse': rmse, 'r2': r2}
+            print(f"{'Baseline':<20} | {X_train.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+            pbar.update(1)
+
+        if 'importance' in methods:
+            pbar.set_description(f"Importance (n={n})")
+            X_train_sel, X_test_sel, _ = feature_importance_selection(X_train, y_train, X_test, n, 'RandomForest')
+            eval_model.fit(X_train_sel, y_train)
+            y_pred = eval_model.predict(X_test_sel)
+            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+            r2 = r2_score(y_test, y_pred)
+            results['importance'] = {'n_features': X_train_sel.shape[1], 'rmse': rmse, 'r2': r2}
+            print(f"{'Feature Importance':<20} | {X_train_sel.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+            pbar.update(1)
+
+        if 'anova' in methods:
+            pbar.set_description(f"ANOVA F-value (n={n})")
+            X_train_sel, X_test_sel, _ = anova_feature_selection(X_train, y_train, X_test, n, 'regression')
+            eval_model.fit(X_train_sel, y_train)
+            y_pred = eval_model.predict(X_test_sel)
+            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+            r2 = r2_score(y_test, y_pred)
+            results['anova'] = {'n_features': X_train_sel.shape[1], 'rmse': rmse, 'r2': r2}
+            print(f"{'ANOVA':<20} | {X_train_sel.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+            pbar.update(1)
+
+        if 'pca' in methods:
+            pbar.set_description(f"PCA (n={n})")
+            X_train_pca, pca_obj = pca_feature_selection(X_train, n_components=n if n < X_train.shape[1] else 0.95)
+            X_test_pca = pca_obj.transform(X_test)
+            eval_model.fit(X_train_pca, y_train)
+            y_pred = eval_model.predict(X_test_pca)
+            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+            r2 = r2_score(y_test, y_pred)
+            results['pca'] = {'n_features': X_train_pca.shape[1], 'rmse': rmse, 'r2': r2}
+            print(f"{'PCA':<20} | {X_train_pca.shape[1]:<12} | {rmse:<12.3f} | {r2:<10.3f}")
+            pbar.update(1)
+
     pbar.close()
     return results
 
