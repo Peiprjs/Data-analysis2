@@ -1124,60 +1124,62 @@ def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_
     total_combinations = len(feature_levels) * len(model_configs)
     pbar = tqdm(total=total_combinations, desc="Cross-validation progress")
     
-    for level in feature_levels:
-        X_filtered = filter_features_by_level(X_train, max_level=level)
-        numeric_cols = X_filtered.select_dtypes(include=[np.number]).columns
-        X_numeric = X_filtered[numeric_cols]
-        
-        if len(X_numeric.columns) == 0:
-            print(f"{level:<12} | All models   | No features available")
-            pbar.update(len(model_configs))
-            continue
-        
-        all_results[level] = {}
-        
-        for config in model_configs:
-            model = config['model'](**config['params'])
-            
-            pbar.set_description(f"CV: {level} - {config['name']}")
-            
-            cv_metrics = cross_validate(
-                model, X_numeric, y_train,
-                cv=cv_folds,
-                scoring={'rmse': 'neg_root_mean_squared_error', 'r2': 'r2'},
-                n_jobs=-1
-            )
-            
-            rmse_scores = -cv_metrics['test_rmse']
-            r2_scores = cv_metrics['test_r2']
-            mean_rmse = np.mean(rmse_scores)
-            std_rmse = np.std(rmse_scores)
-            mean_r2 = np.mean(r2_scores)
-            std_r2 = np.std(r2_scores)
-            
-            all_results[level][config['name']] = {
-                'n_features': len(X_numeric.columns),
-                'mean_rmse': mean_rmse,
-                'std_rmse': std_rmse,
-                'mean_r2': mean_r2,
-                'cv_scores': rmse_scores,
-                'r2_scores': r2_scores
-            }
-            
-            df_rows.append({
-                'Level': level,
-                'Model': config['name'],
-                'Num_Features': len(X_numeric.columns),
-                'Mean_RMSE': mean_rmse,
-                'Std_RMSE': std_rmse,
-                'Mean_R2': mean_r2,
-                'Std_R2': std_r2
-            })
-            
-            print(f"{level:<12} | {config['name']:<15} | {len(X_numeric.columns):<12} | {mean_rmse:<12.3f} | {mean_r2:<10.3f} | ±{std_rmse:<10.3f}")
-            pbar.update(1)
-    
-    pbar.close()
+    try:
+        for level in feature_levels:
+            X_filtered = filter_features_by_level(X_train, max_level=level)
+            numeric_cols = X_filtered.select_dtypes(include=[np.number]).columns
+            X_numeric = X_filtered[numeric_cols]
+
+            if len(X_numeric.columns) == 0:
+                print(f"{level:<12} | All models   | No features available")
+                pbar.update(len(model_configs))
+                continue
+
+            all_results[level] = {}
+
+            for config in model_configs:
+                model = config['model'](**config['params'])
+
+                pbar.set_description(f"CV: {level} - {config['name']}")
+
+                cv_metrics = cross_validate(
+                    model, X_numeric, y_train,
+                    cv=cv_folds,
+                    scoring={'rmse': 'neg_root_mean_squared_error', 'r2': 'r2'},
+                    n_jobs=-1
+                )
+
+                rmse_scores = -cv_metrics['test_rmse']
+                r2_scores = cv_metrics['test_r2']
+                mean_rmse = np.mean(rmse_scores)
+                std_rmse = np.std(rmse_scores)
+                mean_r2 = np.mean(r2_scores)
+                std_r2 = np.std(r2_scores)
+
+                all_results[level][config['name']] = {
+                    'n_features': len(X_numeric.columns),
+                    'mean_rmse': mean_rmse,
+                    'std_rmse': std_rmse,
+                    'mean_r2': mean_r2,
+                    'cv_scores': rmse_scores,
+                    'r2_scores': r2_scores
+                }
+
+                df_rows.append({
+                    'Level': level,
+                    'Model': config['name'],
+                    'Num_Features': len(X_numeric.columns),
+                    'Mean_RMSE': mean_rmse,
+                    'Std_RMSE': std_rmse,
+                    'Mean_R2': mean_r2,
+                    'Std_R2': std_r2
+                })
+
+                print(f"{level:<12} | {config['name']:<15} | {len(X_numeric.columns):<12} | {mean_rmse:<12.3f} | {mean_r2:<10.3f} | ±{std_rmse:<10.3f}")
+                pbar.update(1)
+    finally:
+        pbar.close()
+
     results_df = pd.DataFrame(df_rows)
     return all_results, results_df
 
