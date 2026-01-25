@@ -37,6 +37,7 @@ from scipy import stats
 # =========================================================
 # 1. GLOBAL CONFIG & SYSTEM-AGNOSTIC DEVICE SETUP
 # =========================================================
+MASTER_SEED = 3004
 ModelResult = namedtuple('ModelResult', ['model', 'rmse', 'r2', 'best_params', 'runtime', 'top_features'])
 NNResult = namedtuple('NNResult', ['X_train_elite', 'X_test_elite', 'feature_names', 'rmse', 'n_features'])
 
@@ -68,7 +69,7 @@ else:
     print("No GPU found. Running on CPU mode.")
 
 
-def set_global_seeds(seed=42):
+def set_global_seeds(seed=MASTER_SEED):
     os.environ['PYTHONHASHSEED'] = str(seed)
     random.seed(seed)
     np.random.seed(seed)
@@ -339,7 +340,7 @@ def run_model_benchmark(estimator, param_distributions, X_train_df, X_test_df, y
         n_iter=n_iter,
         cv=cv,
         scoring=scoring,
-        random_state=42,
+        random_state=MASTER_SEED,
         n_jobs=-1,
         verbose=1
     )
@@ -397,11 +398,11 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     X_test_clean.columns = [re.sub('[^A-Za-z0-9_]+', '', str(col)) for col in X_test_clean.columns]
 
     search_xgb = RandomizedSearchCV(
-        estimator=xgb.XGBRegressor(objective='reg:squarederror', random_state=42, n_jobs=-1),
+        estimator=xgb.XGBRegressor(objective='reg:squarederror', random_state=MASTER_SEED, n_jobs=-1),
         param_distributions={"n_estimators": [500, 1000], "learning_rate": [0.01, 0.05], "max_depth": [3, 4, 5],
                              "subsample": [0.7, 0.8], "colsample_bytree": [0.1, 0.2], "reg_alpha": [0.1, 0.5, 1.0],
                              "reg_lambda": [1.0, 5.0]},
-        n_iter=20, cv=5, scoring="neg_root_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="neg_root_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
 
     start_time = time.time()
@@ -425,11 +426,11 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
 def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing Random Forest Engine: {label}")
     search = RandomizedSearchCV(
-        estimator=RandomForestRegressor(random_state=42, n_jobs=-1),
+        estimator=RandomForestRegressor(random_state=MASTER_SEED, n_jobs=-1),
         param_distributions={"n_estimators": [300, 500, 800, 1000], "max_depth": [None, 10, 20, 40],
                              "min_samples_split": [2, 5, 10], "min_samples_leaf": [1, 2, 4],
                              "max_features": ["sqrt", "log2"]},
-        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -452,13 +453,13 @@ def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Datas
 def adaboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing AdaBoost Engine: {label}")
     search = RandomizedSearchCV(
-        estimator=AdaBoostRegressor(random_state=42),
+        estimator=AdaBoostRegressor(random_state=MASTER_SEED),
         param_distributions={
             "n_estimators": [50, 100, 200, 300, 500],
             "learning_rate": [0.01, 0.05, 0.1, 0.5, 1.0],
             "loss": ["linear", "square", "exponential"]
         },
-        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -481,7 +482,7 @@ def adaboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
 def gradient_boosting_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing Gradient Boosting Engine: {label}")
     search = RandomizedSearchCV(
-        estimator=GradientBoostingRegressor(random_state=42),
+        estimator=GradientBoostingRegressor(random_state=MASTER_SEED),
         param_distributions={
             "n_estimators": [100, 200, 300, 500],
             "learning_rate": [0.01, 0.05, 0.1],
@@ -491,7 +492,7 @@ def gradient_boosting_benchmark(X_train_df, X_test_df, y_train, y_test, label="D
             "subsample": [0.6, 0.7, 0.8, 0.9, 1.0],
             "max_features": ["sqrt", "log2", None]
         },
-        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -514,7 +515,7 @@ def gradient_boosting_benchmark(X_train_df, X_test_df, y_train, y_test, label="D
 def lightgbm_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing LightGBM Engine: {label}")
     search = RandomizedSearchCV(
-        estimator=lgb.LGBMRegressor(random_state=42, device = "cpu", n_jobs=1, verbose=-1, importance_type="gain"),
+        estimator=lgb.LGBMRegressor(random_state=MASTER_SEED, device = "cpu", n_jobs=1, verbose=-1, importance_type="gain"),
         param_distributions={
             "n_estimators": [100, 200, 500, 1000],
             "learning_rate": [0.01, 0.05, 0.1],
@@ -526,7 +527,7 @@ def lightgbm_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
             "reg_alpha": [0, 0.1, 0.5, 1.0],
             "reg_lambda": [0, 0.1, 0.5, 1.0]
         },
-        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -549,7 +550,7 @@ def lightgbm_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
 def stochastic_gradient_boosting_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing Stochastic Gradient Boosting: {label}")
     search = RandomizedSearchCV(
-        estimator=GradientBoostingRegressor(random_state=42),
+        estimator=GradientBoostingRegressor(random_state=MASTER_SEED),
         param_distributions={
             "n_estimators": [100, 200, 300, 500],
             "learning_rate": [0.01, 0.05, 0.1, 0.2],
@@ -560,7 +561,7 @@ def stochastic_gradient_boosting_benchmark(X_train_df, X_test_df, y_train, y_tes
             "max_features": ["sqrt", "log2", 0.5, 0.7, 1.0],
             "loss": ["squared_error", "absolute_error", "huber"]
         },
-        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -582,14 +583,14 @@ def stochastic_gradient_boosting_benchmark(X_train_df, X_test_df, y_train, y_tes
 def svc_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing SVC Classifier: {label}")
     search = RandomizedSearchCV(
-        estimator=SVC(random_state=42),
+        estimator=SVC(random_state=MASTER_SEED),
         param_distributions={
             "C": [0.1, 1, 10, 100],
             "kernel": ["linear", "rbf", "poly"],
             "gamma": ["scale", "auto", 0.001, 0.01, 0.1],
             "degree": [2, 3, 4]
         },
-        n_iter=20, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="accuracy", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -607,14 +608,14 @@ def svc_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, label="Data
 def logistic_regression_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing Logistic Regression: {label}")
     search = RandomizedSearchCV(
-        estimator=LogisticRegression(random_state=42, max_iter=1000),
+        estimator=LogisticRegression(random_state=MASTER_SEED, max_iter=1000),
         param_distributions={
             "C": [0.01, 0.1, 1, 10, 100],
             "penalty": ["l1", "l2", "elasticnet", None],
             "solver": ["lbfgs", "saga", "liblinear"],
             "class_weight": [None, "balanced"]
         },
-        n_iter=20, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="accuracy", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -632,7 +633,7 @@ def logistic_regression_benchmark(X_train_df, X_test_df, y_train, y_test, label=
 def random_forest_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing Random Forest Classifier: {label}")
     search = RandomizedSearchCV(
-        estimator=RandomForestClassifier(random_state=42, n_jobs=-1),
+        estimator=RandomForestClassifier(random_state=MASTER_SEED, n_jobs=-1),
         param_distributions={
             "n_estimators": [100, 200, 500],
             "max_depth": [None, 5, 10, 20, 30],
@@ -641,7 +642,7 @@ def random_forest_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, l
             "max_features": ["sqrt", "log2", 0.5],
             "class_weight": [None, "balanced", "balanced_subsample"]
         },
-        n_iter=20, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="accuracy", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -662,7 +663,7 @@ def random_forest_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, l
 def gradient_boosting_classifier_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
     print(f"Initializing Gradient Boosting Classifier: {label}")
     search = RandomizedSearchCV(
-        estimator=GradientBoostingClassifier(random_state=42),
+        estimator=GradientBoostingClassifier(random_state=MASTER_SEED),
         param_distributions={
             "n_estimators": [100, 200, 300],
             "learning_rate": [0.01, 0.05, 0.1],
@@ -672,7 +673,7 @@ def gradient_boosting_classifier_benchmark(X_train_df, X_test_df, y_train, y_tes
             "subsample": [0.7, 0.8, 0.9, 1.0],
             "max_features": ["sqrt", "log2", 0.5]
         },
-        n_iter=20, cv=5, scoring="accuracy", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="accuracy", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -715,16 +716,16 @@ def kernel_random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label
     }
     
     if kernel_method == 'nystroem':
-        kernel_approx = Nystroem(kernel='rbf', random_state=42)
+        kernel_approx = Nystroem(kernel='rbf', random_state=MASTER_SEED)
     elif kernel_method == 'rbf':
-        kernel_approx = RBFSampler(random_state=42)
+        kernel_approx = RBFSampler(random_state=MASTER_SEED)
     else:
         raise ValueError(f"Unknown kernel_method: {kernel_method}. Use 'nystroem' or 'rbf'")
     
     pipeline = Pipeline([
         ('scaler', StandardScaler()),
         ('kernel_approx', kernel_approx),
-        ('rf', RandomForestRegressor(random_state=42, n_jobs=-1))
+        ('rf', RandomForestRegressor(random_state=MASTER_SEED, n_jobs=-1))
     ])
     
     search = RandomizedSearchCV(
@@ -733,7 +734,7 @@ def kernel_random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label
         n_iter=20,
         cv=5,
         scoring='neg_mean_squared_error',
-        random_state=42,
+        random_state=MASTER_SEED,
         n_jobs=-1,
         verbose=1
     )
@@ -787,16 +788,16 @@ def kernel_random_forest_classifier_benchmark(X_train_df, X_test_df, y_train, y_
     }
     
     if kernel_method == 'nystroem':
-        kernel_approx = Nystroem(kernel='rbf', random_state=42)
+        kernel_approx = Nystroem(kernel='rbf', random_state=MASTER_SEED)
     elif kernel_method == 'rbf':
-        kernel_approx = RBFSampler(random_state=42)
+        kernel_approx = RBFSampler(random_state=MASTER_SEED)
     else:
         raise ValueError(f"Unknown kernel_method: {kernel_method}. Use 'nystroem' or 'rbf'")
     
     pipeline = Pipeline([
         ('scaler', StandardScaler()),
         ('kernel_approx', kernel_approx),
-        ('rf', RandomForestClassifier(random_state=42, n_jobs=-1))
+        ('rf', RandomForestClassifier(random_state=MASTER_SEED, n_jobs=-1))
     ])
     
     search = RandomizedSearchCV(
@@ -805,7 +806,7 @@ def kernel_random_forest_classifier_benchmark(X_train_df, X_test_df, y_train, y_
         n_iter=20,
         cv=5,
         scoring='accuracy',
-        random_state=42,
+        random_state=MASTER_SEED,
         n_jobs=-1,
         verbose=1
     )
@@ -950,7 +951,7 @@ def explain_with_lime(model, X_train, X_test, feature_names, num_samples=5, num_
         X_train_np,
         feature_names=feature_names,
         mode='regression',
-        random_state=42
+        random_state=MASTER_SEED
     )
     
     explanations = {}
@@ -1106,12 +1107,12 @@ def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_
     
     if model_configs is None:
         model_configs = [
-            {'name': 'RF_100', 'model': RandomForestRegressor, 'params': {'n_estimators': 100, 'random_state': 42, 'n_jobs': -1}},
-            {'name': 'RF_200', 'model': RandomForestRegressor, 'params': {'n_estimators': 200, 'max_depth': 10, 'random_state': 42, 'n_jobs': -1}},
-            {'name': 'XGB_100', 'model': xgb.XGBRegressor, 'params': {'n_estimators': 100, 'random_state': 42, 'n_jobs': -1}},
-            {'name': 'XGB_lr01', 'model': xgb.XGBRegressor, 'params': {'n_estimators': 200, 'learning_rate': 0.01, 'max_depth': 5, 'random_state': 42, 'n_jobs': -1}},
-            {'name': 'GB_100', 'model': GradientBoostingRegressor, 'params': {'n_estimators': 100, 'random_state': 42}},
-            {'name': 'LightGBM', 'model': lgb.LGBMRegressor, 'params': {'n_estimators': 100, 'random_state': 42, 'n_jobs': -1, 'verbose': -1}},
+            {'name': 'RF_100', 'model': RandomForestRegressor, 'params': {'n_estimators': 100, 'random_state': MASTER_SEED, 'n_jobs': -1}},
+            {'name': 'RF_200', 'model': RandomForestRegressor, 'params': {'n_estimators': 200, 'max_depth': 10, 'random_state': MASTER_SEED, 'n_jobs': -1}},
+            {'name': 'XGB_100', 'model': xgb.XGBRegressor, 'params': {'n_estimators': 100, 'random_state': MASTER_SEED, 'n_jobs': -1}},
+            {'name': 'XGB_lr01', 'model': xgb.XGBRegressor, 'params': {'n_estimators': 200, 'learning_rate': 0.01, 'max_depth': 5, 'random_state': MASTER_SEED, 'n_jobs': -1}},
+            {'name': 'GB_100', 'model': GradientBoostingRegressor, 'params': {'n_estimators': 100, 'random_state': MASTER_SEED}},
+            {'name': 'LightGBM', 'model': lgb.LGBMRegressor, 'params': {'n_estimators': 100, 'random_state': MASTER_SEED, 'n_jobs': -1, 'verbose': -1}},
         ]
     
     all_results = {}
@@ -1365,7 +1366,7 @@ def plot_learning_curves(model, X_train, y_train, cv_folds=5, title="Learning Cu
         cv=cv_folds,
         scoring='neg_root_mean_squared_error',
         n_jobs=-1,
-        random_state=42
+        random_state=MASTER_SEED
     )
     
     # Convert to positive RMSE
@@ -1484,7 +1485,7 @@ def pca_feature_selection(X, n_components=0.95, scale=True):
         scaler = StandardScaler()
         X_arr = scaler.fit_transform(X_arr)
     
-    pca = PCA(n_components=n_components, random_state=42)
+    pca = PCA(n_components=n_components, random_state=MASTER_SEED)
     X_pca = pca.fit_transform(X_arr)
     
     print(f"PCA: reduced to {X_pca.shape[1]} components")
@@ -1510,11 +1511,11 @@ def feature_importance_selection(X_train, y_train, X_test=None, n_features=100, 
     - selected_features: List of selected feature names
     """
     if model_type == 'RandomForest':
-        model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+        model = RandomForestRegressor(n_estimators=100, random_state=MASTER_SEED, n_jobs=-1)
     elif model_type == 'XGBoost':
-        model = xgb.XGBRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+        model = xgb.XGBRegressor(n_estimators=100, random_state=MASTER_SEED, n_jobs=-1)
     elif model_type == 'GradientBoosting':
-        model = GradientBoostingRegressor(n_estimators=100, random_state=42)
+        model = GradientBoostingRegressor(n_estimators=100, random_state=MASTER_SEED)
     else:
         raise ValueError(f"Unknown model_type: {model_type}")
     
@@ -1604,13 +1605,13 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
     n_list = n_features if isinstance(n_features, list) else [n_features]
 
     if model_for_eval == 'RandomForest':
-        eval_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+        eval_model = RandomForestRegressor(n_estimators=100, random_state=MASTER_SEED, n_jobs=-1)
     elif model_for_eval == 'XGBoost':
-        eval_model = xgb.XGBRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+        eval_model = xgb.XGBRegressor(n_estimators=100, random_state=MASTER_SEED, n_jobs=-1)
     elif model_for_eval == 'GradientBoosting':
-        eval_model = GradientBoostingRegressor(n_estimators=100, random_state=42)
+        eval_model = GradientBoostingRegressor(n_estimators=100, random_state=MASTER_SEED)
     else:
-        eval_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+        eval_model = RandomForestRegressor(n_estimators=100, random_state=MASTER_SEED, n_jobs=-1)
 
     print(f"Comparing feature selection methods using {model_for_eval}...")
     print(f"{'Method':<20} | {'# Features':<12} | {'RMSE':<12} | {'R2':<10}")
