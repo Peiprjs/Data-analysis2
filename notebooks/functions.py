@@ -401,7 +401,7 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
         param_distributions={"n_estimators": [500, 1000], "learning_rate": [0.01, 0.05], "max_depth": [3, 4, 5],
                              "subsample": [0.7, 0.8], "colsample_bytree": [0.1, 0.2], "reg_alpha": [0.1, 0.5, 1.0],
                              "reg_lambda": [1.0, 5.0]},
-        n_iter=25, cv=5, scoring="neg_root_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
+        n_iter=20, cv=5, scoring="neg_root_mean_squared_error", random_state=42, n_jobs=-1, verbose=1
     )
 
     start_time = time.time()
@@ -1653,7 +1653,7 @@ def compare_feature_selection_methods(X_train, y_train, X_test, y_test, methods=
         if 'pca' in methods:
             pbar.set_description(f"PCA (n={n})")
             X_train_pca, pca_obj = pca_feature_selection(X_train, n_components=n if n < X_train.shape[1] else 0.95)
-            X_test_pca = pca_obj.transform(X_test)
+            X_test_pca = pca_obj.transform(X_test.values)
             eval_model.fit(X_train_pca, y_train)
             y_pred = eval_model.predict(X_test_pca)
             rmse = np.sqrt(mean_squared_error(y_test, y_pred))
