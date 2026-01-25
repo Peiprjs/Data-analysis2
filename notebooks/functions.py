@@ -864,7 +864,7 @@ def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5, xgb_params=Non
     default_lgbm = {
         'n_estimators': 500, 'learning_rate': 0.05, 'max_depth': 5,
         'num_leaves': 31, 'subsample': 0.8, 'colsample_bytree': 0.8,
-        'n_jobs': -1, 'random_state': 3004, 'verbose': -1
+        'n_jobs': 1, 'random_state': 3004, 'verbose': -1
     }
 
     default_ada = {
