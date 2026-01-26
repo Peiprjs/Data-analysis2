@@ -842,63 +842,66 @@ def kernel_random_forest_classifier_benchmark(X_train_df, X_test_df, y_train, y_
 # =========================================================
 # 4. REPEATED CV BATTLE (5x5 Arena)
 # =========================================================
-def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5, xgb_params=None, rf_params=None, 
-                 gb_params=None, lgbm_params=None, ada_params=None):
-    rkf = RepeatedKFold(n_splits=n_splits, n_repeats=n_repeats, random_state=3004)
+def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5,
+                 xgb_params=None, rf_params=None, gb_params=None,
+                 lgbm_params=None, ada_params=None, sgb_params=None,
+                 krf_params=None):
+    from sklearn.model_selection import RepeatedKFold, cross_validate
+    from sklearn.pipeline import Pipeline
+    from sklearn.kernel_approximation import Nystroem
+    import re
 
-    default_xgb = {
-        'n_estimators': 1000, 'learning_rate': 0.01, 'max_depth': 3,
-        'subsample': 0.7, 'colsample_bytree': 0.2, 'reg_alpha': 0.1,
-        'reg_lambda': 1.0, 'n_jobs': -1, 'random_state': 3004
-    }
+    rkf = RepeatedKFold(n_splits=n_splits, n_repeats=n_repeats, random_state=MASTER_SEED)
 
-    default_rf = {
-        'n_estimators': 1000, 'max_depth': None,
-        'max_features': 'sqrt', 'n_jobs': -1, 'random_state': 3004
-    }
+    def prepare_params(defaults, best):
+        if best is None: return defaults
+        combined = {**defaults, **best}
+        # Remove metadata keys that might be in the dict
+        for key in ['mean_test_score', 'std_test_score', 'rank_test_score']:
+            combined.pop(key, None)
+        return combined
 
-    default_gb = {
-        'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 4,
-        'subsample': 0.8, 'max_features': 'sqrt', 'random_state': 3004
-    }
+    # --- Configuration ---
+    default_xgb = {'n_estimators': 1000, 'learning_rate': 0.01, 'max_depth': 3, 'n_jobs': 4,
+                   'random_state': MASTER_SEED}
+    default_rf = {'n_estimators': 1000, 'max_features': 'sqrt', 'n_jobs': -1, 'random_state': MASTER_SEED}
+    default_gb = {'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 4, 'random_state': MASTER_SEED}
+    default_lgbm = {'n_estimators': 500, 'learning_rate': 0.05, 'n_jobs': 1, 'random_state': MASTER_SEED, 'verbose': -1}
+    default_ada = {'n_estimators': 100, 'learning_rate': 0.1, 'random_state': MASTER_SEED}
+    default_sgb = {**default_gb, 'subsample': 0.8}
 
-    default_lgbm = {
-        'n_estimators': 500, 'learning_rate': 0.05, 'max_depth': 5,
-        'num_leaves': 31, 'subsample': 0.8, 'colsample_bytree': 0.8,
-        'n_jobs': 1, 'random_state': 3004, 'verbose': -1
-    }
+    # FIX: Initialize Kernel RF Pipeline properly
+    krf_pipe = Pipeline([
+        ('kernel', Nystroem(random_state=MASTER_SEED)),
+        ('rf', RandomForestRegressor(**default_rf))
+    ])
 
-    default_ada = {
-        'n_estimators': 100, 'learning_rate': 0.1,
-        'loss': 'square', 'random_state': 3004
-    }
-
-    current_xgb_params = xgb_params if xgb_params else default_xgb
-    current_rf_params = rf_params if rf_params else default_rf
-    current_gb_params = gb_params if gb_params else default_gb
-    current_lgbm_params = lgbm_params if lgbm_params else default_lgbm
-    current_ada_params = ada_params if ada_params else default_ada
+    # Use set_params to handle the 'rf__' prefixes automatically
+    if krf_params:
+        valid_krf_params = {k: v for k, v in krf_params.items()
+                            if any(k.startswith(p) for p in ['rf__', 'kernel__'])}
+        krf_pipe.set_params(**valid_krf_params)
 
     models_to_test = {
-        "XGBoost": xgb.XGBRegressor(**current_xgb_params),
-        "Random Forest": RandomForestRegressor(**current_rf_params),
-        "Gradient Boosting": GradientBoostingRegressor(**current_gb_params),
-        "LightGBM": lgb.LGBMRegressor(**current_lgbm_params),
-        "AdaBoost": AdaBoostRegressor(**current_ada_params)
+        "XGBoost": xgb.XGBRegressor(**prepare_params(default_xgb, xgb_params)),
+        "Random Forest": RandomForestRegressor(**prepare_params(default_rf, rf_params)),
+        "Gradient Boosting": GradientBoostingRegressor(**prepare_params(default_gb, gb_params)),
+        "LightGBM": lgb.LGBMRegressor(**prepare_params(default_lgbm, lgbm_params)),
+        "AdaBoost": AdaBoostRegressor(**prepare_params(default_ada, ada_params)),
+        "Stochastic GB": GradientBoostingRegressor(**prepare_params(default_sgb, sgb_params)),
+        "Kernel RF": krf_pipe  # Use the configured pipeline here
     }
 
     battle_results = []
     print(f"Starting Battle Arena ({n_splits}x{n_repeats} = {n_splits * n_repeats} runs)")
-    # Expanded headers to include R2
-    print(f"{'Dataset':<20} | {'Model':<15} | {'Avg RMSE':<12} | {'Avg R2':<10} | {'Std Dev':<10}")
-    print("-" * 85)
+    print(f"{'Dataset':<20} | {'Model':<18} | {'Avg RMSE':<12} | {'Avg R2':<10} | {'Std Dev':<10}")
+    print("-" * 90)
 
     for data_name, X_data in datasets_dict.items():
         X_clean = X_data.copy()
         X_clean.columns = [re.sub('[^A-Za-z0-9_]+', '', str(col)) for col in X_clean.columns]
 
         for model_name, model_obj in models_to_test.items():
-            # Modified scoring to capture both RMSE and R2
             cv_metrics = cross_validate(
                 model_obj, X_clean, y_train,
                 cv=rkf,
@@ -910,18 +913,15 @@ def final_battle(datasets_dict, y_train, n_splits=5, n_repeats=5, xgb_params=Non
             std_rmse = np.std(cv_metrics['test_rmse'])
             mean_r2 = np.mean(cv_metrics['test_r2'])
 
-            # Print updated table row
-            print(f"{data_name:<20} | {model_name:<15} | {mean_rmse:.2f} days   | {mean_r2:.3f}    | ±{std_rmse:.2f}")
+            print(f"{data_name:<20} | {model_name:<18} | {mean_rmse:.2f} days   | {mean_r2:.3f}    | ±{std_rmse:.2f}")
 
             battle_results.append({
-                'Dataset': data_name,
-                'Model': model_name,
-                'RMSE_Mean': mean_rmse,
-                'RMSE_Std': std_rmse,
-                'R2_Mean': mean_r2
+                'Dataset': data_name, 'Model': model_name,
+                'RMSE_Mean': mean_rmse, 'RMSE_Std': std_rmse, 'R2_Mean': mean_r2
             })
 
     return battle_results
+
 
 
 # =========================================================
