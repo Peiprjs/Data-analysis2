@@ -16,10 +16,11 @@ from tensorflow.keras import layers, models, constraints, callbacks, initializer
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, GradientBoostingRegressor, RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import RandomizedSearchCV, RepeatedKFold, cross_validate, cross_val_score, learning_curve, GridSearchCV
+from sklearn.model_selection import RandomizedSearchCV, KFold, cross_validate, learning_curve
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, accuracy_score, f1_score, roc_auc_score, classification_report
 from sklearn.preprocessing import StandardScaler, RobustScaler
 from sklearn.decomposition import PCA
+
 from sklearn.feature_selection import f_regression, f_classif, SelectKBest, RFE
 from sklearn.kernel_approximation import Nystroem, RBFSampler
 from sklearn.pipeline import Pipeline
@@ -34,9 +35,18 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 
+import warnings
+
 # =========================================================
 # 1. GLOBAL CONFIG & SYSTEM-AGNOSTIC DEVICE SETUP
 # =========================================================
+
+# Suppress the specific Joblib/Parallel propagation warning
+warnings.filterwarnings("ignore", message="`sklearn.utils.parallel.delayed` should be used")
+
+# Alternatively, if you want to be broad for this specific module
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn.utils.parallel")
+
 MASTER_SEED = 3004
 ModelResult = namedtuple('ModelResult', ['model', 'rmse', 'r2', 'best_params', 'runtime', 'top_features'])
 NNResult = namedtuple('NNResult', ['X_train_elite', 'X_test_elite', 'feature_names', 'rmse', 'n_features'])
@@ -423,14 +433,14 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
 
 
 
-def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
+def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset", cv=5, n_iter=20):
     print(f"Initializing Random Forest Engine: {label}")
     search = RandomizedSearchCV(
         estimator=RandomForestRegressor(random_state=MASTER_SEED, n_jobs=-1),
-        param_distributions={"n_estimators": [300, 500, 800, 1000], "max_depth": [None, 10, 20, 40],
+        param_distributions={"n_estimators": [100, 300, 500, 800], "max_depth": [None, 10, 20, 40],
                              "min_samples_split": [2, 5, 10], "min_samples_leaf": [1, 2, 4],
-                             "max_features": ["sqrt", "log2"]},
-        n_iter=20, cv=5, scoring="neg_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
+                             "max_features": [1.0, "sqrt", "log2"]},
+        n_iter=n_iter, cv=cv, scoring="neg_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
     start_time = time.time()
     search.fit(X_train_df, y_train)
@@ -1398,73 +1408,104 @@ def plot_learning_curves(model, X_train, y_train, cv_folds=5, title="Learning Cu
 # =========================================================
 # 8. PRE FILTERING OF FEATURES BASED ON ABUNDANCE, VARIATION, COLLINEARITY, PREVALENCE
 # =========================================================
-
-## Feature Selection Pipeline
-def feature_selection_pipeline(X, prevalence_thresh=0.0633342156194934, abundance_thresh=0.00015905606434428443, variance_thresh=5.3173754852092485e-06,
-                                   corr_thresh=0.9795715454616797):
-    #defaults for genus level:
-    #Best parameters: {'prevalence_thresh': 0.0633342156194934, 'abundance_thresh': 0.00015905606434428443, 'variance_thresh': 5.3173754852092485e-06, 'corr_thresh': 0.9795715454616797}
-    #Best RMSE: 60.973, Best R2: 0.801
-
-    #defaults for species level:
-    #Best parameters: {'prevalence_thresh': 0.0632320223420868, 'abundance_thresh': 1.4626891739832243e-05, 'variance_thresh': 1.9229266155638468e-05, 'corr_thresh': 0.8932026069893284}
-    #Best RMSE: 56.463, Best R2: 0.829
-
-
+def tune_filtering_parameters(X_train, Y_train, n_iterations=20):
     """
-    Feature filtering pipeline for microbiome data.
-
-    Parameters:
-        X: pd.DataFrame
-            Feature matrix (samples x taxa)
-        prevalence_thresh: float
-            Minimum fraction of samples a feature must appear in
-        abundance_thresh: float
-            Minimum mean abundance for a feature to be kept
-        variance_thresh: float
-            Minimum variance threshold
-        corr_thresh: float
-            Maximum allowed correlation between features
-
-    Returns:
-        X_filtered: pd.DataFrame
-            Filtered feature matrix
-        removed_features: list
-            Names of removed features
+    Faster Optimization: Uses 5-Fold CV and Random Forest without repetitions.
     """
-    X_filtered = X.copy()
-    removed_features = []
+    current_params = {
+        "prevalence_thresh": 0.05, "abundance_thresh": 1e-4,
+        "variance_thresh": 1e-5, "corr_thresh": 0.9
+    }
+    param_ranges = {
+        "prevalence_thresh": 0.01, "abundance_thresh": 5e-5,
+        "variance_thresh": 5e-6, "corr_thresh": 0.05
+    }
 
-    # Prevalence filtering
-    prevalence = (X_filtered > 0).sum(axis=0) / X_filtered.shape[0]
-    low_prev = prevalence[prevalence < prevalence_thresh].index.tolist()
-    X_filtered.drop(columns=low_prev, inplace=True)
-    removed_features.extend(low_prev)
-    print(f"Prevalence filtering: removed {len(low_prev)} features")
+    best_avg_rmse = np.inf
 
-    # Mean abundance filtering
-    mean_abundance = X_filtered.mean(axis=0)
-    low_abundance = mean_abundance[mean_abundance < abundance_thresh].index.tolist()
-    X_filtered.drop(columns=low_abundance, inplace=True)
-    removed_features.extend(low_abundance)
-    print(f"Abundance filtering: removed {len(low_abundance)} features")
+    kf = KFold(n_splits=5, shuffle=True, random_state=MASTER_SEED)
 
-    # Low variance filtering
-    variance = X_filtered.var(axis=0)
-    low_variance = variance[variance < variance_thresh].index.tolist()
-    X_filtered.drop(columns=low_variance, inplace=True)
-    removed_features.extend(low_variance)
-    print(f"Variance filtering: removed {len(low_variance)} features")
+    for i in range(n_iterations):
+        trial_params = {
+            k: max(1e-9, current_params[k] + np.random.uniform(-param_ranges[k], param_ranges[k]))
+            for k in current_params
+        }
+        if trial_params["corr_thresh"] >= 1.0: trial_params["corr_thresh"] = 0.99
 
-    # Collinearity filtering (remove one of each pair of highly correlated features)
+        fold_rmses = []
+
+        for train_idx, val_idx in kf.split(X_train):
+            X_itrain, X_ival = X_train.iloc[train_idx], X_train.iloc[val_idx]
+            Y_itrain, Y_ival = Y_train.iloc[train_idx], Y_train.iloc[val_idx]
+
+            # Internal filter
+            X_trial_train, _ = feature_selection_pipeline(
+                X_itrain, Y_itrain, optimize=False, verbose=False, **trial_params
+            )
+
+            # Efficiency check: if no features left, this trial is a fail
+            if X_trial_train.shape[1] == 0:
+                fold_rmses.append(np.inf)
+                break
+
+            # Evaluate with the ACTUAL model you use later
+            rf = RandomForestRegressor(n_estimators=50, random_state=MASTER_SEED, n_jobs=-1)
+            rf.fit(X_trial_train, Y_itrain)
+
+            X_trial_val = X_ival[X_trial_train.columns]
+            rmse = np.sqrt(mean_squared_error(Y_ival, rf.predict(X_trial_val)))
+            fold_rmses.append(rmse)
+
+        avg_rmse = np.mean(fold_rmses)
+        if avg_rmse < best_avg_rmse:
+            best_avg_rmse = avg_rmse
+            current_params = trial_params.copy()
+
+    return current_params
+
+def feature_selection_pipeline(X_train, Y_train, optimize=True, n_iterations=30, verbose=True, **kwargs):
+    """
+    Main Pipeline: Returns (Filtered_DF, Removed_Features_List)
+    """
+    if optimize:
+        if verbose: print(f"--- Running K-Fold Optimization ({n_iterations} iterations) ---")
+        best_params = tune_filtering_parameters(X_train, Y_train, n_iterations)
+    else:
+        best_params = {
+            "prevalence_thresh": kwargs.get("prevalence_thresh", 0.05),
+            "abundance_thresh": kwargs.get("abundance_thresh", 1e-4),
+            "variance_thresh": kwargs.get("variance_thresh", 1e-5),
+            "corr_thresh": kwargs.get("corr_thresh", 0.95)
+        }
+
+    # FILTERING LOGIC
+    X_filtered = X_train.copy()
+    initial_cols = set(X_filtered.columns)
+
+    # 1. Prevalence
+    prev = (X_filtered > 0).sum(axis=0) / len(X_filtered)
+    X_filtered.drop(columns=prev[prev < best_params["prevalence_thresh"]].index, inplace=True)
+
+    # 2. Abundance
+    abun = X_filtered.mean(axis=0)
+    X_filtered.drop(columns=abun[abun < best_params["abundance_thresh"]].index, inplace=True)
+
+    # 3. Variance
+    var = X_filtered.var(axis=0)
+    X_filtered.drop(columns=var[var < best_params["variance_thresh"]].index, inplace=True)
+
+    # 4. Correlation
     corr_matrix = X_filtered.corr().abs()
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-    to_drop = [col for col in upper.columns if any(upper[col] > corr_thresh)]
+    to_drop = [col for col in upper.columns if any(upper[col] > best_params["corr_thresh"])]
     X_filtered.drop(columns=to_drop, inplace=True)
-    removed_features.extend(to_drop)
-    print(f"Collinearity filtering: removed {len(to_drop)} features")
 
-    print(f"Remaining features: {X_filtered.shape[1]}")
+    removed_features = list(initial_cols - set(X_filtered.columns))
+
+    if verbose:
+        print(f"Done. Kept: {X_filtered.shape[1]} | Removed: {len(removed_features)}")
+        print(f"Best Filtering Parameters Found: {best_params}")
+
     return X_filtered, removed_features
 
 
@@ -1715,3 +1756,40 @@ def find_best_evaluation_metric(y_true, y_pred, task='regression'):
                 print(f"  {metric_name}: {value:.4f}")
     
     return metrics
+
+# =========================================================
+# 9. CLR Transformation
+# =========================================================
+
+"""The CLR function based on: https://medium.com/@nextgendatascientist/a-guide-for-data-scientists-log-ratio-transformations-in-machine-learning-a2db44e2a455"""
+
+def clr_transform(X, epsilon=1e-6):
+    """
+    Compute CLR with a tunable zero-replacement value (epsilon).
+    """
+
+    #To capture metadata from the original dataframe
+    if isinstance(X, pd.DataFrame):
+        index = X.index
+        columns = X.columns
+        X_arr = X.values.astype(float)
+    else:
+        X_arr = np.array(X).astype(float)
+
+    # 1. Replace zeros with epsilon (tunable parameter)
+    X_replaced = np.where(X_arr == 0, epsilon, X_arr)
+
+    # 2. Compute Geometric Mean
+    # exp(mean(log)) is safer and standard for this
+    gm = np.exp(np.log(X_replaced).mean(axis=1, keepdims=True))
+
+    # 3. CLR transformation
+    X_clr = np.log(X_replaced / gm)
+
+
+    #Rebulding back a NumPy array to a dataframe
+    if isinstance(X, pd.DataFrame):
+        return pd.DataFrame(X_clr, index=index, columns=columns)
+
+    return X_clr
+
