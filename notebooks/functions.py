@@ -223,7 +223,7 @@ def nn_feature_search(
             w = model.layers[1].get_weights()[0]
             batch_weights.append(w > 1e-2)
 
-            y_pred = model.predict(X_train_tf, batch_size=batch_size, verbose=0)
+            y_pred = model(X_train_tf, training=False).numpy()
             batch_rmse.append(np.sqrt(mean_squared_error(y_train_tf, y_pred)))
             batch_r2.append(r2_score(y_train_tf, y_pred))
 
@@ -1112,7 +1112,7 @@ def cross_validate_feature_cutoffs(X_train, y_train, feature_levels=None, model_
             {'name': 'XGB_100', 'model': xgb.XGBRegressor, 'params': {'n_estimators': 100, 'random_state': MASTER_SEED, 'n_jobs': -1}},
             {'name': 'XGB_lr01', 'model': xgb.XGBRegressor, 'params': {'n_estimators': 200, 'learning_rate': 0.01, 'max_depth': 5, 'random_state': MASTER_SEED, 'n_jobs': -1}},
             {'name': 'GB_100', 'model': GradientBoostingRegressor, 'params': {'n_estimators': 100, 'random_state': MASTER_SEED}},
-            {'name': 'LightGBM', 'model': lgb.LGBMRegressor, 'params': {'n_estimators': 100, 'random_state': MASTER_SEED, 'n_jobs': -1, 'verbose': -1}},
+            {'name': 'LightGBM', 'model': lgb.LGBMRegressor, 'params': {'n_estimators': 100, 'random_state': MASTER_SEED, 'n_jobs': 1, 'verbose': -1}},
         ]
     
     all_results = {}
