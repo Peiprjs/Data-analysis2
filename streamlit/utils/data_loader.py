@@ -33,9 +33,9 @@ def load_raw_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     
     Notes
     -----
-    Data files are expected to be in the data/raw/ directory relative to the
-    module location. The abundance table was manually converted from TSV to CSV
-    for proper pandas loading.
+    Data files are expected to be in the repository-level ``data/raw/`` directory.
+    The abundance table was manually converted from TSV to CSV for proper pandas
+    loading.
     
     Examples
     --------
@@ -45,7 +45,7 @@ def load_raw_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     >>> print(metadata.shape)
     (930, 6)
     """
-    base_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'raw')
+    base_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'raw')
     
     data_path = os.path.join(base_path, 'MAI3004_lucki_mpa411.csv')
     metadata_path = os.path.join(base_path, 'MAI3004_lucki_metadata_safe.csv')

@@ -128,14 +128,6 @@ st.markdown("""
         top: 0;
     }
     
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --text-color: #E0E0E0;
-            --background-color: #1E1E1E;
-            --secondary-background-color: #2D2D2D;
-        }
-    }
-    
     @media (max-width: 768px) {
         .main .block-container {
             padding-left: 1rem;
@@ -262,50 +254,6 @@ with st.sidebar.expander("Settings", expanded=False):
         st.markdown("<style>body { font-size: 1.1rem; }</style>", unsafe_allow_html=True)
     elif font_size == "Extra Large":
         st.markdown("<style>body { font-size: 1.2rem; }</style>", unsafe_allow_html=True)
-    
-    st.markdown("---")
-    
-    st.markdown("**Theme**")
-    theme_choice = st.selectbox(
-        "Color Mode",
-        ["Dark", "Light"],
-        help="Switch between light and dark mode",
-    )
-    
-    # Apply theme-specific styling
-    if theme_choice == "Dark":
-        bg_color = "#0E1117"
-        secondary_bg = "#262730"
-        text_color = "#FAFAFA"
-    else:
-        bg_color = "#FFFFFF"
-        secondary_bg = "#F5F5F5"
-        text_color = "#1E1E1E"
-    
-    st.markdown(f"""
-        <style>
-        :root {{
-            --background-color: {bg_color} !important;
-            --secondary-background-color: {secondary_bg} !important;
-            --text-color: {text_color} !important;
-        }}
-        .stApp {{
-            background-color: {bg_color} !important;
-        }}
-        .main {{
-            background-color: {bg_color} !important;
-        }}
-        [data-testid="stSidebar"] {{
-            background-color: {secondary_bg} !important;
-        }}
-        h1, h2, h3, h4, h5, h6, p, span, div, label {{
-            color: {text_color} !important;
-        }}
-        .stMarkdown {{
-            color: {text_color} !important;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("""

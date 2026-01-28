@@ -19,6 +19,17 @@ def app():
         """
     )
 
+    st.markdown(
+        """
+        **How to cite this work**
+
+        - Title: *Data Analysis Pipeline for Microbial Community Profiling*
+        - Authors: Mar Roca Cugat; Lucien Santiago; Jacob Záboj; Tom Einhaus; Julie Kretzers
+        - Version: 1.0.0 (released 2026-01-19)
+        - DOI: [10.5281/zenodo.18302927](https://doi.org/10.5281/zenodo.18302927)
+        """
+    )
+
     st.markdown("---")
     st.subheader("Cohort and Data Source")
     st.markdown(
