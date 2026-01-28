@@ -19,7 +19,7 @@ XGBoost, neural-networks
 ```
 
 **Unique Identifiers**
-- GitHub Repository: https://github.com/Peiprjs/Data-analysis2
+- GitHub Repository: https://github.com/MAI-David/Data-analysis
 - Project Name: Microbiome Data Analysis Platform
 - Version: 1.0.0 (semantic versioning)
 - DOI: (Ready for assignment upon publication)
@@ -279,7 +279,7 @@ addopts = ["--verbose", "--cov=."]
   title = {Microbiome Data Analysis Platform},
   author = {Data Analysis Team},
   year = {2024},
-  url = {https://github.com/Peiprjs/Data-analysis2},
+  url = {https://github.com/MAI-David/Data-analysis},
   version = {1.0.0}
 }
 ```

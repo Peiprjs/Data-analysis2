@@ -320,7 +320,7 @@ slide_9 = """
         <h1>Thank You!</h1>
         <div style="margin-top: 3rem; font-size: 1.4rem;">
             <p>🧬 Microbiome Data Analysis Platform</p>
-            <p style="margin-top: 1rem;">📚 github.com/Peiprjs/Data-analysis2</p>
+            <p style="margin-top: 1rem;">📚 github.com/MAI-David/Data-analysis</p>
             <p style="margin-top: 1rem;">📧 Contact via GitHub Issues</p>
         </div>
         

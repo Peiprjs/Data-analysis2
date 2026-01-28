@@ -4,16 +4,16 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'notebooks'))
 
-from pages import home, preprocessing, models, interpretability, results
+from pages import introduction, eda, models_overview, conclusions
 
 st.set_page_config(
     page_title='Microbiome Data Analysis - LucKi Cohort',
-    page_icon='🧬',
+    page_icon=None,
     initial_sidebar_state='expanded',
     layout='wide',
     menu_items={
-        'Get Help': 'https://github.com/Peiprjs/Data-analysis2/issues',
-        'Report a bug': 'https://github.com/Peiprjs/Data-analysis2/issues',
+        'Get Help': 'https://github.com/MAI-David/Data-analysis/issues',
+        'Report a bug': 'https://github.com/MAI-David/Data-analysis/issues',
         'About': """
         # Microbiome Data Analysis Platform
         Version 1.0.0
@@ -25,18 +25,15 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    /* Accessibility improvements */
     * {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
     }
     
-    /* High contrast focus indicators for accessibility */
     button:focus, input:focus, select:focus, textarea:focus {
         outline: 3px solid #2E7D32 !important;
         outline-offset: 2px !important;
     }
     
-    /* Improved readability */
     .main .block-container {
         max-width: 1200px;
         padding-top: 2rem;
@@ -45,7 +42,6 @@ st.markdown("""
         padding-right: 2rem;
     }
     
-    /* Better heading hierarchy for screen readers */
     h1 {
         font-size: 2.5rem !important;
         font-weight: 700 !important;
@@ -70,7 +66,6 @@ st.markdown("""
         color: var(--text-color);
     }
     
-    /* Improved contrast for links */
     a {
         color: #1565C0 !important;
         text-decoration: underline !important;
@@ -80,7 +75,6 @@ st.markdown("""
         color: #0D47A1 !important;
     }
     
-    /* Better visibility for buttons */
     .stButton > button {
         background-color: #2E7D32;
         color: white;
@@ -96,7 +90,6 @@ st.markdown("""
         color: white;
     }
     
-    /* Sidebar styling */
     [data-testid="stSidebar"] {
         background-color: var(--secondary-background-color);
     }
@@ -106,24 +99,20 @@ st.markdown("""
         font-weight: 500;
     }
     
-    /* Better table styling */
     .dataframe {
         font-size: 0.9rem;
     }
     
-    /* Metric styling */
     [data-testid="stMetricValue"] {
         font-size: 2rem;
         font-weight: 700;
     }
     
-    /* Info boxes */
     .stAlert {
         border-radius: 4px;
         border-left: 4px solid;
     }
     
-    /* Skip to main content link for accessibility */
     .skip-to-main {
         position: absolute;
         top: -40px;
@@ -139,7 +128,6 @@ st.markdown("""
         top: 0;
     }
     
-    /* Dark mode support */
     @media (prefers-color-scheme: dark) {
         :root {
             --text-color: #E0E0E0;
@@ -148,7 +136,6 @@ st.markdown("""
         }
     }
     
-    /* Responsive design */
     @media (max-width: 768px) {
         .main .block-container {
             padding-left: 1rem;
@@ -164,48 +151,43 @@ st.markdown("""
         }
     }
     
-    /* Loading spinner accessibility */
     .stSpinner > div {
         border-color: #2E7D32 transparent transparent transparent;
     }
     
-    /* Better visibility for selected radio buttons */
     .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child {
         background-color: #2E7D32;
     }
-    </style>
-    """, unsafe_allow_html=True)
-
-st.markdown('<a href="#main-content" class="skip-to-main">Skip to main content</a>', unsafe_allow_html=True)
+    </style>    """, unsafe_allow_html=True)
 
 PAGES = {
-    "🏠 Home": home,
-    "🔬 Data Preprocessing": preprocessing,
-    "🤖 Model Training": models,
-    "🔍 Model Interpretability": interpretability,
-    "📊 Results Comparison": results
+    "Introduction": introduction,
+    "Exploratory Data Analysis": eda,
+    "Models": models_overview,
+    "Conclusions": conclusions
 }
 
 st.sidebar.markdown("""
     <div style="text-align: center; padding: 1rem 0;">
-        <h1 style="font-size: 1.8rem; margin: 0; color: #2E7D32;">🧬</h1>
-        <h2 style="font-size: 1.3rem; margin: 0.5rem 0 0 0;">Microbiome Analysis</h2>
-        <p style="font-size: 0.85rem; color: #666; margin: 0.25rem 0 0 0;">LucKi Cohort Platform</p>
+        <h1 style="font-size: 1.8rem; margin: 0; color: #2E7D32;">Microbiome Analysis</h1>
+        <h2 style="font-size: 1.1rem; margin: 0.5rem 0 0 0;">LucKi Cohort Platform</h2>
+        <p style="font-size: 0.85rem; color: #666; margin: 0.25rem 0 0 0;">Accessible and FAIR-aligned</p>
     </div>
     """, unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### Navigation")
 
-selection = st.sidebar.radio(
+selection = st.sidebar.segmented_control(
     "Select a page",
     list(PAGES.keys()),
-    label_visibility="collapsed"
+    default="Introduction",
+    width="stretch"
 )
 
 st.sidebar.markdown("---")
 
-with st.sidebar.expander("ℹ️ About", expanded=False):
+with st.sidebar.expander("About", expanded=False):
     st.markdown("""
     **Version:** 1.0.0
     
@@ -217,7 +199,7 @@ with st.sidebar.expander("ℹ️ About", expanded=False):
     **Models:** Random Forest, XGBoost, Gradient Boosting, LightGBM, Neural Networks
     """)
 
-with st.sidebar.expander("🔧 Settings", expanded=False):
+with st.sidebar.expander("Settings", expanded=False):
     st.markdown("**Accessibility Options**")
     
     font_size = st.selectbox(
@@ -278,9 +260,9 @@ with st.sidebar.expander("🔧 Settings", expanded=False):
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
     <div style="text-align: center; font-size: 0.8rem; color: #666;">
-        <p>📚 <a href="https://github.com/Peiprjs/Data-analysis2" target="_blank">Documentation</a></p>
-        <p>🐛 <a href="https://github.com/Peiprjs/Data-analysis2/issues" target="_blank">Report Issues</a></p>
-        <p style="margin-top: 1rem;">© 2024 Data Analysis Team</p>
+        <p><a href="https://github.com/MAI-David/Data-analysis" target="_blank">Documentation</a></p>
+        <p><a href="https://github.com/MAI-David/Data-analysis/issues" target="_blank">Report Issues</a></p>
+        <p style="margin-top: 1rem;">© 2026 Team David</p>
     </div>
     """, unsafe_allow_html=True)
 
