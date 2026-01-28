@@ -178,12 +178,42 @@ st.sidebar.markdown("""
 st.sidebar.markdown("---")
 st.sidebar.markdown("### Navigation")
 
-selection = st.sidebar.segmented_control(
+selection = st.sidebar.radio(
     "Select a page",
     list(PAGES.keys()),
-    default="Introduction",
-    width="stretch"
+    index=list(PAGES.keys()).index("Introduction") if "Introduction" in PAGES else 0,
+    key="page_selection"
 )
+
+st.sidebar.markdown("""
+    <style>
+    [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child {
+    display: none !important;
+    }
+    [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] {
+        display: block;
+        margin: 0.25rem 0;
+    }
+    [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div {
+        border-radius: 0.5rem;
+        padding: 0.45rem 0.75rem;
+        border: 1px solid rgba(0,0,0,0.08);
+        background-color: var(--secondary-background-color);
+        color: var(--text-color);
+        cursor: pointer;
+        align-items: center;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    [data-testid="stSidebar"] .stRadio input[type="radio"] {
+        display: none;
+    }
+    [data-testid="stSidebar"] .stRadio input[type="radio"]:checked + div {
+        background-color: #2E7D32;
+        color: white;
+        border-color: #2E7D32;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
 
