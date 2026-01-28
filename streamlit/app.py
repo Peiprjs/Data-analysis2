@@ -187,30 +187,50 @@ selection = st.sidebar.radio(
 
 st.sidebar.markdown("""
     <style>
-    [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child {
-    display: none !important;
+    [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+        box-sizing: border-box;
     }
+
+    [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child {
+        display: none !important;
+    }
+
     [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] {
         display: block;
-        margin: 0.25rem 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
+
     [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div {
+        display: flex;
+        width: 110%;
+        box-sizing: border-box;
+        justify-content: center;
+        align-items: center;
         border-radius: 0.5rem;
-        padding: 0.45rem 0.75rem;
+        padding: 0.45rem 2rem;
         border: 1px solid rgba(0,0,0,0.08);
         background-color: var(--secondary-background-color);
         color: var(--text-color);
         cursor: pointer;
-        align-items: center;
         transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
     }
+
     [data-testid="stSidebar"] .stRadio input[type="radio"] {
         display: none;
     }
+
     [data-testid="stSidebar"] .stRadio input[type="radio"]:checked + div {
         background-color: #2E7D32;
         color: white;
         border-color: #2E7D32;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06), 0 1px 6px rgba(46,125,50,0.25);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -248,8 +268,8 @@ with st.sidebar.expander("Settings", expanded=False):
     st.markdown("**Theme**")
     theme_choice = st.selectbox(
         "Color Mode",
-        ["Light", "Dark"],
-        help="Switch between light and dark mode"
+        ["Dark", "Light"],
+        help="Switch between light and dark mode",
     )
     
     # Apply theme-specific styling
