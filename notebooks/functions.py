@@ -11,8 +11,8 @@ from tqdm import tqdm
 # Machine Learning & Stats
 import xgboost as xgb
 import lightgbm as lgb
-import tensorflow as tf
-from tensorflow.keras import layers, models, constraints, callbacks, initializers, regularizers
+#import tensorflow as tf
+#from tensorflow.keras import layers, models, constraints, callbacks, initializers, regularizers
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, GradientBoostingRegressor, RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
@@ -58,7 +58,7 @@ os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
 
 # Detect Device
-gpus = tf.config.list_physical_devices('GPU')
+'''gpus = tf.config.list_physical_devices('GPU')
 if gpus:
     try:
         # Re-verify visibility and growth
@@ -77,21 +77,20 @@ if gpus:
 else:
     DEVICE = '/CPU:0'
     print("No GPU found. Running on CPU mode.")
-
+'''
 
 def set_global_seeds(seed=MASTER_SEED):
     os.environ['PYTHONHASHSEED'] = str(seed)
     random.seed(seed)
     np.random.seed(seed)
-    tf.random.set_seed(seed)
     print(f"Global seeds set to {seed}")
 
-
+'''
 # =========================================================
 # 2. NEURAL NETWORK SELECTOR (Robust Version)
 # =========================================================
-import tensorflow as tf
-from tensorflow.keras import layers, regularizers, initializers, constraints, models, callbacks
+#import tensorflow as tf
+#from tensorflow.keras import layers, regularizers, initializers, constraints, models, callbacks
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error, r2_score
@@ -311,7 +310,7 @@ def nn_feature_search(
     print(f"   RMSE: {champion['rmse']:.2f}")
 
     return NNResult(X_train[elite_names], X_test[elite_names], elite_names, champion['rmse'], champion['n_features'])
-
+'''
 # =========================================================
 # 3. CLASSICAL ML BENCHMARKS (XGB & RF)
 # =========================================================
