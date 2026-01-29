@@ -19,7 +19,7 @@ XGBoost` `neural-networks` `streamlit` `python` `data-science`
 
 ### Identifiers
 
-- **Repository**: <https://github.com/Peiprjs/Data-analysis2>
+- **Repository**: <https://github.com/MAI-David/Data-analysis>
 - **Project Name**: Microbiome Data Analysis Platform
 - **Version**: 1.0.0
 - **DOI**: 10.5281/zenodo.18302927
@@ -104,7 +104,7 @@ XGBoost` `neural-networks` `streamlit` `python` `data-science`
 #### 1\. Clone the Repository
 
 ```bash
-git clone https://github.com/Peiprjs/Data-analysis2.git
+git clone https://github.com/MAI-David/Data-analysis.git
 cd Data-analysis2
 ```
 #### 2\. Create Virtual Environment (Recommended)
@@ -372,7 +372,7 @@ Full environment captured in:
 1.  **Clone exact repository version**:
 
     ```bash
-    git clone https://github.com/Peiprjs/Data-analysis2.git
+    git clone https://github.com/MAI-David/Data-analysis.git
     git checkout <commit-hash>  # Use specific commit for exact reproduction
     ```
 2.  **Install exact dependencies**:
