@@ -35,7 +35,7 @@ def app():
 
     # Interactive visualization for samples per family
     st.markdown("---")
-    st.markdown("### 👨‍👩‍👧‍👦 Samples per Family (Interactive)")
+    st.markdown("###Samples per Family")
     
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -64,7 +64,7 @@ def app():
 
     # Interactive age group distribution
     st.markdown("---")
-    st.markdown("### 📅 Age Group Distribution (Interactive)")
+    st.markdown("###Age Group Distribution")
     
     col1, col2 = st.columns(2)
     
@@ -93,7 +93,7 @@ def app():
 
     # Interactive taxa analysis
     st.markdown("---")
-    st.markdown("### 🦠 Taxa Analysis (Interactive)")
+    st.markdown("###Taxa Analysis")
     
     # Add filter for viewing raw data
     show_details = st.checkbox("Show detailed statistics", value=False)
@@ -115,7 +115,7 @@ def app():
             )
     
     # Sample distribution visualization
-    st.markdown("### 🔬 Sample Metadata Exploration")
+    st.markdown("###Sample Metadata Exploration")
     
     viz_type = st.selectbox(
         "Select visualization type",
@@ -165,6 +165,6 @@ def app():
         st.plotly_chart(fig, use_container_width=True)
 
     st.info(
-        "💡 EDA summary is cached for performance. Values are computed directly from the raw data for reproducibility. "
+        "The EDA summary is cached for performance. Values are computed directly from the raw data for reproducibility. "
         "Use the interactive controls above to explore different aspects of the dataset."
     )
