@@ -1298,8 +1298,8 @@ def plot_prediction_intervals(y_true, y_pred, prediction_std=None, sample_indice
     y_pred_sorted = y_pred_subset[sort_idx]
     
     # Plot true values and predictions
-    ax.plot(x, y_true_sorted, 'o-', label='True Values', alpha=0.7, markersize=5)
-    ax.plot(x, y_pred_sorted, 's-', label='Predictions', alpha=0.7, markersize=5)
+    ax.plot(x, y_true_sorted, 'o-', color='black', label='True Values', alpha=0.7, markersize=5)
+    ax.plot(x, y_pred_sorted, 's-', color='#00d4ff', label='Predictions', alpha=0.7, markersize=5)
     
     # Add prediction intervals if available
     if prediction_std is not None:
@@ -1307,7 +1307,8 @@ def plot_prediction_intervals(y_true, y_pred, prediction_std=None, sample_indice
         ax.fill_between(x, 
                         y_pred_sorted - 1.96 * pred_std_sorted,
                         y_pred_sorted + 1.96 * pred_std_sorted,
-                        alpha=0.2, label='95% Prediction Interval')
+                        color='#39FF14',
+                        alpha=0.25, label='95% Prediction Interval')
     
     ax.set_xlabel('Sample (sorted by true value)', fontsize=12)
     ax.set_ylabel('Age Group', fontsize=12)
