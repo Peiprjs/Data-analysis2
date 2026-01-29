@@ -411,7 +411,7 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
         param_distributions={"n_estimators": [500, 1000], "learning_rate": [0.01, 0.05], "max_depth": [3, 4, 5],
                              "subsample": [0.7, 0.8], "colsample_bytree": [0.1, 0.2], "reg_alpha": [0.1, 0.5, 1.0],
                              "reg_lambda": [1.0, 5.0]},
-        n_iter=20, cv=5, scoring="neg_root_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
+        n_iter=13, cv=7, scoring="neg_root_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
 
     start_time = time.time()
@@ -432,7 +432,7 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
 
 
 
-def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset", cv=5, n_iter=20):
+def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset", cv=7, n_iter=13):
     print(f"Initializing Random Forest Engine: {label}")
     search = RandomizedSearchCV(
         estimator=RandomForestRegressor(random_state=MASTER_SEED, n_jobs=-1),
