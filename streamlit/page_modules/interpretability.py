@@ -172,8 +172,8 @@ def app():
                 
                 sample_idx = st.slider("Select Sample Index", 0, len(X_samples)-1, 0, key='sample_idx')
                 sample = X_samples.iloc[sample_idx:sample_idx+1]
-                true_value = y_samples.iloc[sample_idx]
-                pred_value = model.predict(sample)[0]
+                true_value = float(y_samples.iloc[sample_idx])
+                pred_value = float(model.predict(sample)[0])
                 
                 # Display sample information
                 st.subheader("Sample Information")
@@ -181,17 +181,17 @@ def app():
                 with col1:
                     st.metric("Sample Index", f"{sample_idx}")
                 with col2:
-                    st.metric("True Age Group", f"{true_value}")
+                    st.metric("True Age (days)", f"{true_value:.1f}")
                 with col3:
-                    st.metric("Predicted Age Group", f"{pred_value:.2f}")
+                    st.metric("Predicted Age (days)", f"{pred_value:.1f}")
                 
                 error = abs(true_value - pred_value)
-                if error < 0.5:
-                    st.success(f"Excellent prediction! Error: {error:.3f}")
-                elif error < 1.0:
-                    st.info(f"Good prediction! Error: {error:.3f}")
+                if error < 3.5:
+                    st.success(f"Excellent prediction! Error: {error:.1f} days")
+                elif error < 7.0:
+                    st.info(f"Good prediction! Error: {error:.1f} days")
                 else:
-                    st.warning(f"Significant error: {error:.3f}")
+                    st.warning(f"Significant error: {error:.1f} days")
                 
                 # Top feature contributions
                 st.subheader("Feature Contributions for This Sample")
@@ -326,27 +326,27 @@ def app():
                     sample = X_test_genus.iloc[sample_idx:sample_idx+1]
                     shap_values_sample = explainer.shap_values(sample)
                     
-                    true_value = y_test.iloc[sample_idx]
-                    pred_value = model.predict(sample)[0]
-                    base_value = explainer.expected_value
+                    true_value = float(y_test.iloc[sample_idx])
+                    pred_value = float(model.predict(sample)[0])
+                    base_value = float(explainer.expected_value)
                     
                     col1, col2, col3, col4 = st.columns(4)
                     with col1:
                         st.metric("Sample Index", f"{sample_idx}")
                     with col2:
-                        st.metric("True Age Group", f"{true_value}")
+                        st.metric("True Age (days)", f"{true_value:.1f}")
                     with col3:
-                        st.metric("Predicted Age Group", f"{pred_value:.2f}")
+                        st.metric("Predicted Age (days)", f"{pred_value:.1f}")
                     with col4:
-                        st.metric("Base Value", f"{base_value:.2f}")
+                        st.metric("Base Value", f"{base_value:.1f}")
                     
                     error = abs(true_value - pred_value)
-                    if error < 0.5:
-                        st.success(f"Excellent prediction! Error: {error:.3f}")
-                    elif error < 1.0:
-                        st.info(f"Good prediction! Error: {error:.3f}")
+                    if error < 3.5:
+                        st.success(f"Excellent prediction! Error: {error:.1f} days")
+                    elif error < 7.0:
+                        st.info(f"Good prediction! Error: {error:.1f} days")
                     else:
-                        st.warning(f"Significant error: {error:.3f}")
+                        st.warning(f"Significant error: {error:.1f} days")
                     
                     # Create waterfall plot
                     st.subheader("SHAP Waterfall Plot")
@@ -418,8 +418,8 @@ def app():
                     
                     st.info("""
                     **How to interpret:**
-                    - Green bars (positive SHAP) push the prediction toward higher age groups
-                    - Red bars (negative SHAP) push the prediction toward lower age groups
+                    - Green bars (positive SHAP) push the prediction toward higher age (more days)
+                    - Red bars (negative SHAP) push the prediction toward lower age (fewer days)
                     - Longer bars have stronger impact on the prediction
                     - The sum of all SHAP values plus the base value equals the final prediction
                     """)
