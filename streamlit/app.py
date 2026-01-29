@@ -4,7 +4,7 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'notebooks'))
 
-from pages import introduction, eda, models_overview, conclusions, fair_compliance
+from pages import introduction, eda, models_overview, conclusions, fair_compliance, models, interpretability
 
 st.set_page_config(
     page_title='Microbiome Data Analysis - LucKi Cohort',
@@ -114,6 +114,17 @@ st.markdown("""
     [data-testid="stSidebar"] * {
         color: #e2e8f0;
     }
+
+    @media (prefers-color-scheme: light) {
+        [data-testid="stSidebar"] {
+            background-color: #e3f2fd;
+            color: #1565C0;
+        }
+        
+        [data-testid="stSidebar"] * {
+            color: #1565C0;
+        }
+    }
     
     [data-testid="stSidebar"] .stRadio > label {
         font-size: 1rem;
@@ -177,7 +188,9 @@ PAGES = {
     "Introduction": introduction,
     "FAIR Compliance": fair_compliance,
     "Exploratory Data Analysis": eda,
-    "Models": models_overview,
+    "Models Overview": models_overview,
+    "Model Training": models,
+    "Model Interpretability": interpretability,
     "Conclusions": conclusions
 }
 
@@ -268,6 +281,34 @@ st.sidebar.html("""
     [data-testid="stSidebar"] .stRadio input[type="radio"]:checked + div::before {
         background: #c9f7d4;
         height: 80%;
+    }
+
+    @media (prefers-color-scheme: light) {
+        [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div {
+            border: 1px solid rgba(21,101,192,0.2);
+            background: linear-gradient(135deg, rgba(227,242,253,0.5), rgba(187,222,251,0.6));
+            color: #1565C0;
+        }
+
+        [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:hover {
+            border-color: rgba(46,125,50,0.4);
+            box-shadow: 0 2px 8px rgba(46,125,50,0.15);
+        }
+
+        [data-testid="stSidebar"] .stRadio input[type="radio"]:checked + div {
+            background: linear-gradient(135deg, #2E7D32, #1B5E20);
+            color: white;
+            border-color: #2E7D32;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), 0 6px 14px rgba(46,125,50,0.35);
+        }
+
+        [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div::before {
+            background: rgba(21,101,192,0.2);
+        }
+
+        [data-testid="stSidebar"] .stRadio input[type="radio"]:checked + div::before {
+            background: #c9f7d4;
+        }
     }
 
     </style>
