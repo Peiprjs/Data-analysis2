@@ -236,7 +236,13 @@ def app():
         col1, col2 = st.columns(2)
         with col1:
             image_path = os.path.join(os.path.dirname(__file__), "..", "notebooks", "battle_results.png")
-            st.image(image_path, caption="Model comparison heatmap (from notebooks)", use_column_width=True)
+            if os.path.exists(image_path):
+                st.image(image_path, caption="Model comparison heatmap (from notebooks)", use_column_width=True)
+            else:
+                st.info(
+                    "Notebook visualization image 'battle_results.png' is not available. "
+                    "Please ensure it exists in the notebooks directory."
+                )
         with col2:
             st.pyplot(_notebook_metric_barplot())
 
