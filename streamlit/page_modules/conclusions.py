@@ -9,10 +9,10 @@ def app():
         """
         **Summary of insights**
         - The LucKi cohort subset comprises 930 samples with ~6,900 features; data are sparse with ~300 taxa per sample.
-        - Age-related signal exists but explains a limited share of variance; PCA shows a gradient rather than distinct clusters.
+        - An age-related signal exists but explains a limited share of variance; PCA shows a gradient rather than distinct clusters.
         - Model performance improves with CLR normalization and genus-level feature filtering.
         - Tree-based ensemble methods (Random Forest, XGBoost, Gradient Boosting, LightGBM) provide competitive baselines.
-        - Feature importance and SHAP/LIME highlight prevalent genera as key contributors.
+        - Feature importance and SHAP highlight prevalent genera as key contributors.
         """
     )
 
@@ -21,20 +21,19 @@ def app():
         """
         **FAIR and accessibility notes**
         - Findable & Accessible: Data paths and preprocessing steps are documented; navigation uses clear labels.
-        - Interoperable: Standard CSV inputs, encoded labels, and reproducible splits.
-        - Reusable: Cached preprocessing, documented transformations, and model summaries enable re-analysis.
+        - Interoperable: Standard CSV inputs, encoded labels, and reproducible splits. Known metagenomic format.
+        - Reusable: Cached preprocessing, documented transformations, and model summaries enable re-analysis. Code is open source, allowing for easy validation.
         - Accessibility: Descriptive text accompanies metrics and tables; no emojis are used.
         """
     )
-
     st.markdown("---")
+
+    st.subheader("Possible Limitations and Improvements")
     st.markdown(
         """
-        **Potential next steps**
-        - Explore domain-adapted neural architectures for microbiome data.
-        - Incorporate uncertainty estimates (e.g., quantile regression forests).
-        - Extend interpretability with cohort-specific subgroup analyses.
+        - **Data scope:** Current models are trained on a single cohort; performance may vary on new populations, based on geography, culture, religion...
+        - **Temporal drift:** Microbiome profiles can change over time; periodic re-training could be useful.
+        - **Confounding factors:** Diet, antibiotics, and environment are not fully captured and may bias predictions.
+        - **Future work:** Performing external validation, longitudinal modeling, and uncertainty estimates for predictions would improve its applicability in clinical practice.
         """
     )
-
-    st.success("This page concludes the summarized insights from the notebooks.")
