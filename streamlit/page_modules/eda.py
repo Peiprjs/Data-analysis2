@@ -23,7 +23,7 @@ def app():
     )
 
     # Interactive section for dataset overview
-    st.markdown("### 📊 Dataset Overview")
+    st.markdown("### Dataset Overview")
     
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -35,7 +35,7 @@ def app():
 
     # Interactive visualization for samples per family
     st.markdown("---")
-    st.markdown("###Samples per Family")
+    st.markdown("### Samples per Family")
     
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -64,7 +64,7 @@ def app():
 
     # Interactive age group distribution
     st.markdown("---")
-    st.markdown("###Age Group Distribution")
+    st.markdown("### Age Group Distribution")
     
     col1, col2 = st.columns(2)
     
@@ -93,7 +93,7 @@ def app():
 
     # Interactive taxa analysis
     st.markdown("---")
-    st.markdown("###Taxa Analysis")
+    st.markdown("### Taxa Analysis")
     
     # Add filter for viewing raw data
     show_details = st.checkbox("Show detailed statistics", value=False)
@@ -115,11 +115,11 @@ def app():
             )
     
     # Sample distribution visualization
-    st.markdown("###Sample Metadata Exploration")
+    st.markdown("### Sample Metadata Exploration")
     
-    viz_type = st.selectbox(
+    viz_type = st.segmented_control(
         "Select visualization type",
-        ["Samples by Sex", "Samples by Age and Sex", "Family Size Distribution"]
+        ["Samples by Sex", "Samples by Age and Sex"]
     )
     
     merged_data = summaries["merged"]
@@ -127,12 +127,11 @@ def app():
     if viz_type == "Samples by Sex":
         sex_counts = merged_data['sex'].value_counts().reset_index()
         sex_counts.columns = ['Sex', 'Count']
-        fig = px.bar(
+        fig = px.pie(
             sex_counts,
-            x='Sex',
-            y='Count',
+            values='Count',
+            names='Sex',
             title='Sample Distribution by Sex',
-            color='Sex',
             color_discrete_sequence=['#3498db', '#e74c3c']
         )
         st.plotly_chart(fig, use_container_width=True)
