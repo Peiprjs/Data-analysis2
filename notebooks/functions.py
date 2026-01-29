@@ -1231,27 +1231,30 @@ def plot_feature_cutoff_comparison(cv_results, title="Model Performance vs Taxon
     plt.show()
 
 
-def plot_model_comparison_heatmap(results_dict, title="Model Performance Heatmap"):
-    """
-    Create a heatmap comparing different models and configurations.
-    
-    Parameters:
-    - results_dict: Dictionary with model names as keys and ModelResult objects as values
-    - title: Plot title
-    """
-    # Prepare data
-    models = list(results_dict.keys())
-    metrics = ['RMSE', 'R²']
-    data = np.array([[results_dict[model].rmse, results_dict[model].r2] for model in models])
-    
-    fig, ax = plt.subplots(figsize=(10, len(models) * 0.5 + 2))
-    
-    # Create heatmap
-    sns.heatmap(data, annot=True, fmt='.3f', cmap='RdYlGn_r', 
-                xticklabels=metrics, yticklabels=models, 
-                cbar_kws={'label': 'Score'}, ax=ax)
-    
-    ax.set_title(title, fontsize=14, pad=20)
+def plot_model_comparison_heatmap(model_results_list, title="Model & Set Comparison"):
+    # 1. Convert list of dicts to DataFrame
+    df = pd.DataFrame(model_results_list)
+
+    # 2. Create a "Comparison ID" for the Y-axis
+    # This combines 'XGBoost' + 'Full Dataset' into 'XGBoost (Full Dataset)'
+    df['Comparison'] = df['model'] + " (" + df['label'] + ")"
+
+    # 3. Prepare data for heatmap (Metrics only)
+    # We set the new 'Comparison' column as the index
+    plot_data = df.set_index('Comparison')[['rmse', 'r2']]
+
+    # 4. Plotting
+    fig, ax = plt.subplots(figsize=(8, len(df) * 0.7 + 2))
+
+    sns.heatmap(plot_data,
+                annot=True,
+                fmt='.4f',
+                cmap='viridis',
+                linewidths=1,
+                ax=ax)
+
+    ax.set_title(title, fontsize=15, pad=20)
+    ax.set_ylabel("")  # Hide the index title for a cleaner look
     plt.tight_layout()
     plt.show()
 
