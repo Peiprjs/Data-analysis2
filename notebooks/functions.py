@@ -411,7 +411,7 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
         param_distributions={"n_estimators": [500, 1000], "learning_rate": [0.01, 0.05], "max_depth": [3, 4, 5],
                              "subsample": [0.7, 0.8], "colsample_bytree": [0.1, 0.2], "reg_alpha": [0.1, 0.5, 1.0],
                              "reg_lambda": [1.0, 5.0]},
-        n_iter=20, cv=5, scoring="neg_root_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
+        n_iter=13, cv=7, scoring="neg_root_mean_squared_error", random_state=MASTER_SEED, n_jobs=-1, verbose=1
     )
 
     start_time = time.time()
@@ -432,7 +432,7 @@ def xgboost_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset"):
 
 
 
-def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset", cv=5, n_iter=20):
+def random_forest_benchmark(X_train_df, X_test_df, y_train, y_test, label="Dataset", cv=7, n_iter=13):
     print(f"Initializing Random Forest Engine: {label}")
     search = RandomizedSearchCV(
         estimator=RandomForestRegressor(random_state=MASTER_SEED, n_jobs=-1),
@@ -1231,27 +1231,42 @@ def plot_feature_cutoff_comparison(cv_results, title="Model Performance vs Taxon
     plt.show()
 
 
-def plot_model_comparison_heatmap(results_dict, title="Model Performance Heatmap"):
+def plot_model_comparison_heatmap(results_list, title="Final Model Performance Comparison"):
     """
-    Create a heatmap comparing different models and configurations.
-    
-    Parameters:
-    - results_dict: Dictionary with model names as keys and ModelResult objects as values
-    - title: Plot title
+    Creates a heatmap from a list of dictionaries.
+    Handles 'model' and 'label' to create unique row identifiers.
     """
-    # Prepare data
-    models = list(results_dict.keys())
-    metrics = ['RMSE', 'R²']
-    data = np.array([[results_dict[model].rmse, results_dict[model].r2] for model in models])
-    
-    fig, ax = plt.subplots(figsize=(10, len(models) * 0.5 + 2))
-    
-    # Create heatmap
-    sns.heatmap(data, annot=True, fmt='.3f', cmap='RdYlGn_r', 
-                xticklabels=metrics, yticklabels=models, 
-                cbar_kws={'label': 'Score'}, ax=ax)
-    
-    ax.set_title(title, fontsize=14, pad=20)
+    # 1. Convert the list of dicts directly to a DataFrame
+    df = pd.DataFrame(results_list)
+
+    # 2. Combine model and label for the Y-axis (e.g., "XGBoost (Species Level)")
+    # This prevents rows from overlapping if you use the same model on different sets
+    df['Model_Setup'] = df['model'] + " - " + df['label']
+
+    # 3. Prepare data for the heatmap
+    # We set our new 'Model_Setup' as the index and select only metrics
+    plot_df = df.set_index('Model_Setup')[['rmse', 'r2']]
+
+    # 4. Create the plot
+    # Height scales with the number of models to keep it readable
+    plt.figure(figsize=(10, len(results_list) * 0.7 + 2))
+
+    # Use 'coolwarm' or 'YlGnBu' for clear differentiation
+    sns.heatmap(plot_df,
+                annot=True,
+                fmt='.4f',
+                cmap='YlGnBu',
+                linewidths=1,
+                linecolor='white')
+
+    plt.title(title, fontsize=16, pad=20)
+    plt.ylabel("Model & Configuration", fontsize=12)
+    plt.xlabel("Evaluation Metrics", fontsize=12)
+
+    # Move X-axis labels to the top for a professional "Table" feel
+    plt.tick_params(axis='both', which='major', labelsize=10,
+                    labelbottom=False, bottom=False, top=False, labeltop=True)
+
     plt.tight_layout()
     plt.show()
 
