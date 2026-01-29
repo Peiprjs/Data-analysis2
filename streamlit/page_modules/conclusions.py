@@ -17,13 +17,12 @@ def app():
         **Significant bacteria affecting age prediction:**
         
         Examples of genera that consistently show high feature importance in the models include:
-        - *Bacteroides*: A dominant genus in the human gut microbiome, known to change with age and diet
-        - *Faecalibacterium*: Associated with gut health and metabolic functions, varies across life stages
-        - *Bifidobacterium*: Particularly abundant in infants, decreases with age
-        - *Prevotella*: Influenced by dietary patterns and shows age-related variations
-        - *Akkermansia*: Associated with metabolic health, shows age-dependent abundance patterns
-        - *Blautia*: Part of the core gut microbiome, exhibits age-related shifts
-        
+        - Staphylococcus: 
+        - Citrobacter:
+        - Bifidobacterium: 
+        - Cornyebacterium:
+        - Lacrimispora:
+            
         These genera represent the most influential features in predicting age groups and reflect 
         known biological patterns of microbiome development and aging.
         """
