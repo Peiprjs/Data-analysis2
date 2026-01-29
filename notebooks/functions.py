@@ -1298,7 +1298,7 @@ def plot_prediction_intervals(y_true, y_pred, prediction_std=None, sample_indice
     y_pred_sorted = y_pred_subset[sort_idx]
     
     # Plot true values and predictions
-    ax.plot(x, y_true_sorted, 'o-', color='white', label='True Values', alpha=0.7, markersize=5)
+    ax.plot(x, y_true_sorted, 'o-', color='black', label='True Values', alpha=0.7, markersize=5)
     ax.plot(x, y_pred_sorted, 's-', color='#00d4ff', label='Predictions', alpha=0.7, markersize=5)
     
     # Add prediction intervals if available
