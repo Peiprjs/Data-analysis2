@@ -64,7 +64,7 @@ def app():
     st.markdown("### Key modeling notes")
     st.markdown(
         """
-        - Train/test split: 80/20 stratified by age group (random_state=42).
+        - Train/test split: 80/20 stratified by age group (random_state=3004).
         - Features: CLR-transformed abundances filtered to genus level to reduce dimensionality.
         - Metrics: RMSE, R², and MAE reported in the notebooks for baseline vs tuned models.
         - Interpretability: SHAP/LIME and feature importance highlight influential genera.

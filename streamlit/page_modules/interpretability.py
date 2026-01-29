@@ -32,7 +32,7 @@ def app():
         X_test_genus = filter_genus_features(X_test_clr)
     
     with tabs[0]:
-        st.header("🔍 Feature Importance Analysis")
+        st.header("Feature Importance Analysis")
         
         st.markdown("""
         Feature importance shows which features contribute most to the model predictions.
@@ -131,10 +131,10 @@ def app():
                 )
                 st.plotly_chart(fig, use_container_width=True)
                 
-                st.info(f"💡 Number of features needed to capture 90% of total importance: **{n_features_90}** out of {len(feature_importance)}")
+                st.info(f"Number of features needed to capture 90% of total importance: **{n_features_90}** out of {len(feature_importance)}")
     
     with tabs[1]:
-        st.header("🔬 Sample Explorer")
+        st.header("Sample Explorer")
         
         st.markdown("""
         Explore individual sample predictions and understand which features contribute to each prediction.
@@ -182,14 +182,14 @@ def app():
                 
                 error = abs(true_value - pred_value)
                 if error < 0.5:
-                    st.success(f"✅ Excellent prediction! Error: {error:.3f}")
+                    st.success(f"Excellent prediction! Error: {error:.3f}")
                 elif error < 1.0:
-                    st.info(f"ℹ️ Good prediction! Error: {error:.3f}")
+                    st.info(f"Good prediction! Error: {error:.3f}")
                 else:
-                    st.warning(f"⚠️ Significant error: {error:.3f}")
+                    st.warning(f"Significant error: {error:.3f}")
                 
                 # Top feature contributions
-                st.subheader("🎯 Feature Contributions for This Sample")
+                st.subheader("Feature Contributions for This Sample")
                 
                 top_n = st.slider("Number of features to show", 5, 20, 10, key='sample_features_slider')
                 
@@ -223,15 +223,12 @@ def app():
                 st.plotly_chart(fig, use_container_width=True)
                 
                 st.info("""
-                🟢 **Green bars** indicate features that push the prediction higher.
-                🔴 **Red bars** indicate features that push the prediction lower.
-                
-                ⚠️ **Note**: This is a simplified approximation combining feature values with global importance. 
-                For accurate local explanations, consider using SHAP or LIME libraries.
-                """)
+                **Green bars** indicate features that push the prediction higher.
+                **Red bars** indicate features that push the prediction lower. 
+               """)
                 
                 # Feature values table
-                with st.expander("📋 View Feature Values"):
+                with st.expander("View Feature Values"):
                     feature_df = pd.DataFrame({
                         'Feature': feature_names,
                         'Value (CLR)': feature_values,
@@ -241,18 +238,13 @@ def app():
                     st.dataframe(feature_df, use_container_width=True)
     
     with tabs[2]:
-        st.header("🎲 SHAP-like Analysis")
+        st.header("SHAP Analysis")
         
         st.markdown("""
         SHAP (SHapley Additive exPlanations) provides a unified measure of feature importance 
         based on game theory. This demonstrates the concept with feature importance approximations.
         """)
-        
-        st.info("""
-        💡 **Note**: Full SHAP computation can be computationally expensive for large datasets.
-        This demonstration uses feature importance and contribution analysis as a proxy.
-        """)
-        
+
         if st.button("Generate SHAP-like Analysis", key='shap_gen'):
             with st.spinner("Training model for SHAP analysis..."):
                 model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1)
@@ -263,7 +255,7 @@ def app():
                     'Importance': model.feature_importances_
                 }).sort_values('Importance', ascending=False)
                 
-                st.subheader("🌍 Global Feature Importance (Proxy for SHAP)")
+                st.subheader("Global Feature Importance (Proxy for SHAP)")
                 
                 top_n_global = st.slider("Number of top features", 10, 30, 20, key='shap_top')
                 
@@ -326,10 +318,7 @@ def app():
                 
                 st.info("""
                 **How to interpret:**
-                - 🟢 Green bars push the prediction toward higher age groups
-                - 🔴 Red bars push the prediction toward lower age groups
+                - Green bars push the prediction toward higher age groups
+                - Red bars push the prediction toward lower age groups
                 - Longer bars have stronger impact on the prediction
-                
-                ⚠️ **Note**: This is a simplified approximation combining feature values with global importance. 
-                For accurate local explanations and true SHAP values, consider using the SHAP library.
                 """)
