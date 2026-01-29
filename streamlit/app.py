@@ -4,7 +4,40 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'notebooks'))
 
-from pages import introduction, eda, models_overview, conclusions, fair_compliance, models, interpretability
+# Lazy import page modules - only import when actually needed
+# This improves initial page load performance
+def get_page_module(page_name):
+    """Lazy load page modules on demand to improve performance"""
+    if page_name == "Introduction":
+        from page_modules import introduction
+        return introduction
+    elif page_name == "FAIR Compliance":
+        from page_modules import fair_compliance
+        return fair_compliance
+    elif page_name == "Exploratory Data Analysis":
+        from page_modules import eda
+        return eda
+    elif page_name == "Models Overview":
+        from page_modules import models_overview
+        return models_overview
+    elif page_name == "Model Training":
+        from page_modules import models
+        return models
+    elif page_name == "Model Interpretability":
+        from page_modules import interpretability
+        return interpretability
+    elif page_name == "Conclusions":
+        from page_modules import conclusions
+        return conclusions
+    else:
+        raise ValueError(f"Unknown page: {page_name}")
+
+# Debug logging
+print("=" * 80)
+print("DEBUG: app.py starting execution")
+print(f"DEBUG: Python version: {sys.version}")
+print(f"DEBUG: Current working directory: {os.getcwd()}")
+print("=" * 80)
 
 st.set_page_config(
     page_title='Microbiome Data Analysis - LucKi Cohort',
@@ -19,7 +52,6 @@ st.set_page_config(
         """
     }
 )
-
 st.markdown("""
     <style>
     * {
@@ -181,34 +213,44 @@ st.markdown("""
     }
     </style>    """, unsafe_allow_html=True)
 
-PAGES = {
-    "Introduction": introduction,
-    "FAIR Compliance": fair_compliance,
-    "Exploratory Data Analysis": eda,
-    "Models Overview": models_overview,
-    "Model Training": models,
-    "Model Interpretability": interpretability,
-    "Conclusions": conclusions
-}
+# Define available pages (names only for performance)
+PAGES = [
+    "Introduction",
+    "FAIR Compliance",
+    "Exploratory Data Analysis",
+    "Models Overview",
+    "Model Training",
+    "Model Interpretability",
+    "Conclusions"
+]
 
-st.sidebar.markdown("""
-    <div style="text-align: center; padding: 1rem 0;">
-        <h1 style="font-size: 1.8rem; margin: 0; color: #2E7D32;">Microbiome Analysis</h1>
-        <h2 style="font-size: 1.1rem; margin: 0.5rem 0 0 0;">LucKi Cohort Platform</h2>
-        <p style="font-size: 0.85rem; color: #666; margin: 0.25rem 0 0 0;">Accessible and FAIR-aligned</p>
+print("=" * 80)
+print("DEBUG: Available pages:")
+for page_name in PAGES:
+    print(f"  - {page_name}")
+print("=" * 80)
+st.sidebar.html("""
+    <div style="text-align: center; padding: -1rem 0;">
+        <h1 style="font-size: 1.5rem; margin: 0; color: #2E7D32;">LucKi Microbiome Analysis for Age Prediction</h1>
     </div>
-    """, unsafe_allow_html=True)
-
+    """)
 st.sidebar.markdown("---")
 st.sidebar.markdown("### Navigation")
-
+print("DEBUG: About to create sidebar radio widget")
+print(f"DEBUG: Available pages: {PAGES}")
+print(f"DEBUG: Default selection index: {PAGES.index('Introduction') if 'Introduction' in PAGES else 0}")
 selection = st.sidebar.radio(
     "Select a page",
-    list(PAGES.keys()),
-    index=list(PAGES.keys()).index("Introduction") if "Introduction" in PAGES else 0,
+    PAGES,
+    index=PAGES.index("Introduction") if "Introduction" in PAGES else 0,
     key="page_selection"
 )
 
+print("=" * 80)
+print(f"DEBUG: User selected page: '{selection}'")
+print(f"DEBUG: Selection type: {type(selection)}")
+print(f"DEBUG: Selected page is in PAGES list: {selection in PAGES}")
+print("=" * 80)
 st.sidebar.html("""
     <style>
     [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] {
@@ -310,7 +352,7 @@ st.sidebar.html("""
 
     </style>
 """)
-
+print("DEBUG: Custom sidebar styling applied")
 st.sidebar.markdown("---")
 
 with st.sidebar.expander("About", expanded=False):
@@ -349,3 +391,26 @@ st.sidebar.markdown("""
     """, unsafe_allow_html=True)
 
 st.markdown('<div id="main-content"></div>', unsafe_allow_html=True)
+
+# Render the selected page with lazy loading
+print("=" * 80)
+print(f"DEBUG: About to render page: '{selection}'")
+try:
+    # Lazy load the page module only when needed
+    page = get_page_module(selection)
+    print(f"DEBUG: Lazy-loaded page module: {page}")
+    print(f"DEBUG: Page module has 'app' attribute: {hasattr(page, 'app')}")
+    
+    if hasattr(page, 'app'):
+        print(f"DEBUG: Calling {selection}.app() function...")
+        page.app()
+        print(f"DEBUG: Successfully rendered page: '{selection}'")
+    else:
+        print(f"ERROR: Page module '{selection}' does not have an 'app()' function!")
+        st.error(f"Page '{selection}' is not properly configured. Missing app() function.")
+except Exception as e:
+    print(f"ERROR: Failed to render page '{selection}': {str(e)}")
+    import traceback
+    traceback.print_exc()
+    st.error(f"Error loading page '{selection}': {str(e)}")
+print("=" * 80)
