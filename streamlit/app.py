@@ -15,10 +15,7 @@ st.set_page_config(
         'Get Help': 'https://github.com/MAI-David/Data-analysis/issues',
         'Report a bug': 'https://github.com/MAI-David/Data-analysis/issues',
         'About': """
-        # Microbiome Data Analysis Platform
-        Version 1.0.0
-        
-        Analyze microbiome data from the LucKi cohort using machine learning.
+        # LucKi Microbiome Analysis for Age Prediction 
         """
     }
 )
