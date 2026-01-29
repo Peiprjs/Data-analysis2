@@ -9,7 +9,7 @@ from pages import introduction, eda, models_overview, conclusions, fair_complian
 st.set_page_config(
     page_title='Microbiome Data Analysis - LucKi Cohort',
     page_icon=None,
-    initial_sidebar_state='expanded',
+    initial_sidebar_state=570,
     layout='wide',
     menu_items={
         'Get Help': 'https://github.com/MAI-David/Data-analysis/issues',
@@ -40,6 +40,22 @@ st.markdown("""
         padding-bottom: 2rem;
         padding-left: 2rem;
         padding-right: 2rem;
+    }
+
+    [data-testid="stAppViewContainer"] .main {
+        background: #111827;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        [data-testid="stAppViewContainer"] .main {
+            background: #161f2d;
+        }
+    }
+
+    @media (prefers-color-scheme: light) {
+        [data-testid="stAppViewContainer"] .main {
+            background: #e9edf3;
+        }
     }
     
     h1 {
@@ -183,7 +199,7 @@ selection = st.sidebar.radio(
     key="page_selection"
 )
 
-st.sidebar.markdown("""
+st.sidebar.html("""
     <style>
     [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] {
         display: flex;
@@ -211,27 +227,51 @@ st.sidebar.markdown("""
         box-sizing: border-box;
         justify-content: center;
         align-items: center;
-        border-radius: 0.5rem;
-        padding: 0.45rem 2rem;
-        border: 1px solid rgba(255,255,255,0.08);
-        background-color: #1e293b;
+        border-radius: 0.75rem;
+        padding: 0.6rem 1.1rem 0.6rem 1.4rem;
+        border: 1px solid rgba(255,255,255,0.15);
+        background: linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.95));
         color: #e2e8f0;
         cursor: pointer;
-        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        position: relative;
+        font-weight: 600;
     }
 
     [data-testid="stSidebar"] .stRadio input[type="radio"] {
         display: none;
     }
 
+    [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:hover {
+        border-color: rgba(46,125,50,0.35);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
     [data-testid="stSidebar"] .stRadio input[type="radio"]:checked + div {
-        background-color: #2E7D32;
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
         color: white;
         border-color: #2E7D32;
-        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06), 0 1px 6px rgba(46,125,50,0.25);
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), 0 6px 14px rgba(46,125,50,0.35);
     }
+
+    [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div::before {
+        content: "";
+        position: absolute;
+        left: 0.75rem;
+        width: 6px;
+        height: 70%;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.12);
+        transition: background-color 0.15s ease, height 0.15s ease;
+    }
+
+    [data-testid="stSidebar"] .stRadio input[type="radio"]:checked + div::before {
+        background: #c9f7d4;
+        height: 80%;
+    }
+
     </style>
-""", unsafe_allow_html=True)
+""")
 
 st.sidebar.markdown("---")
 
@@ -271,6 +311,3 @@ st.sidebar.markdown("""
     """, unsafe_allow_html=True)
 
 st.markdown('<div id="main-content"></div>', unsafe_allow_html=True)
-
-page = PAGES[selection]
-page.app()
