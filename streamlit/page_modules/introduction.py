@@ -3,19 +3,12 @@ import streamlit as st
 
 def app():
     st.title("Introduction")
-    st.markdown("## LucKi Cohort Microbiome Study Overview")
+    st.markdown("## LucKi Microbiome Analysis for Age Prediction - Overview")
 
     st.markdown(
         """
-        This app summarizes findings from the project notebooks **Finalized Models** and **data_analysis**.
-        The dataset is a subset of the LucKi cohort, consisting of **930 stool samples** with
+        The dataset used is a subset of the LucKi cohort, consisting of **930 stool samples** with
         approximately **6,900 microbiome features** derived from MetaPhlAn 4.1.1 taxonomic profiles.
-
-        We summarize key steps of the analysis, keeping the information **FAIR**:
-        - **Findable:** Clear naming, stable links, and identifiers for data sources.
-        - **Accessible:** Public repository links and concise summaries for non-specialists.
-        - **Interoperable:** Standard tabular formats (CSV), taxonomic feature names, and label encodings.
-        - **Reusable:** Documented preprocessing (encoding, CLR transformation), splits, and model choices.
         """
     )
 
@@ -63,21 +56,6 @@ def app():
         """
     )
 
-    st.info(
-        "Use the sidebar to navigate to Exploratory Data Analysis, Models, and Conclusions pages. "
-        "Alt text is included for plots when relevant to improve accessibility."
-    )
-
-    st.markdown("---")
-    st.subheader("Possible Limitations and Improvements")
-    st.markdown(
-        """
-        - **Data scope:** Current models are trained on a single cohort; performance may vary on new populations.
-        - **Temporal drift:** Microbiome profiles can change over time; periodic re-training is recommended.
-        - **Confounding factors:** Diet, antibiotics, and environment are not fully captured and may bias predictions.
-        - **Future work:** Add external validation, longitudinal modeling, and uncertainty estimates for predictions.
-        """
-    )
     st.markdown("---")
     st.subheader("How to cite this work")
     st.code(
