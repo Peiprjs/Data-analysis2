@@ -377,9 +377,23 @@ with st.sidebar.expander("Settings", expanded=False):
     )
     
     if font_size == "Large":
-        st.markdown("<style>body { font-size: 1.1rem; }</style>", unsafe_allow_html=True)
+        st.markdown("""
+            <style>
+            .main .block-container, .main .block-container p, .main .block-container div, 
+            .main .block-container span, .main .block-container li {
+                font-size: 1.1rem !important;
+            }
+            </style>
+        """, unsafe_allow_html=True)
     elif font_size == "Extra Large":
-        st.markdown("<style>body { font-size: 1.2rem; }</style>", unsafe_allow_html=True)
+        st.markdown("""
+            <style>
+            .main .block-container, .main .block-container p, .main .block-container div, 
+            .main .block-container span, .main .block-container li {
+                font-size: 1.2rem !important;
+            }
+            </style>
+        """, unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
