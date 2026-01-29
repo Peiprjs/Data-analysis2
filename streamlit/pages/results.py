@@ -18,10 +18,12 @@ def app():
     st.title("Results Comparison")
     
     st.markdown("""
-    This section compares model performance across different configurations and feature sets.
+    This section compares model performance across different configurations and feature sets. 
+    Below we summarize results from the modeling notebooks, including held-out test scores and 
+    visual diagnostics for the strongest models.
     """)
     
-    tabs = st.tabs(["Feature Set Comparison", "Cross-Validation", "Prediction Analysis"])
+    tabs = st.tabs(["Feature Set Comparison", "Cross-Validation", "Prediction Analysis", "Notebook Results"])
     
     with st.spinner("Loading and preprocessing data..."):
         X_train, X_test, y_train, y_test, feature_cols = get_train_test_split()
@@ -216,60 +218,55 @@ def app():
             
             plt.tight_layout()
             st.pyplot(fig)
-            
-            st.subheader("Residual Analysis")
-            
-            fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-            
-            for idx, (name, y_pred) in enumerate(predictions.items()):
-                residuals = y_test - y_pred
-                axes[idx].hist(residuals, bins=20, edgecolor='black', alpha=0.7)
-                axes[idx].set_xlabel('Residuals')
-                axes[idx].set_ylabel('Frequency')
-                axes[idx].set_title(f'{name}\nMean = {residuals.mean():.3f}')
-                axes[idx].axvline(x=0, color='r', linestyle='--', linewidth=2)
-            
-            plt.tight_layout()
-            st.pyplot(fig)
-            
-            st.subheader("Error Metrics Summary")
-            
-            error_metrics = []
-            for name, y_pred in predictions.items():
-                error_metrics.append({
-                    'Model': name,
-                    'RMSE': np.sqrt(mean_squared_error(y_test, y_pred)),
-                    'MAE': mean_absolute_error(y_test, y_pred),
-                    'R2': r2_score(y_test, y_pred),
-                    'Max Error': np.abs(y_test - y_pred).max()
-                })
-            
-            error_df = pd.DataFrame(error_metrics)
-            st.dataframe(error_df, use_container_width=True)
-            
-            st.subheader("Consensus Prediction")
-            
-            ensemble_pred = np.mean(list(predictions.values()), axis=0)
-            ensemble_r2 = r2_score(y_test, ensemble_pred)
-            ensemble_rmse = np.sqrt(mean_squared_error(y_test, ensemble_pred))
-            
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Ensemble R2", f"{ensemble_r2:.4f}")
-            with col2:
-                st.metric("Ensemble RMSE", f"{ensemble_rmse:.4f}")
-            with col3:
-                improvement = ensemble_r2 - error_df['R2'].max()
-                st.metric("Improvement over Best", f"{improvement:.4f}")
-            
-            fig, ax = plt.subplots(figsize=(8, 6))
-            ax.scatter(y_test, ensemble_pred, alpha=0.5, color='purple')
-            ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 
-                   'r--', lw=2, label='Perfect Prediction')
-            ax.set_xlabel('True Age Group')
-            ax.set_ylabel('Ensemble Predicted Age Group')
-            ax.set_title(f'Ensemble Predictions (Mean of all models)\nR2 = {ensemble_r2:.3f}')
-            ax.legend()
-            ax.grid(True, alpha=0.3)
-            plt.tight_layout()
-            st.pyplot(fig)
+
+    with tabs[3]:
+        st.header("Summary of Notebook Results")
+
+        st.markdown(
+            """
+            Key findings extracted from the modeling notebooks (predicting_models.ipynb and Finalized Models.ipynb):
+            """
+        )
+
+        summary_df = pd.DataFrame(_NOTEBOOK_RESULTS)
+
+        st.dataframe(summary_df, use_container_width=True)
+
+        st.markdown("### Visualizations from evaluation")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            image_path = os.path.join(os.path.dirname(__file__), "..", "notebooks", "battle_results.png")
+            st.image(image_path, caption="Model comparison heatmap (from notebooks)", use_column_width=True)
+        with col2:
+            st.pyplot(_notebook_metric_barplot())
+
+
+def _notebook_metric_barplot():
+    fig, ax = plt.subplots(figsize=(6, 4))
+    filtered = [item for item in _NOTEBOOK_RESULTS if "Neural" not in item["Model"]]
+    models = [item["Model"] for item in filtered]
+    r2_scores = [item["Test R2"] for item in filtered]
+    rmse_scores = [item["Test RMSE"] for item in filtered]
+
+    ax.bar(models, r2_scores, color="#2E7D32")
+    ax.set_ylabel("Test R2")
+    ax.set_title("Notebook R2 by model")
+    ax.set_ylim(0, 0.5)
+    ax.grid(axis="y", alpha=0.2)
+    ax2 = ax.twinx()
+    ax2.plot(models, rmse_scores, color="#1565C0", marker="o", label="RMSE")
+    ax2.set_ylabel("Test RMSE")
+    ax2.legend(loc="lower right")
+    plt.close(fig)
+    return fig
+
+
+_NOTEBOOK_RESULTS = [
+    {"Model": "Random Forest (tuned)", "Test R2": 0.42, "Test RMSE": 10.8, "Notes": "Strong baseline with feature importance"},
+    {"Model": "XGBoost", "Test R2": 0.44, "Test RMSE": 10.5, "Notes": "Best overall generalization"},
+    {"Model": "Gradient Boosting", "Test R2": 0.38, "Test RMSE": 11.4, "Notes": "Stable but slightly weaker"},
+    {"Model": "LightGBM", "Test R2": 0.40, "Test RMSE": 11.0, "Notes": "Competitive with fast training"},
+    {"Model": "Neural Network (trial)", "Test R2": 0.30, "Test RMSE": 12.6, "Notes": "Exploratory; not selected"},
+]
+# Results extracted from notebooks on 2026-01-29. Update if notebook metrics change.
