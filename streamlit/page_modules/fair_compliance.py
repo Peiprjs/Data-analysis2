@@ -2,7 +2,7 @@ import streamlit as st
 
 
 def app():
-    st.title("FAIR Compliance")
+    st.title("FAIRness")
     st.markdown(
         """
         This study follows the **FAIR principles** to ensure data and models remain

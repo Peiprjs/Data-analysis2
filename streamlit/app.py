@@ -11,7 +11,7 @@ def get_page_module(page_name):
     if page_name == "Introduction":
         from page_modules import introduction
         return introduction
-    elif page_name == "FAIR Compliance":
+    elif page_name == "FAIRness":
         from page_modules import fair_compliance
         return fair_compliance
     elif page_name == "Exploratory Data Analysis":
@@ -216,7 +216,7 @@ st.markdown("""
 # Define available pages (names only for performance)
 PAGES = [
     "Introduction",
-    "FAIR Compliance",
+    "FAIRness",
     "Exploratory Data Analysis",
     "Models Overview",
     "Model Training",
