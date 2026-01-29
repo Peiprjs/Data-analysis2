@@ -208,8 +208,8 @@ def app():
                 ax.scatter(y_test, y_pred, alpha=0.5)
                 ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 
                        'r--', lw=2, label='Perfect Prediction')
-                ax.set_xlabel('True Age Group')
-                ax.set_ylabel('Predicted Age Group')
+                ax.set_xlabel('True Age (days)')
+                ax.set_ylabel('Predicted Age (days)')
                 ax.set_title(f'{name}\nR2 = {r2_score(y_test, y_pred):.3f}')
                 ax.legend()
                 ax.grid(True, alpha=0.3)

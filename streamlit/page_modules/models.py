@@ -101,15 +101,15 @@ def app():
                     
                     ax1.scatter(y_train, model.predict(X_train_genus), alpha=0.5, label='Train')
                     ax1.plot([y_train.min(), y_train.max()], [y_train.min(), y_train.max()], 'r--', lw=2)
-                    ax1.set_xlabel('True Age Group')
-                    ax1.set_ylabel('Predicted Age Group')
+                    ax1.set_xlabel('True Age (days)')
+                    ax1.set_ylabel('Predicted Age (days)')
                     ax1.set_title('Training Set Predictions')
                     ax1.legend()
                     
                     ax2.scatter(y_test, model.predict(X_test_genus), alpha=0.5, label='Test', color='orange')
                     ax2.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
-                    ax2.set_xlabel('True Age Group')
-                    ax2.set_ylabel('Predicted Age Group')
+                    ax2.set_xlabel('True Age (days)')
+                    ax2.set_ylabel('Predicted Age (days)')
                     ax2.set_title('Test Set Predictions')
                     ax2.legend()
                     
@@ -172,15 +172,15 @@ def app():
                     
                     ax1.scatter(y_train, model.predict(X_train_genus), alpha=0.5, label='Train')
                     ax1.plot([y_train.min(), y_train.max()], [y_train.min(), y_train.max()], 'r--', lw=2)
-                    ax1.set_xlabel('True Age Group')
-                    ax1.set_ylabel('Predicted Age Group')
+                    ax1.set_xlabel('True Age (days)')
+                    ax1.set_ylabel('Predicted Age (days)')
                     ax1.set_title('Training Set Predictions')
                     ax1.legend()
                     
                     ax2.scatter(y_test, model.predict(X_test_genus), alpha=0.5, label='Test', color='orange')
                     ax2.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
-                    ax2.set_xlabel('True Age Group')
-                    ax2.set_ylabel('Predicted Age Group')
+                    ax2.set_xlabel('True Age (days)')
+                    ax2.set_ylabel('Predicted Age (days)')
                     ax2.set_title('Test Set Predictions')
                     ax2.legend()
                     

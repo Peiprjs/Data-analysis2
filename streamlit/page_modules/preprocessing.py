@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from utils.data_loader import load_raw_data, preprocess_data, get_train_test_split, apply_clr_transformation
+from utils.data_loader import load_raw_data, preprocess_data, get_train_test_split, apply_clr_transformation, age_group_to_days
 
 def app():
     st.title("Data Preprocessing")
@@ -60,11 +60,13 @@ def app():
         
         with col2:
             st.subheader("Age Group Encoding")
+            # Create mapping showing age groups to days
             age_mapping = pd.DataFrame({
-                'Original': le_age.classes_,
-                'Encoded': range(len(le_age.classes_))
+                'Age Group': le_age.classes_,
+                'Days': [age_group_to_days(ag) for ag in le_age.classes_]
             })
             st.dataframe(age_mapping, use_container_width=True)
+            st.info("Age groups are encoded as approximate number of days")
         
         with col3:
             st.subheader("Family ID")
