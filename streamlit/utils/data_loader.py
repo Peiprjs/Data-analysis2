@@ -12,6 +12,9 @@ import numpy as np
 import streamlit as st
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+import xgboost as xgb
+import lightgbm as lgb
 import os
 
 
@@ -158,7 +161,7 @@ def get_train_test_split() -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Se
     
     Notes
     -----
-    Random state is fixed at 42 for reproducibility. Stratification ensures
+    Random state is fixed at 3004 for reproducibility. Stratification ensures
     that all age groups are represented proportionally in both train and test sets.
     
     Examples
@@ -180,7 +183,7 @@ def get_train_test_split() -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Se
     y = encoded_samples['age_group_encoded']
     
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+        X, y, test_size=0.2, random_state=3004, stratify=y
     )
     
     return X_train, X_test, y_train, y_test, feature_cols
@@ -304,3 +307,113 @@ def filter_genus_features(X: pd.DataFrame) -> pd.DataFrame:
     """
     genus_cols = [col for col in X.columns if '|g__' in col and '|s__' not in col]
     return X[genus_cols]
+
+
+def extract_genus_name(taxonomic_string: str) -> str:
+    """
+    Extract the genus name from a MetaPhlAn taxonomic string.
+    
+    Parses a taxonomic classification string and returns only the genus name
+    without prefixes or higher taxonomic levels.
+    
+    Parameters
+    ----------
+    taxonomic_string : str
+        Full taxonomic classification string from MetaPhlAn
+        (e.g., "k__Bacteria|p__Firmicutes|c__Bacilli|o__Bacillales|f__Staphylococcaceae|g__Staphylococcus")
+    
+    Returns
+    -------
+    str
+        The genus name only (e.g., "Staphylococcus")
+        If no genus is found, returns the original string
+    
+    Examples
+    --------
+    >>> extract_genus_name("k__Bacteria|p__Firmicutes|c__Bacilli|g__Staphylococcus")
+    'Staphylococcus'
+    >>> extract_genus_name("k__Bacteria|p__Firmicutes")
+    'k__Bacteria|p__Firmicutes'
+    """
+    if '|g__' in taxonomic_string:
+        # Find the part containing g__
+        parts = taxonomic_string.split('|')
+        for part in parts:
+            if part.startswith('g__'):
+                # Return just the genus name without the g__ prefix
+                return part.replace('g__', '')
+    return taxonomic_string
+
+
+@st.cache_resource(show_spinner="Training model with default parameters...")
+def get_cached_model(model_name: str = "Random Forest"):
+    """
+    Get a cached trained model with default parameters.
+    
+    This function trains and caches models with default hyperparameters to avoid
+    repeated training. Models are only retrained when the model_name changes or
+    when the cache is cleared.
+    
+    Parameters
+    ----------
+    model_name : str, optional
+        Name of the model to train. Options: "Random Forest", "XGBoost",
+        "Gradient Boosting", "LightGBM". Default is "Random Forest".
+    
+    Returns
+    -------
+    tuple
+        A tuple containing:
+        - model: Trained model object
+        - X_train_genus: Training features (genus-level, CLR-transformed)
+        - X_test_genus: Test features (genus-level, CLR-transformed)
+        - y_train: Training labels
+        - y_test: Test labels
+    
+    Notes
+    -----
+    Default hyperparameters:
+    - Random Forest: n_estimators=100, max_depth=20, random_state=3004
+    - XGBoost: n_estimators=100, max_depth=6, learning_rate=0.1, random_state=3004
+    - Gradient Boosting: n_estimators=100, max_depth=5, learning_rate=0.1, random_state=3004
+    - LightGBM: n_estimators=100, max_depth=6, learning_rate=0.1, random_state=3004
+    
+    The cache persists across streamlit reruns until explicitly cleared or when
+    the function signature changes.
+    
+    Examples
+    --------
+    >>> model, X_train, X_test, y_train, y_test = get_cached_model("Random Forest")
+    >>> predictions = model.predict(X_test)
+    """
+    # Load and preprocess data
+    X_train, X_test, y_train, y_test, _ = get_train_test_split()
+    X_train_clr, X_test_clr = apply_clr_transformation(X_train, X_test)
+    X_train_genus = filter_genus_features(X_train_clr)
+    X_test_genus = filter_genus_features(X_test_clr)
+    
+    # Define models with default parameters
+    models = {
+        'Random Forest': RandomForestRegressor(
+            n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1
+        ),
+        'XGBoost': xgb.XGBRegressor(
+            n_estimators=100, max_depth=6, learning_rate=0.1, 
+            random_state=3004, n_jobs=-1
+        ),
+        'Gradient Boosting': GradientBoostingRegressor(
+            n_estimators=100, max_depth=5, learning_rate=0.1, random_state=3004
+        ),
+        'LightGBM': lgb.LGBMRegressor(
+            n_estimators=100, max_depth=6, learning_rate=0.1, 
+            random_state=3004, n_jobs=-1, verbose=-1
+        )
+    }
+    
+    if model_name not in models:
+        raise ValueError(f"Model {model_name} not recognized. Choose from: {list(models.keys())}")
+    
+    model = models[model_name]
+    model.fit(X_train_genus, y_train)
+    
+    return model, X_train_genus, X_test_genus, y_train, y_test

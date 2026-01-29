@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 import seaborn as sns
+import shap
 from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
-from utils.data_loader import get_train_test_split, apply_clr_transformation, filter_genus_features
+from utils.data_loader import get_train_test_split, apply_clr_transformation, filter_genus_features, extract_genus_name
 from utils.functions import train_and_evaluate_model
 import sys
 import os
@@ -50,9 +51,9 @@ def app():
         if st.button("Calculate Feature Importance", key='fi_calc'):
             with st.spinner(f"Training {model_choice} and calculating feature importance..."):
                 if model_choice == "Random Forest":
-                    model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1)
+                    model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1)
                 else:
-                    model = xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1)
+                    model = xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=3004, n_jobs=-1)
                 
                 model.fit(X_train_genus, y_train)
                 
@@ -61,6 +62,9 @@ def app():
                     'Importance': model.feature_importances_
                 }).sort_values('Importance', ascending=False)
                 
+                # Extract genus names for display
+                feature_importance['Genus'] = feature_importance['Feature'].apply(extract_genus_name)
+                
                 # Display top features
                 top_features_df = feature_importance.head(n_features)
                 
@@ -68,10 +72,11 @@ def app():
                 
                 with col2:
                     st.subheader(f"Top {n_features} Features")
-                    st.dataframe(top_features_df, use_container_width=True, height=400)
+                    display_df = top_features_df[['Genus', 'Importance']].copy()
+                    st.dataframe(display_df, use_container_width=True, height=400)
                     
                     st.metric("Total Features", len(feature_importance))
-                    st.metric("Top Feature", feature_importance.iloc[0]['Feature'])
+                    st.metric("Top Feature", feature_importance.iloc[0]['Genus'])
                     st.metric("Top Feature Importance", f"{feature_importance.iloc[0]['Importance']:.4f}")
                 
                 with col1:
@@ -79,7 +84,7 @@ def app():
                         fig, ax = plt.subplots(figsize=(10, 8))
                         ax.barh(range(len(top_features_df)), top_features_df['Importance'].values, color='steelblue')
                         ax.set_yticks(range(len(top_features_df)))
-                        ax.set_yticklabels(top_features_df['Feature'].values, fontsize=8)
+                        ax.set_yticklabels(top_features_df['Genus'].values, fontsize=8)
                         ax.set_xlabel('Importance')
                         ax.set_title(f'Top {n_features} Feature Importances - {model_choice}')
                         ax.invert_yaxis()
@@ -88,7 +93,7 @@ def app():
                     elif viz_type == "Interactive Bar":
                         fig = px.bar(
                             top_features_df,
-                            y='Feature',
+                            y='Genus',
                             x='Importance',
                             orientation='h',
                             title=f'Top {n_features} Feature Importances - {model_choice}',
@@ -101,7 +106,7 @@ def app():
                         importance_matrix = top_features_df['Importance'].values.reshape(-1, 1)
                         fig, ax = plt.subplots(figsize=(3, 10))
                         sns.heatmap(importance_matrix, 
-                                    yticklabels=top_features_df['Feature'].values,
+                                    yticklabels=top_features_df['Genus'].values,
                                     xticklabels=['Importance'],
                                     cmap='YlOrRd', annot=False, cbar=True, ax=ax)
                         ax.set_title(f'Top {n_features} Features Heatmap')
@@ -109,7 +114,7 @@ def app():
                         st.pyplot(fig)
                 
                 # Cumulative importance
-                st.subheader("📈 Cumulative Importance Analysis")
+                st.subheader("Cumulative Importance Analysis")
                 cumsum_importance = np.cumsum(feature_importance['Importance'].values)
                 n_features_90 = np.argmax(cumsum_importance >= 0.9) + 1
                 
@@ -151,9 +156,9 @@ def app():
         if st.button("Train Model for Sample Analysis", key='sample_train'):
             with st.spinner(f"Training {model_choice}..."):
                 if model_choice == "Random Forest":
-                    model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1)
+                    model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1)
                 else:
-                    model = xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1)
+                    model = xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=3004, n_jobs=-1)
                 
                 model.fit(X_train_genus, y_train)
                 
@@ -171,7 +176,7 @@ def app():
                 pred_value = model.predict(sample)[0]
                 
                 # Display sample information
-                st.subheader("📊 Sample Information")
+                st.subheader("Sample Information")
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     st.metric("Sample Index", f"{sample_idx}")
@@ -196,6 +201,7 @@ def app():
                 top_feature_indices = model.feature_importances_.argsort()[-top_n:][::-1]
                 feature_values = sample.iloc[0, top_feature_indices].values
                 feature_names = X_train_genus.columns[top_feature_indices]
+                feature_genus_names = [extract_genus_name(name) for name in feature_names]
                 feature_importances_local = model.feature_importances_[top_feature_indices]
                 
                 # Note: This is a rough approximation. For accurate local explanations, use SHAP or LIME.
@@ -206,7 +212,7 @@ def app():
                 fig = go.Figure()
                 colors = ['red' if c < 0 else 'green' for c in contributions]
                 fig.add_trace(go.Bar(
-                    y=feature_names,
+                    y=feature_genus_names,
                     x=contributions,
                     orientation='h',
                     marker=dict(color=colors),
@@ -216,7 +222,7 @@ def app():
                 fig.update_layout(
                     title=f'Top {top_n} Feature Contributions for Sample {sample_idx}',
                     xaxis_title='Contribution',
-                    yaxis_title='Feature',
+                    yaxis_title='Genus',
                     height=max(400, top_n * 30),
                     yaxis={'categoryorder': 'total ascending'}
                 )
@@ -230,7 +236,7 @@ def app():
                 # Feature values table
                 with st.expander("View Feature Values"):
                     feature_df = pd.DataFrame({
-                        'Feature': feature_names,
+                        'Genus': feature_genus_names,
                         'Value (CLR)': feature_values,
                         'Importance': feature_importances_local,
                         'Contribution': contributions
@@ -242,83 +248,178 @@ def app():
         
         st.markdown("""
         SHAP (SHapley Additive exPlanations) provides a unified measure of feature importance 
-        based on game theory. This demonstrates the concept with feature importance approximations.
+        based on game theory. This tool uses the official SHAP library to provide accurate
+        explanations of model predictions.
         """)
 
-        if st.button("Generate SHAP-like Analysis", key='shap_gen'):
-            with st.spinner("Training model for SHAP analysis..."):
-                model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1)
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            analysis_type = st.radio("Analysis Type", ["Global Feature Importance", "Local Sample Explanation"])
+        
+        with col2:
+            if analysis_type == "Local Sample Explanation":
+                sample_idx = st.slider("Select Sample for Local Explanation", 0, len(X_test_genus)-1, 0, key='shap_sample')
+
+        if st.button("Generate SHAP Analysis", key='shap_gen'):
+            with st.spinner("Training model and computing SHAP values..."):
+                model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1)
                 model.fit(X_train_genus, y_train)
                 
-                feature_importance = pd.DataFrame({
-                    'Feature': X_train_genus.columns,
-                    'Importance': model.feature_importances_
-                }).sort_values('Importance', ascending=False)
+                # Create SHAP explainer
+                explainer = shap.TreeExplainer(model)
                 
-                st.subheader("Global Feature Importance (Proxy for SHAP)")
-                
-                top_n_global = st.slider("Number of top features", 10, 30, 20, key='shap_top')
-                
-                # Interactive plotly chart
-                top_features = feature_importance.head(top_n_global)
-                fig = px.bar(
-                    top_features,
-                    y='Feature',
-                    x='Importance',
-                    orientation='h',
-                    title=f'Top {top_n_global} Features by Global Importance',
-                    color='Importance',
-                    color_continuous_scale='Blues'
-                )
-                fig.update_layout(height=max(400, top_n_global * 25), yaxis={'categoryorder': 'total ascending'})
-                st.plotly_chart(fig, use_container_width=True)
-                
-                # Local explanation
-                st.subheader("🔍 Local Explanation")
-                sample_idx = st.slider("Select Sample for Local Explanation", 0, len(X_test_genus)-1, 0, key='shap_sample')
-                sample = X_test_genus.iloc[sample_idx:sample_idx+1]
-                true_value = y_test.iloc[sample_idx]
-                pred_value = model.predict(sample)[0]
-                
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("True Age Group", f"{true_value}")
-                with col2:
-                    st.metric("Predicted Age Group", f"{pred_value:.2f}")
-                with col3:
-                    st.metric("Prediction Error", f"{abs(true_value - pred_value):.2f}")
-                
-                top_feature_indices = model.feature_importances_.argsort()[-15:][::-1]
-                feature_values = sample.iloc[0, top_feature_indices].values
-                feature_names = X_train_genus.columns[top_feature_indices]
-                feature_importances_local = model.feature_importances_[top_feature_indices]
-                
-                # Note: This is a rough approximation. For accurate local explanations, use SHAP or LIME.
-                # This calculation combines feature values with global importance as a proxy for contribution.
-                contributions = feature_values * feature_importances_local
-                
-                fig = go.Figure()
-                colors = ['rgba(255,0,0,0.7)' if c < 0 else 'rgba(0,128,0,0.7)' for c in contributions]
-                fig.add_trace(go.Bar(
-                    y=feature_names,
-                    x=contributions,
-                    orientation='h',
-                    marker=dict(color=colors),
-                    text=[f"{c:.3f}" for c in contributions],
-                    textposition='auto',
-                ))
-                fig.update_layout(
-                    title=f'Feature Contributions for Sample {sample_idx}',
-                    xaxis_title='Contribution (SHAP-like)',
-                    yaxis_title='Feature',
-                    height=500,
-                    yaxis={'categoryorder': 'total ascending'}
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                
-                st.info("""
-                **How to interpret:**
-                - Green bars push the prediction toward higher age groups
-                - Red bars push the prediction toward lower age groups
-                - Longer bars have stronger impact on the prediction
-                """)
+                if analysis_type == "Global Feature Importance":
+                    st.subheader("Global Feature Importance")
+                    
+                    # Calculate SHAP values for test set
+                    shap_values = explainer.shap_values(X_test_genus)
+                    
+                    # Calculate mean absolute SHAP values for global importance
+                    mean_shap = np.abs(shap_values).mean(axis=0)
+                    
+                    feature_importance = pd.DataFrame({
+                        'Feature': X_train_genus.columns,
+                        'Mean |SHAP|': mean_shap
+                    }).sort_values('Mean |SHAP|', ascending=False)
+                    
+                    # Extract genus names
+                    feature_importance['Genus'] = feature_importance['Feature'].apply(extract_genus_name)
+                    
+                    top_n_global = st.slider("Number of top features", 10, 30, 20, key='shap_top')
+                    top_features = feature_importance.head(top_n_global)
+                    
+                    # Interactive plotly chart
+                    fig = px.bar(
+                        top_features,
+                        y='Genus',
+                        x='Mean |SHAP|',
+                        orientation='h',
+                        title=f'Top {top_n_global} Features by Mean Absolute SHAP Value',
+                        color='Mean |SHAP|',
+                        color_continuous_scale='Blues'
+                    )
+                    fig.update_layout(height=max(400, top_n_global * 25), yaxis={'categoryorder': 'total ascending'})
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Display summary statistics
+                    st.subheader("SHAP Summary Statistics")
+                    display_df = top_features[['Genus', 'Mean |SHAP|']].copy()
+                    st.dataframe(display_df, use_container_width=True)
+                    
+                    # SHAP summary plot
+                    st.subheader("SHAP Summary Plot")
+                    st.info("The summary plot shows the distribution of SHAP values for each feature across all samples.")
+                    
+                    # Create renamed columns for display
+                    X_test_genus_display = X_test_genus.copy()
+                    X_test_genus_display.columns = [extract_genus_name(col) for col in X_test_genus_display.columns]
+                    
+                    shap.summary_plot(shap_values, X_test_genus_display, show=False, max_display=top_n_global)
+                    st.pyplot(plt.gcf(), bbox_inches='tight')
+                    plt.close()
+                    
+                else:  # Local Sample Explanation
+                    st.subheader("Local Sample Explanation")
+                    
+                    # Calculate SHAP values for the selected sample
+                    sample = X_test_genus.iloc[sample_idx:sample_idx+1]
+                    shap_values_sample = explainer.shap_values(sample)
+                    
+                    true_value = y_test.iloc[sample_idx]
+                    pred_value = model.predict(sample)[0]
+                    base_value = explainer.expected_value
+                    
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        st.metric("Sample Index", f"{sample_idx}")
+                    with col2:
+                        st.metric("True Age Group", f"{true_value}")
+                    with col3:
+                        st.metric("Predicted Age Group", f"{pred_value:.2f}")
+                    with col4:
+                        st.metric("Base Value", f"{base_value:.2f}")
+                    
+                    error = abs(true_value - pred_value)
+                    if error < 0.5:
+                        st.success(f"Excellent prediction! Error: {error:.3f}")
+                    elif error < 1.0:
+                        st.info(f"Good prediction! Error: {error:.3f}")
+                    else:
+                        st.warning(f"Significant error: {error:.3f}")
+                    
+                    # Create waterfall plot
+                    st.subheader("SHAP Waterfall Plot")
+                    st.info("The waterfall plot shows how each feature contributes to push the prediction from the base value to the final prediction.")
+                    
+                    # Create a renamed version for display
+                    feature_names_display = [extract_genus_name(col) for col in X_test_genus.columns]
+                    
+                    shap.waterfall_plot(
+                        shap.Explanation(
+                            values=shap_values_sample[0],
+                            base_values=base_value,
+                            data=sample.values[0],
+                            feature_names=feature_names_display
+                        ),
+                        show=False,
+                        max_display=15
+                    )
+                    st.pyplot(plt.gcf(), bbox_inches='tight')
+                    plt.close()
+                    
+                    # Force plot
+                    st.subheader("SHAP Force Plot")
+                    st.info("The force plot visualizes which features push the prediction higher (red) or lower (blue).")
+                    
+                    # Create force plot
+                    force_plot = shap.force_plot(
+                        base_value,
+                        shap_values_sample[0],
+                        sample.values[0],
+                        feature_names=feature_names_display,
+                        matplotlib=True,
+                        show=False
+                    )
+                    st.pyplot(force_plot, bbox_inches='tight')
+                    plt.close()
+                    
+                    # Top contributing features
+                    st.subheader("Top Contributing Features")
+                    
+                    # Get top features by absolute SHAP value
+                    shap_df = pd.DataFrame({
+                        'Feature': X_test_genus.columns,
+                        'Genus': [extract_genus_name(col) for col in X_test_genus.columns],
+                        'SHAP Value': shap_values_sample[0],
+                        'Feature Value': sample.values[0]
+                    })
+                    shap_df['Abs SHAP'] = np.abs(shap_df['SHAP Value'])
+                    shap_df = shap_df.sort_values('Abs SHAP', ascending=False).head(15)
+                    
+                    fig = go.Figure()
+                    colors = ['red' if c < 0 else 'green' for c in shap_df['SHAP Value']]
+                    fig.add_trace(go.Bar(
+                        y=shap_df['Genus'],
+                        x=shap_df['SHAP Value'],
+                        orientation='h',
+                        marker=dict(color=colors),
+                        text=[f"{c:.3f}" for c in shap_df['SHAP Value']],
+                        textposition='auto',
+                    ))
+                    fig.update_layout(
+                        title=f'Top 15 SHAP Values for Sample {sample_idx}',
+                        xaxis_title='SHAP Value',
+                        yaxis_title='Genus',
+                        height=500,
+                        yaxis={'categoryorder': 'total ascending'}
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    st.info("""
+                    **How to interpret:**
+                    - Green bars (positive SHAP) push the prediction toward higher age groups
+                    - Red bars (negative SHAP) push the prediction toward lower age groups
+                    - Longer bars have stronger impact on the prediction
+                    - The sum of all SHAP values plus the base value equals the final prediction
+                    """)
