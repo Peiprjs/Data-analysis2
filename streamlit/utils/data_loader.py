@@ -99,7 +99,7 @@ def preprocess_data() -> Tuple[pd.DataFrame, LabelEncoder, LabelEncoder, LabelEn
     
     sample_cols = [col for col in data.columns if col.startswith('mpa411_')]
     sample_abundances = data[sample_cols].T
-    sample_abundances.columns = data['clade_name']
+    sample_abundances.columns = data.index
     sample_abundances.index = sample_abundances.index.str.replace('mpa411_', '')
     sample_abundances.index.name = 'sample_id'
     
