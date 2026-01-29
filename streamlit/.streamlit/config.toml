@@ -34,4 +34,4 @@ gatherUsageStats = false
 [client]
 showErrorDetails = true
 toolbarMode = "auto"
-showSidebarNavigation = false
+showSidebarNavigation = true

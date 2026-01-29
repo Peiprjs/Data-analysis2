@@ -1,6 +1,5 @@
 import streamlit as st
 
-st.balloons()
 st.title("Introduction")
 st.markdown("## LucKi Cohort Microbiome Study Overview")
 
