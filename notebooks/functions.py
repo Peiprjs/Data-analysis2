@@ -1231,30 +1231,42 @@ def plot_feature_cutoff_comparison(cv_results, title="Model Performance vs Taxon
     plt.show()
 
 
-def plot_model_comparison_heatmap(model_results_list, title="Model & Set Comparison"):
-    # 1. Convert list of dicts to DataFrame
-    df = pd.DataFrame(model_results_list)
+def plot_model_comparison_heatmap(results_list, title="Final Model Performance Comparison"):
+    """
+    Creates a heatmap from a list of dictionaries.
+    Handles 'model' and 'label' to create unique row identifiers.
+    """
+    # 1. Convert the list of dicts directly to a DataFrame
+    df = pd.DataFrame(results_list)
 
-    # 2. Create a "Comparison ID" for the Y-axis
-    # This combines 'XGBoost' + 'Full Dataset' into 'XGBoost (Full Dataset)'
-    df['Comparison'] = df['model'] + " (" + df['label'] + ")"
+    # 2. Combine model and label for the Y-axis (e.g., "XGBoost (Species Level)")
+    # This prevents rows from overlapping if you use the same model on different sets
+    df['Model_Setup'] = df['model'] + " - " + df['label']
 
-    # 3. Prepare data for heatmap (Metrics only)
-    # We set the new 'Comparison' column as the index
-    plot_data = df.set_index('Comparison')[['rmse', 'r2']]
+    # 3. Prepare data for the heatmap
+    # We set our new 'Model_Setup' as the index and select only metrics
+    plot_df = df.set_index('Model_Setup')[['rmse', 'r2']]
 
-    # 4. Plotting
-    fig, ax = plt.subplots(figsize=(8, len(df) * 0.7 + 2))
+    # 4. Create the plot
+    # Height scales with the number of models to keep it readable
+    plt.figure(figsize=(10, len(results_list) * 0.7 + 2))
 
-    sns.heatmap(plot_data,
+    # Use 'coolwarm' or 'YlGnBu' for clear differentiation
+    sns.heatmap(plot_df,
                 annot=True,
                 fmt='.4f',
-                cmap='viridis',
+                cmap='YlGnBu',
                 linewidths=1,
-                ax=ax)
+                linecolor='white')
 
-    ax.set_title(title, fontsize=15, pad=20)
-    ax.set_ylabel("")  # Hide the index title for a cleaner look
+    plt.title(title, fontsize=16, pad=20)
+    plt.ylabel("Model & Configuration", fontsize=12)
+    plt.xlabel("Evaluation Metrics", fontsize=12)
+
+    # Move X-axis labels to the top for a professional "Table" feel
+    plt.tick_params(axis='both', which='major', labelsize=10,
+                    labelbottom=False, bottom=False, top=False, labeltop=True)
+
     plt.tight_layout()
     plt.show()
 
