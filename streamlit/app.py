@@ -4,7 +4,7 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'notebooks'))
 
-from pages import introduction, eda, models_overview, conclusions
+from pages import introduction, eda, models_overview, conclusions, fair_compliance
 
 st.set_page_config(
     page_title='Microbiome Data Analysis - LucKi Cohort',
@@ -91,7 +91,12 @@ st.markdown("""
     }
     
     [data-testid="stSidebar"] {
-        background-color: var(--secondary-background-color);
+        background-color: #0f172a;
+        color: #e2e8f0;
+    }
+
+    [data-testid="stSidebar"] * {
+        color: #e2e8f0;
     }
     
     [data-testid="stSidebar"] .stRadio > label {
@@ -154,6 +159,7 @@ st.markdown("""
 
 PAGES = {
     "Introduction": introduction,
+    "FAIR Compliance": fair_compliance,
     "Exploratory Data Analysis": eda,
     "Models": models_overview,
     "Conclusions": conclusions
@@ -207,9 +213,9 @@ st.sidebar.markdown("""
         align-items: center;
         border-radius: 0.5rem;
         padding: 0.45rem 2rem;
-        border: 1px solid rgba(0,0,0,0.08);
-        background-color: var(--secondary-background-color);
-        color: var(--text-color);
+        border: 1px solid rgba(255,255,255,0.08);
+        background-color: #1e293b;
+        color: #e2e8f0;
         cursor: pointer;
         transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
     }

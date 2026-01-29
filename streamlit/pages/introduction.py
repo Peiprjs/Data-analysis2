@@ -40,6 +40,26 @@ def app():
         """
     )
 
+    st.markdown("### Intended Use")
+    st.markdown(
+        """
+        This software is intended to **predict a child's age from gut microbiome composition** and
+        compare the predicted age with the actual age. A notable deviation between predicted and real
+        age could flag potential gut health issues for further investigation. It is not a diagnostic
+        tool and should be used to generate hypotheses in conjunction with clinical expertise.
+        """
+    )
+
+    st.markdown("### Cohort Description")
+    st.markdown(
+        """
+        - **Population:** LucKi cohort subset with 930 stool samples from children across multiple families.
+        - **Features:** ~6,900 microbial abundance features (MetaPhlAn 4.1.1), reduced to genus level for modeling.
+        - **Metadata:** Age group labels, sex, family identifiers, and sample identifiers.
+        - **Split:** Stratified 80/20 train-test split by age group to preserve distribution.
+        """
+    )
+
     st.markdown("---")
     st.subheader("Analysis Workflow Recap")
     st.markdown(
@@ -57,4 +77,15 @@ def app():
     st.info(
         "Use the sidebar to navigate to Exploratory Data Analysis, Models, and Conclusions pages. "
         "Alt text is included for plots when relevant to improve accessibility."
+    )
+
+    st.markdown("---")
+    st.subheader("Possible Limitations and Improvements")
+    st.markdown(
+        """
+        - **Data scope:** Current models are trained on a single cohort; performance may vary on new populations.
+        - **Temporal drift:** Microbiome profiles can change over time; periodic re-training is recommended.
+        - **Confounding factors:** Diet, antibiotics, and environment are not fully captured and may bias predictions.
+        - **Future work:** Add external validation, longitudinal modeling, and uncertainty estimates for predictions.
+        """
     )

@@ -17,6 +17,22 @@ def app():
     st.markdown("## Summary of trained and alternative models from the notebooks")
 
     X_train_genus, X_test_genus, y_train, y_test = _prepare_data()
+    st.markdown("### Distribution of age groups in training vs test")
+    dist_df = pd.concat(
+        [
+            pd.DataFrame({'Split': 'Train', 'Age Group': y_train}),
+            pd.DataFrame({'Split': 'Test', 'Age Group': y_test}),
+        ],
+        ignore_index=True,
+    )
+    counts = (
+        dist_df.groupby(['Age Group', 'Split'])
+        .size()
+        .reset_index(name='count')
+        .pivot(index='Age Group', columns='Split', values='count')
+        .fillna(0)
+    )
+    st.bar_chart(data=counts)
 
     st.markdown(
         """
@@ -39,6 +55,10 @@ def app():
     with col2:
         st.metric("Test samples", len(X_test_genus))
         st.metric("Age groups", len(pd.unique(y_train)))
+
+    st.markdown("### Feature variance (top 15 genera)")
+    feature_variance = X_train_genus.var().sort_values(ascending=False).head(15)
+    st.bar_chart(feature_variance)
 
     st.markdown("---")
     st.markdown("### Key modeling notes")
