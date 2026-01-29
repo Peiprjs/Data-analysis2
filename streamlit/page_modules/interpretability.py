@@ -328,7 +328,12 @@ def app():
                     
                     true_value = float(y_test.iloc[sample_idx])
                     pred_value = float(model.predict(sample)[0])
-                    base_value = float(explainer.expected_value)
+                    # Handle expected_value which may be an array for multi-output models
+                    expected_val = explainer.expected_value
+                    if isinstance(expected_val, np.ndarray):
+                        base_value = float(expected_val.flatten()[0])
+                    else:
+                        base_value = float(expected_val)
                     
                     col1, col2, col3, col4 = st.columns(4)
                     with col1:
