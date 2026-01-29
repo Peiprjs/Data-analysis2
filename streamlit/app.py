@@ -52,7 +52,7 @@ st.set_page_config(
         """
     }
 )
-st.markdown("""
+st.html("""
     <style>
     * {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
@@ -211,7 +211,7 @@ st.markdown("""
     .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child {
         background-color: #2E7D32;
     }
-    </style>    """, unsafe_allow_html=True)
+    </style>    """)
 
 # Define available pages (names only for performance)
 PAGES = [
@@ -377,34 +377,34 @@ with st.sidebar.expander("Settings", expanded=False):
     )
     
     if font_size == "Large":
-        st.markdown("""
+        st.html("""
             <style>
             .main .block-container, .main .block-container p, .main .block-container div, 
             .main .block-container span, .main .block-container li {
                 font-size: 1.1rem !important;
             }
             </style>
-        """, unsafe_allow_html=True)
+        """)
     elif font_size == "Extra Large":
-        st.markdown("""
+        st.html("""
             <style>
             .main .block-container, .main .block-container p, .main .block-container div, 
             .main .block-container span, .main .block-container li {
                 font-size: 1.2rem !important;
             }
             </style>
-        """, unsafe_allow_html=True)
+        """)
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("""
+st.sidebar.html("""
     <div style="text-align: center; font-size: 0.8rem; color: #666;">
         <p><a href="https://github.com/MAI-David/Data-analysis" target="_blank">Documentation</a></p>
         <p><a href="https://github.com/MAI-David/Data-analysis/issues" target="_blank">Report Issues</a></p>
         <p style="margin-top: 1rem;">© 2026 Team David</p>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
-st.markdown('<div id="main-content"></div>', unsafe_allow_html=True)
+st.html('<div id="main-content"></div>')
 
 # Render the selected page with lazy loading
 print("=" * 80)
