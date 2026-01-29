@@ -45,7 +45,7 @@ def app():
             progress_bar = st.progress(0)
             status_text = st.empty()
             
-            model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1)
+            model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1)
             
             status_text.text("Training on all features... (1/2)")
             progress_bar.progress(0.25)
@@ -58,7 +58,7 @@ def app():
             
             status_text.text("Training on genus features... (2/2)")
             progress_bar.progress(0.75)
-            model_genus = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1)
+            model_genus = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1)
             model_genus = model_genus.fit(X_train_genus, y_train)
             progress_bar.progress(0.9)
             y_pred_genus = model_genus.predict(X_test_genus)
@@ -118,10 +118,10 @@ def app():
         
         if st.button("Run Cross-Validation", key='cv_run'):
             models = {
-                'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1),
-                'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1),
-                'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42),
-                'AdaBoost': AdaBoostRegressor(n_estimators=100, learning_rate=0.1, random_state=42)
+                'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1),
+                'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=3004, n_jobs=-1),
+                'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=3004),
+                'AdaBoost': AdaBoostRegressor(n_estimators=100, learning_rate=0.1, random_state=3004)
             }
             
             progress_bar = st.progress(0)
@@ -178,9 +178,9 @@ def app():
         
         if st.button("Generate Prediction Analysis", key='pred_analysis'):
             models = {
-                'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1),
-                'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1),
-                'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42),
+                'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1),
+                'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=3004, n_jobs=-1),
+                'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=3004),
             }
             
             progress_bar = st.progress(0)

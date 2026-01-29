@@ -81,7 +81,7 @@ def app():
                     n_estimators=n_estimators,
                     max_depth=max_depth,
                     min_samples_split=min_samples_split,
-                    random_state=42,
+                    random_state=3004,
                     n_jobs=-1
                 )
                 
@@ -152,7 +152,7 @@ def app():
                     n_estimators=xgb_n_estimators,
                     max_depth=xgb_max_depth,
                     learning_rate=xgb_learning_rate,
-                    random_state=42,
+                    random_state=3004,
                     n_jobs=-1
                 )
                 
@@ -208,7 +208,7 @@ def app():
                     n_estimators=gb_n_estimators,
                     max_depth=gb_max_depth,
                     learning_rate=gb_learning_rate,
-                    random_state=42
+                    random_state=3004
                 )
                 
                 results = train_and_evaluate_model(model, X_train_genus, X_test_genus, y_train, y_test, "Gradient Boosting")
@@ -244,7 +244,7 @@ def app():
                     n_estimators=lgb_n_estimators,
                     max_depth=lgb_max_depth,
                     learning_rate=lgb_learning_rate,
-                    random_state=42,
+                    random_state=3004,
                     n_jobs=-1,
                     verbose=-1
                 )
@@ -270,10 +270,10 @@ def app():
         
         if st.button("Train All Models", key='train_all'):
             models = {
-                'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=42, n_jobs=-1),
-                'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1),
-                'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42),
-                'LightGBM': lgb.LGBMRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, n_jobs=-1, verbose=-1)
+                'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1),
+                'XGBoost': xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=3004, n_jobs=-1),
+                'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=3004),
+                'LightGBM': lgb.LGBMRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=3004, n_jobs=-1, verbose=-1)
             }
             
             progress_bar = st.progress(0)
