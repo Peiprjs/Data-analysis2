@@ -7,7 +7,6 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, A
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from sklearn.model_selection import cross_val_score
 import xgboost as xgb
-import lightgbm as lgb
 from utils.data_loader import get_train_test_split, apply_clr_transformation, filter_genus_features
 import sys
 import os
