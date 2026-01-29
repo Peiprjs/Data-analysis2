@@ -30,6 +30,7 @@ XGBoost` `neural-networks` `streamlit` `python` `data-science`
 ## Table of Contents
 
 - [Features](#features)
+- [Organization](#organization)
 - [Installation](#installation)
 - [Hardware Requirements](#hardware-requirements)
 - [Quick Start](#quick-start)
@@ -76,6 +77,18 @@ XGBoost` `neural-networks` `streamlit` `python` `data-science`
 - **Visualization**: Comprehensive plotting and comparison tools
 - **User-Friendly**: No coding required for basic analysis
 
+- - -
+
+## Organization
+
+### Notebooks:
+
+| Notebook Name       | Contents                                                                                                                                              |
+|---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `data-pipeline`     | Full process of the entire project, from the pre-processing/exploration of the dataset, to the finalization of the model. Includes exploratory tests. |
+| `data_analysis`     | Pre-processing of data and exploratory data analysis (EDA).                                                                                           |
+| `predicting_models` | The various models trained and tested at various stages.                                                                                              |
+| `model_results`     | Visualizations of each model's performance.                                                                                                           |
 - - -
 ## Installation
 
