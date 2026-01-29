@@ -17,11 +17,7 @@ def app():
         **Significant bacteria affecting age prediction:**
         
         Examples of genera that consistently show high feature importance in the models include:
-        - Staphylococcus: Helps stabilise the gut microbiota.
-        - Citrobacter: May aid in digesting certain compounds.
-        - Bifidobacterium: 
-        - Cornyebacterium: 
-        - Lacrimispora: 
+        - *Staphylococcus*, *Citrobacter*, *Bifidobacterium*, *Corynebacterium*, and *Lacrimispora* 
             
         These genera represent the most influential features in predicting age groups and reflect 
         known biological patterns of microbiome development and aging.
@@ -35,7 +31,6 @@ def app():
         - Findable & Accessible: Data paths and preprocessing steps are documented; navigation uses clear labels.
         - Interoperable: Standard CSV inputs, encoded labels, and reproducible splits. Known metagenomic format.
         - Reusable: Cached preprocessing, documented transformations, and model summaries enable re-analysis. Code is open source, allowing for easy validation.
-        - Accessibility: Descriptive text accompanies metrics and tables; no emojis are used.
         """
     )
     st.markdown("---")
