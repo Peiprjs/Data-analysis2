@@ -59,6 +59,61 @@ def load_raw_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     return data, metadata
 
 
+def age_group_to_days(age_group: str) -> float:
+    """
+    Convert age group string to number of days.
+    
+    Parameters
+    ----------
+    age_group : str
+        Age group string (e.g., "1-2 weeks", "4 months")
+    
+    Returns
+    -------
+    float
+        Approximate number of days for the age group
+    
+    Examples
+    --------
+    >>> age_group_to_days("1-2 weeks")
+    10.5
+    >>> age_group_to_days("4 months")
+    120.0
+    """
+    # Handle empty or invalid inputs
+    if pd.isna(age_group) or age_group == '':
+        return np.nan
+    
+    age_group = str(age_group).strip().lower()
+    
+    # Handle weeks
+    if 'week' in age_group:
+        try:
+            if '-' in age_group:
+                # Handle range like "1-2 weeks"
+                parts = age_group.split('-')
+                start = float(parts[0].strip())
+                end = float(parts[1].split()[0].strip())
+                return (start + end) / 2 * 7  # Average in days
+            else:
+                # Handle single value like "4 weeks"
+                weeks = float(age_group.split()[0].strip())
+                return weeks * 7
+        except (ValueError, IndexError):
+            return np.nan
+    
+    # Handle months
+    elif 'month' in age_group:
+        try:
+            months = float(age_group.split()[0].strip())
+            return months * 30  # Approximate 30 days per month
+        except (ValueError, IndexError):
+            return np.nan
+    
+    # If format is not recognized, return NaN
+    return np.nan
+
+
 @st.cache_data(show_spinner="Preprocessing data...")
 def preprocess_data() -> Tuple[pd.DataFrame, LabelEncoder, LabelEncoder, LabelEncoder, pd.DataFrame]:
     """
@@ -68,8 +123,9 @@ def preprocess_data() -> Tuple[pd.DataFrame, LabelEncoder, LabelEncoder, LabelEn
     1. Transpose abundance table to sample × feature format
     2. Merge with metadata
     3. Remove unnecessary columns (year_of_birth, body_product)
-    4. Label encode categorical variables (sex, family_id, age_group)
-    5. Remove samples with missing age group information
+    4. Label encode categorical variables (sex, family_id)
+    5. Convert age groups to days
+    6. Remove samples with missing age group information
     
     Returns
     -------
@@ -78,7 +134,7 @@ def preprocess_data() -> Tuple[pd.DataFrame, LabelEncoder, LabelEncoder, LabelEn
         - encoded_samples : pd.DataFrame
             Preprocessed data with encoded categorical variables
         - le_age : LabelEncoder
-            Fitted encoder for age groups
+            Fitted encoder for age groups (deprecated, kept for compatibility)
         - le_sex : LabelEncoder
             Fitted encoder for sex
         - le_family : LabelEncoder
@@ -88,15 +144,15 @@ def preprocess_data() -> Tuple[pd.DataFrame, LabelEncoder, LabelEncoder, LabelEn
     
     Notes
     -----
-    Label encoding is used instead of one-hot encoding to preserve ordinal
-    relationships and reduce dimensionality. Missing age group samples are
+    Age groups are converted to days instead of using label encoding to provide
+    more meaningful and interpretable values. Missing age group samples are
     dropped as they cannot be used for supervised learning.
     
     Examples
     --------
     >>> encoded_samples, le_age, le_sex, le_family, merged = preprocess_data()
     >>> print(encoded_samples['age_group_encoded'].unique())
-    [0 1 2 3 4]
+    [10.5 28.0 56.0 120.0 ...]
     """
     data, metadata = load_raw_data()
     
@@ -128,10 +184,20 @@ def preprocess_data() -> Tuple[pd.DataFrame, LabelEncoder, LabelEncoder, LabelEn
     
     encoded_samples = encoded_samples.dropna(subset=['age_group_at_sample'])
     
+    # Convert age groups to days instead of using LabelEncoder
+    encoded_samples['age_group_encoded'] = encoded_samples['age_group_at_sample'].apply(age_group_to_days)
+    
+    # Remove any samples where age conversion failed
+    encoded_samples = encoded_samples.dropna(subset=['age_group_encoded'])
+    
+    # Create a dummy LabelEncoder for backward compatibility
+    # Sort age groups by their days value for chronological order
     le_age = LabelEncoder()
-    encoded_samples['age_group_encoded'] = le_age.fit_transform(
-        encoded_samples['age_group_at_sample']
-    )
+    unique_ages = encoded_samples['age_group_at_sample'].unique()
+    # Sort by days value instead of alphabetically
+    age_days_pairs = [(ag, age_group_to_days(ag)) for ag in unique_ages]
+    sorted_ages = [ag for ag, days in sorted(age_days_pairs, key=lambda x: x[1])]
+    le_age.classes_ = np.array(sorted_ages)
     
     return encoded_samples, le_age, le_sex, le_family, merged_samples
 
