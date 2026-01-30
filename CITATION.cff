@@ -33,6 +33,26 @@ abstract: >-
   analyzing MetaPhlAn 4 microbial abundance data, including
   machine learning models for age prediction from gut
   microbiome composition.
+preferred-citation:
+     authors:
+     - family-names: Roca Cugat
+       affiliation: Maastricht University
+       given-names: Mar
+       email: m.rocacugat@student.maastrichtuniversity.nl
+       orcid: 'https://orcid.org/0000-0001-8796-8396'
+     - given-names: Lucien
+       family-names: Santiago
+       affiliation: Maastricht University
+     - given-names: 'Jacob '
+       family-names: Záboj
+       affiliation: Maastricht University
+     - given-names: 'Tom '
+       family-names: Einhaus
+       affiliation: Maastricht University
+     - given-names: Julie
+       family-names: Kretzers
+       affiliation: Maastricht University
+  title: Data Analysis Pipeline for Microbial Community Profiling
 keywords:
   - microbiome
   - metagenomics
