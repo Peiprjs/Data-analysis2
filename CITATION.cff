@@ -46,6 +46,6 @@ keywords:
   - age prediction
   - taxonomic profiling
   - LucKi
-license: AGPL-3.0
+license: "AGPL-3.0"
 version: 1.0.0
 date-released: '2026-01-30'
