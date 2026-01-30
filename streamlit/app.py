@@ -224,10 +224,54 @@ PAGES = [
     "Conclusions"
 ]
 
+# URL parameter to page name mapping (for direct links)
+# Maps URL-friendly identifiers to actual page names
+PAGE_URL_MAPPING = {
+    "introduction": "Introduction",
+    "fairness": "FAIRness",
+    "eda": "Exploratory Data Analysis",
+    "exploratory-data-analysis": "Exploratory Data Analysis",
+    "models-overview": "Models Overview",
+    "model-training": "Model Training",
+    "models": "Model Training",
+    "interpretability": "Model Interpretability",
+    "model-interpretability": "Model Interpretability",
+    "conclusions": "Conclusions"
+}
+
 print("=" * 80)
 print("DEBUG: Available pages:")
 for page_name in PAGES:
     print(f"  - {page_name}")
+print("=" * 80)
+
+# Check for URL query parameter to determine initial page
+# Supports ?page=<page_identifier> format for direct links
+query_params = st.query_params
+requested_page = None
+
+if "page" in query_params:
+    # Get the page parameter value
+    page_param = str(query_params["page"]).lower()
+    print(f"DEBUG: URL parameter 'page' detected: '{page_param}'")
+    
+    # Try to map URL parameter to actual page name
+    if page_param in PAGE_URL_MAPPING:
+        requested_page = PAGE_URL_MAPPING[page_param]
+        print(f"DEBUG: Mapped to page: '{requested_page}'")
+    else:
+        print(f"DEBUG: Unknown page parameter: '{page_param}'. Using default.")
+else:
+    print("DEBUG: No URL parameter detected. Using default page.")
+
+# Determine the initial page index for the radio selector
+if requested_page and requested_page in PAGES:
+    initial_index = PAGES.index(requested_page)
+    print(f"DEBUG: Setting initial page index to {initial_index} for '{requested_page}'")
+else:
+    initial_index = PAGES.index("Introduction") if "Introduction" in PAGES else 0
+    print(f"DEBUG: Using default page index: {initial_index}")
+
 print("=" * 80)
 st.sidebar.html("""
     <div style="text-align: center; padding: -1rem 0;">
@@ -238,11 +282,11 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("### Navigation")
 print("DEBUG: About to create sidebar radio widget")
 print(f"DEBUG: Available pages: {PAGES}")
-print(f"DEBUG: Default selection index: {PAGES.index('Introduction') if 'Introduction' in PAGES else 0}")
+print(f"DEBUG: Initial page index: {initial_index}")
 selection = st.sidebar.radio(
     "Select a page",
     PAGES,
-    index=PAGES.index("Introduction") if "Introduction" in PAGES else 0,
+    index=initial_index,
     key="page_selection"
 )
 

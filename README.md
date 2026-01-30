@@ -187,6 +187,13 @@ streamlit run app.py
 ```
 Then open your browser to http://localhost:8501
 
+**Direct Navigation**: You can navigate directly to specific sections using URL parameters:
+```
+http://localhost:8501/?page=interpretability
+http://localhost:8501/?page=eda
+```
+See `streamlit/URL_NAVIGATION.md` for all available page identifiers.
+
 ### Using Jupyter Notebook
 
 ```bash
