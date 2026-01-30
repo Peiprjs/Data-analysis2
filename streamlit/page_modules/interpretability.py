@@ -15,6 +15,10 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'notebooks'))
 
+# Prediction quality thresholds (in days)
+EXCELLENT_ERROR_THRESHOLD = 7.0
+GOOD_ERROR_THRESHOLD = 21.0
+
 def app():
     st.title("Model Interpretability")
     
@@ -186,12 +190,12 @@ def app():
                     st.metric("Predicted Age (days)", f"{pred_value:.1f}")
                 
                 error = abs(true_value - pred_value)
-                if error < 3.5:
-                    st.success(f"Excellent prediction! Error: {error:.1f} days")
-                elif error < 7.0:
-                    st.info(f"Good prediction! Error: {error:.1f} days")
+                if error < EXCELLENT_ERROR_THRESHOLD:
+                    st.success(f"Error: {error:.1f} days")
+                elif error < GOOD_ERROR_THRESHOLD:
+                    st.info(f"Error: {error:.1f} days")
                 else:
-                    st.warning(f"Significant error: {error:.1f} days")
+                    st.warning(f"Error: {error:.1f} days")
                 
                 # Top feature contributions
                 st.subheader("Feature Contributions for This Sample")
@@ -252,6 +256,12 @@ def app():
         explanations of model predictions.
         """)
 
+        # Initialize session state for sample selection
+        if 'selected_sample_idx' not in st.session_state:
+            st.session_state.selected_sample_idx = None
+        if 'trigger_shap_analysis' not in st.session_state:
+            st.session_state.trigger_shap_analysis = False
+
         col1, col2 = st.columns([1, 1])
         
         with col1:
@@ -260,8 +270,59 @@ def app():
         with col2:
             if analysis_type == "Local Sample Explanation":
                 sample_idx = st.slider("Select Sample for Local Explanation", 0, len(X_test_genus)-1, 0, key='shap_sample')
+                
+                st.markdown("**Quick Sample Selection:**")
+                col_btn1, col_btn2, col_btn3 = st.columns(3)
+                with col_btn1:
+                    show_excellent = st.button("Excellent", key='btn_excellent', help=f"Show a random sample with excellent prediction (error < {EXCELLENT_ERROR_THRESHOLD} days)")
+                with col_btn2:
+                    show_good = st.button("Good", key='btn_good', help=f"Show a random sample with good prediction ({EXCELLENT_ERROR_THRESHOLD} ≤ error < {GOOD_ERROR_THRESHOLD} days)")
+                with col_btn3:
+                    show_bad = st.button("Bad", key='btn_bad', help=f"Show a random sample with bad prediction (error ≥ {GOOD_ERROR_THRESHOLD} days)")
 
-        if st.button("Generate SHAP Analysis", key='shap_gen'):
+        # Handle button clicks for quick sample selection
+        if analysis_type == "Local Sample Explanation":
+            if show_excellent or show_good or show_bad:
+                with st.spinner("Finding appropriate sample..."):
+                    # Train model to calculate predictions
+                    temp_model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1)
+                    temp_model.fit(X_train_genus, y_train)
+                    predictions = temp_model.predict(X_test_genus)
+                    errors = np.abs(y_test.values - predictions)
+                    
+                    # Filter samples based on button clicked
+                    if show_excellent:
+                        candidate_indices = np.where(errors < EXCELLENT_ERROR_THRESHOLD)[0]
+                        quality = "excellent"
+                    elif show_good:
+                        candidate_indices = np.where((errors >= EXCELLENT_ERROR_THRESHOLD) & (errors < GOOD_ERROR_THRESHOLD))[0]
+                        quality = "good"
+                    else:  # show_bad
+                        candidate_indices = np.where(errors >= GOOD_ERROR_THRESHOLD)[0]
+                        quality = "bad"
+                    
+                    if len(candidate_indices) > 0:
+                        # Select a random sample from candidates
+                        selected_idx = int(np.random.choice(candidate_indices))
+                        st.session_state.selected_sample_idx = selected_idx
+                        st.session_state.trigger_shap_analysis = True
+                        if quality == "excellent":
+                            st.success(f"Found {quality} prediction sample at index {selected_idx}. Generating SHAP analysis...")
+                        elif quality == "good":
+                            st.warning(f"Found {quality} prediction sample at index {selected_idx}. Generating SHAP analysis...")
+                        else:
+                            st.error(f"Found {quality} prediction sample at index {selected_idx}. Generating SHAP analysis...")
+                    else:
+                        st.warning(f"No samples found with {quality} predictions")
+        
+        # Check if we should trigger SHAP analysis
+        should_generate = st.button("Generate SHAP Analysis", key='shap_gen') or st.session_state.trigger_shap_analysis
+        
+        if should_generate:
+            # Reset trigger flag
+            if st.session_state.trigger_shap_analysis:
+                st.session_state.trigger_shap_analysis = False
+                
             with st.spinner("Training model and computing SHAP values..."):
                 model = RandomForestRegressor(n_estimators=100, max_depth=20, random_state=3004, n_jobs=-1)
                 model.fit(X_train_genus, y_train)
@@ -322,11 +383,18 @@ def app():
                 else:  # Local Sample Explanation
                     st.subheader("Local Sample Explanation")
                     
+                    # Use selected sample index if available from button click
+                    effective_sample_idx = sample_idx
+                    if st.session_state.selected_sample_idx is not None:
+                        effective_sample_idx = st.session_state.selected_sample_idx
+                        # Reset the session state after using it
+                        st.session_state.selected_sample_idx = None
+                    
                     # Calculate SHAP values for the selected sample
-                    sample = X_test_genus.iloc[sample_idx:sample_idx+1]
+                    sample = X_test_genus.iloc[effective_sample_idx:effective_sample_idx+1]
                     shap_values_sample = explainer.shap_values(sample)
                     
-                    true_value = float(y_test.iloc[sample_idx])
+                    true_value = float(y_test.iloc[effective_sample_idx])
                     pred_value = float(model.predict(sample)[0])
                     # Handle expected_value which may be an array for multi-output models
                     expected_val = explainer.expected_value
@@ -337,7 +405,7 @@ def app():
                     
                     col1, col2, col3, col4 = st.columns(4)
                     with col1:
-                        st.metric("Sample Index", f"{sample_idx}")
+                        st.metric("Sample Index", f"{effective_sample_idx}")
                     with col2:
                         st.metric("True Age (days)", f"{true_value:.1f}")
                     with col3:
@@ -346,9 +414,9 @@ def app():
                         st.metric("Base Value", f"{base_value:.1f}")
                     
                     error = abs(true_value - pred_value)
-                    if error < 3.5:
+                    if error < EXCELLENT_ERROR_THRESHOLD:
                         st.success(f"Excellent prediction! Error: {error:.1f} days")
-                    elif error < 7.0:
+                    elif error < GOOD_ERROR_THRESHOLD:
                         st.info(f"Good prediction! Error: {error:.1f} days")
                     else:
                         st.warning(f"Significant error: {error:.1f} days")
@@ -413,7 +481,7 @@ def app():
                         textposition='auto',
                     ))
                     fig.update_layout(
-                        title=f'Top 15 SHAP Values for Sample {sample_idx}',
+                        title=f'Top 15 SHAP Values for Sample {effective_sample_idx}',
                         xaxis_title='SHAP Value',
                         yaxis_title='Genus',
                         height=500,
