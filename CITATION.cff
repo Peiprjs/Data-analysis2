@@ -25,7 +25,7 @@ authors:
     affiliation: Maastricht University
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.18302928
+    value: 10.5281/zenodo.18302927
     description: DOI family
   - type: swh
     value: 'swh:1:dir:64625db57c69e042f01cff9b227ab9c65ccac511'
