@@ -19,10 +19,10 @@ Comprehensive assessment of the FAIR status of datasets, including actions to en
 
 - **Findable:** Data files reside in `data/raw/` with descriptive filenames. Future improvement: publish metadata with DOIs and searchable registry entries.
 - **Accessible:** Raw CSVs are stored locally; access requires repository cloning. Suggested action: host anonymized subsets with clear licenses; document access steps in `README.md`.
-- **Interoperable:** Data uses tabular CSV with consistent pseudonymized sample IDs (`mpa411_` prefix assigned during ingestion). Taxonomic strings follow MetaPhlAn 4 conventions. Recommendation: provide JSON/Parquet versions and explicit data dictionaries.
+- **Interoperable:** Data uses tabular CSV with consistent pseudonymized sample IDs (`mpa411_` prefix supplied by the data provider and preserved during ingestion). Taxonomic strings follow MetaPhlAn 4 conventions. Recommendation: provide JSON/Parquet versions and explicit data dictionaries.
 - **Reusable:** License is AGPL-3.0; metadata columns and preprocessing steps are described in `README.md`. Further steps: include provenance for each derived dataset and specify units/pseudocounts for CLR.
 - **Actions taken:** Documented preprocessing (merging metadata, dropping unused columns, label encoding, CLR transform) and model evaluation pipeline. Captured algorithm rationale above.
-- **Challenges:** Raw cohort data may include privacy-sensitive fields (e.g., year of birth); these are dropped during preprocessing. Sharing full datasets externally may be restricted—consider providing synthetic or aggregated data for open access.
+- **Challenges:** Raw cohort data includes privacy-sensitive fields (e.g., year of birth) that are removed during preprocessing. Sharing full datasets externally may be restricted—consider providing synthetic or aggregated data for open access.
 
 ---
 
